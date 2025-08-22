@@ -28,6 +28,9 @@ JWT_ALG=HS256          # алгоритм (обычно HS256)
 # === CORS ===
 CORS_ORIGINS="*"       # список разрешённых origin через запятую
 
+# === Telegram ===
+BOT_TOKEN="0000000000:AA..." # токен Telegram-бота для проверки initData
+
 # === Rate limit ===
 RATE_LIMIT_BUCKET=ip   # тип лимита: ip или user
 RATE_LIMIT=60          # запросов в минуту
@@ -41,9 +44,14 @@ REDIS_DSN="tcp://127.0.0.1:6379"
 В `app/Config/config.php`:
 
 ```php
+'bot_token' => getenv('BOT_TOKEN'),
+
 'db' => [
     'dsn'  => getenv('DB_DSN'),
     'user' => getenv('DB_USER'),
     'pass' => getenv('DB_PASS'),
 ],
 ```
+
+`initData` от Telegram WebApp может передаваться в заголовке `Authorization: tma <данные>`,
+в заголовке `X-Telegram-Init-Data` или параметре `initData` (query/body).

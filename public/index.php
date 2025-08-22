@@ -80,7 +80,7 @@ $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $
         $auth->post('/users', [\App\Controllers\Api\UsersController::class, 'create']);
     })->add(new \App\Middleware\RateLimitMiddleware($config['rate_limit']))
       ->add(new \App\Middleware\JwtMiddleware($config['jwt']));
-})->add(new \App\Middleware\TelegramInitDataMiddleware(getenv('BOT_TOKEN') ?: ''));
+})->add(new \App\Middleware\TelegramInitDataMiddleware($config['bot_token'] ?: ''));
 
 // === Запуск ===
 $app->run();
