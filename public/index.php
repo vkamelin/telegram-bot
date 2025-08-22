@@ -51,30 +51,13 @@ $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $
     $g->post('/auth/login', [\App\Controllers\Api\AuthController::class, 'login']);
 
     $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($pdo) {
-        $auth->get('/me', function (Req $req, Res $res) use ($pdo): Res {
-            $jwt = (array)$req->getAttribute('jwt');
-            $uid = (int)($jwt['uid'] ?? 0);
-            if ($uid <= 0) {
-                return \App\Helpers\Response::problem($res, 401, 'Unauthorized');
-            }
-            $stmt = $pdo->prepare('SELECT id, email, created_at FROM users WHERE id = ? LIMIT 1');
-            $stmt->execute([$uid]);
-            $u = $stmt->fetch();
-            if (!$u) {
-                return \App\Helpers\Response::problem($res, 404, 'User not found');
-            }
-            return \App\Helpers\Response::json($res, 200, ['user' => $u]);
-        });
+          $auth->get('/me', function (Req $req, Res $res) use ($pdo): Res {
+              return (new \App\Controllers\Api\MeController($pdo))->show($req, $res);
+          });
 
-        $auth->get('/items', fn(Req $req, Res $res): Res => \App\Helpers\Response::json($res, 200, ['items' => []]));
+          $auth->get('/items', [\App\Controllers\Api\ItemsController::class, 'list']);
 
-        $auth->post('/order', function (Req $req, Res $res): Res {
-            $data = (array)$req->getParsedBody();
-            if (empty($data['item_id'])) {
-                return \App\Helpers\Response::problem($res, 400, 'Validation error', ['errors' => ['item_id' => 'required']]);
-            }
-            return \App\Helpers\Response::json($res, 201, ['status' => 'created']);
-        });
+          $auth->post('/orders', [\App\Controllers\Api\OrdersController::class, 'create']);
 
         $auth->get('/users', [\App\Controllers\Api\UsersController::class, 'list']);
         $auth->post('/users', [\App\Controllers\Api\UsersController::class, 'create']);
