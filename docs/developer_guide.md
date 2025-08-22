@@ -2,16 +2,22 @@
 
 ## Подготовка окружения
 - Установить PHP 8.3
-- Composer install
+- Создать файл `.env` на основе `.env.example`
+- Запустить `composer install`
+- Выполнить `php bin/console migrate:run`
 - Docker up
 
 ## Запуск
-- `make serve`
-- `make test`
+- `composer serve`
+- Запуск воркеров из каталога `workers/` (`php workers/<worker>.php`)
+- `vendor/bin/phpunit`
 
 ## Структура каталогов
-(ссылка на project_structure.md)
+Смотрите [project_structure.md](project_structure.md) и [README.md](../README.md) для дополнительных деталей.
 
 ## Полезные команды
-- php artisan migrate
-- composer dump-autoload
+- `vendor/bin/phinx migrate` — выполнить миграции
+- `vendor/bin/phinx rollback` — откатить миграции
+- `rm -f var/log/*.log` — очистка логов
+- `php workers/<worker>.php` — запуск конкретного воркера
+- `composer dump-autoload`
