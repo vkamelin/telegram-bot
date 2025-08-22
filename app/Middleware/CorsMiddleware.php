@@ -15,12 +15,19 @@ class CorsMiddleware
      * @var string[]
      */
     private array $allowedOrigins;
+    private string $allowedMethods;
+    private string $allowedHeaders;
     private ResponseFactory $responseFactory;
 
-    public function __construct(?string $origins = null, ?ResponseFactory $responseFactory = null)
-    {
-        $origins = $origins ?? ($_ENV['CORS_ORIGIN'] ?? '');
-        $this->allowedOrigins = array_filter(array_map('trim', explode(',', $origins)));
+    public function __construct(
+        array $origins = [],
+        ?string $methods = null,
+        ?string $headers = null,
+        ?ResponseFactory $responseFactory = null,
+    ) {
+        $this->allowedOrigins = array_filter(array_map('trim', $origins));
+        $this->allowedMethods = $methods ?? 'GET,POST,PUT,PATCH,DELETE,OPTIONS';
+        $this->allowedHeaders = $headers ?? 'Content-Type, Authorization';
         $this->responseFactory = $responseFactory ?? new ResponseFactory();
     }
 
@@ -33,13 +40,13 @@ class CorsMiddleware
         }
 
         $origin = $request->getHeaderLine('Origin');
-        if ($origin !== '' && in_array($origin, $this->allowedOrigins, true)) {
+        if ($origin !== '' && (empty($this->allowedOrigins) || in_array($origin, $this->allowedOrigins, true))) {
             $response = $response->withHeader('Access-Control-Allow-Origin', $origin)
                 ->withHeader('Access-Control-Allow-Credentials', 'true');
         }
 
         return $response
-            ->withHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            ->withHeader('Access-Control-Allow-Methods', $this->allowedMethods)
+            ->withHeader('Access-Control-Allow-Headers', $this->allowedHeaders);
     }
 }
