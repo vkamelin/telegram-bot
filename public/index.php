@@ -5,6 +5,7 @@ use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use Dotenv\Dotenv;
+use App\Middleware\CorsMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -23,19 +24,11 @@ $app->addBodyParsingMiddleware();
 $app->add(new \App\Middleware\ErrorMiddleware($config['debug']));
 
 // === CORS для API ===
-$app->options('/{routes:.+}', fn(Req $r, Res $w)=>$w);
-$app->add(function (Req $req, $handler) use ($config) {
-    $res = $handler->handle($req);
-    $origin = $req->getHeaderLine('Origin');
-    if ($origin && (empty($config['cors']['origins']) || in_array($origin, $config['cors']['origins'], true))) {
-        return $res
-            ->withHeader('Access-Control-Allow-Origin', $origin)
-            ->withHeader('Access-Control-Allow-Credentials', 'true')
-            ->withHeader('Access-Control-Allow-Headers', $config['cors']['headers'])
-            ->withHeader('Access-Control-Allow-Methods', $config['cors']['methods']);
-    }
-    return $res;
-});
+$app->add(new CorsMiddleware(
+    $config['cors']['origins'],
+    $config['cors']['methods'],
+    $config['cors']['headers'],
+));
 
 // === Группы маршрутов ===
 
