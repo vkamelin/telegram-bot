@@ -11,6 +11,9 @@ class Kernel
         Commands\ListCommand::class,
         Commands\HelpCommand::class,
         Commands\CacheClearCommand::class,
+        Commands\MigrateRunCommand::class,
+        Commands\MigrateCreateCommand::class,
+        Commands\MigrateRollbackCommand::class,
         Commands\RefreshTokenPurgeCommand::class,
     ];
 
