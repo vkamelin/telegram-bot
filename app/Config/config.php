@@ -5,7 +5,8 @@ declare(strict_types=1);
 return [
     'app_env' => getenv('APP_ENV') ?: 'prod',
     'debug' => (bool)(getenv('APP_DEBUG') ?: false),
-    
+    'bot_token' => getenv('BOT_TOKEN'),
+
     'db' => [
         'dsn' => getenv('DB_DSN'),   // 'mysql:host=127.0.0.1;dbname=app;charset=utf8mb4'
         'user' => getenv('DB_USER'),
