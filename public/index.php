@@ -6,6 +6,11 @@ use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use Dotenv\Dotenv;
 use App\Middleware\CorsMiddleware;
+use App\Middleware\RequestIdMiddleware;
+use App\Middleware\RequestSizeLimitMiddleware;
+use App\Middleware\JsonErrorMiddleware;
+use App\Middleware\ContentSecurityPolicyMiddleware;
+use App\Middleware\XFrameOptionsMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -18,17 +23,20 @@ $pdo = new PDO($config['db']['dsn'], $config['db']['user'], $config['db']['pass'
 
 // === Slim App ===
 $app = AppFactory::create();
+$app->add(new RequestIdMiddleware());
+$app->add(new RequestSizeLimitMiddleware($config['request_size_limit']));
 $app->addBodyParsingMiddleware();
-
-// === Error handler (RFC7807) ===
-$app->add(new \App\Middleware\ErrorMiddleware($config['debug']));
-
-// === CORS для API ===
+$app->add(new JsonErrorMiddleware());
+$app->add(new ContentSecurityPolicyMiddleware());
+$app->add(new XFrameOptionsMiddleware());
 $app->add(new CorsMiddleware(
     $config['cors']['origins'],
     $config['cors']['methods'],
     $config['cors']['headers'],
 ));
+
+// === Error handler (RFC7807) ===
+$app->add(new \App\Middleware\ErrorMiddleware($config['debug']));
 
 // === Группы маршрутов ===
 
