@@ -5,16 +5,16 @@
 
 declare(strict_types=1);
 
-namespace App\Controllers\Dashboard;
+namespace App\Controllers\Api;
 
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
+use App\Helpers\Response;
 
-final class HomeController
+final class ItemsController
 {
-    public function index(Req $req, Res $res): Res
+    public function list(Req $req, Res $res): Res
     {
-        $res->getBody()->write('Dashboard OK');
-        return $res;
+        return Response::json($res, 200, ['items' => []]);
     }
 }
