@@ -39,12 +39,14 @@ cp .env.example .env
 Укажи в `.env`:
 
 ```
-DB_DSN="mysql:host=127.0.0.1;dbname=app;charset=utf8mb4"
-DB_USER="user"
-DB_PASS="pass"
-JWT_SECRET="secret"
-CORS_ORIGINS="*"
-BOT_TOKEN="0000000000:AA..."
+DB_DSN="mysql:host=127.0.0.1;dbname=app;charset=utf8mb4" # строка подключения к БД
+DB_USER="user"                                           # пользователь БД
+DB_PASS="pass"                                           # пароль БД
+JWT_SECRET="secret"                                      # секретный ключ JWT
+CORS_ORIGINS="*"                                         # разрешённые origin через запятую
+RATE_LIMIT_BUCKET=ip                                     # тип лимита: ip или user
+RATE_LIMIT=60                                            # запросов в минуту
+BOT_TOKEN="0000000000:AA..."                            # токен Telegram-бота
 ```
 
 BOT_TOKEN — токен бота для проверки `initData` из Telegram WebApp.
