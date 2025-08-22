@@ -53,5 +53,18 @@ REDIS_DSN="tcp://127.0.0.1:6379"
 ],
 ```
 
-`initData` от Telegram WebApp может передаваться в заголовке `Authorization: tma <данные>`,
-в заголовке `X-Telegram-Init-Data` или параметре `initData` (query/body).
+## Проверка initData
+
+`TelegramInitDataMiddleware` валидирует подпись `initData` с помощью `BOT_TOKEN` из `.env`. Передавать данные можно тремя способами:
+
+1. Заголовок `Authorization: tma <initData>`
+2. Заголовок `X-Telegram-Init-Data: <initData>`
+3. Параметр `initData` в query или body
+
+Примеры:
+
+```bash
+curl http://localhost:8080/api/health -H "Authorization: tma <initData>"
+curl http://localhost:8080/api/health -H "X-Telegram-Init-Data: <initData>"
+curl "http://localhost:8080/api/health?initData=<initData>"
+```

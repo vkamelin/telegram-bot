@@ -44,7 +44,10 @@ DB_USER="user"
 DB_PASS="pass"
 JWT_SECRET="secret"
 CORS_ORIGINS="*"
+BOT_TOKEN="0000000000:AA..."
 ```
+
+BOT_TOKEN — токен бота для проверки `initData` из Telegram WebApp.
 
 ---
 
@@ -58,6 +61,7 @@ composer serve
 
 * API: [http://localhost:8080/api/](http://localhost:8080/api/)\*
 * Dashboard: [http://localhost:8080/dashboard/](http://localhost:8080/dashboard/)\*
+* Health: [http://localhost:8080/api/health](http://localhost:8080/api/health)
 
 ---
 
@@ -67,6 +71,19 @@ composer serve
 * `JwtMiddleware` — защита API
 * `CsrfMiddleware` — защита Dashboard
 * `RateLimitMiddleware` — ограничение запросов
+* `TelegramInitDataMiddleware` — проверка `initData` Telegram WebApp
+
+---
+
+## 📱 Telegram Mini App
+
+Для запросов из Telegram WebApp передай `initData`, который проверяется через `TelegramInitDataMiddleware` и `BOT_TOKEN`.
+
+```bash
+curl http://localhost:8080/api/health -H "Authorization: tma <initData>"
+curl http://localhost:8080/api/health -H "X-Telegram-Init-Data: <initData>"
+curl "http://localhost:8080/api/health?initData=<initData>"
+```
 
 ---
 

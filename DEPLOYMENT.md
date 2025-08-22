@@ -25,7 +25,7 @@
 ```bash
 chmod +x scripts/init.sh scripts/deploy.sh docker/entrypoint.sh
 ./scripts/init.sh       # заполнит .env (интерактивно)
-````
+```
 
 ### 3) Запуск
 
@@ -404,6 +404,28 @@ final class HealthController
 
 ```php
 $api->get('/health', \App\Controllers\Api\HealthController::class);
+```
+
+Проверка:
+
+```bash
+curl http://localhost:8080/api/health
+```
+
+### Telegram Mini App и `TelegramInitDataMiddleware`
+
+Добавьте проверку `initData` в `public/index.php` (требуется `BOT_TOKEN`):
+
+```php
+})->add(new \App\Middleware\TelegramInitDataMiddleware($config['bot_token'] ?: ''));
+```
+
+Примеры запросов:
+
+```bash
+curl http://localhost:8080/api/health -H "Authorization: tma <initData>"
+curl http://localhost:8080/api/health -H "X-Telegram-Init-Data: <initData>"
+curl "http://localhost:8080/api/health?initData=<initData>"
 ```
 
 ---

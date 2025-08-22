@@ -6,7 +6,7 @@
 - Включай `declare(strict_types=1)` во всех файлах.
 - Все ответы от API возвращаются через Helpers\Response.
 - PDO используется напрямую (никаких ORM/репозиториев).
-- Middleware не размножаем: только Error, Jwt, Csrf, RateLimit.
+- Middleware не размножаем: только Error, Jwt, Csrf, RateLimit, TelegramInitData.
 
 ## Добавление новой фичи
 

@@ -28,10 +28,12 @@ vendor/
 1. **Единый вход** — `public/index.php`.
 2. **Контроллеры** — простые классы, работа напрямую с PDO.
 3. **PDO напрямую** — `$pdo->query()`, `$pdo->prepare()->execute()`.
-4. **Middleware** — только Jwt, Csrf, RateLimit, Error.
+4. **Middleware** — только Jwt, Csrf, RateLimit, TelegramInitData, Error.
 5. **Helpers\Response** — единый способ ответов (json/problem).
 6. **Dashboard и API** — разделены префиксами (`/dashboard`, `/api`).
 7. **Воркеры** — не изменяются.
+8. **Health-эндпойнт** — `/api/health` для мониторинга.
+9. **Telegram Mini App** — `TelegramInitDataMiddleware` проверяет `initData`.
 
 ## Чек-лист Code Review
 
@@ -40,4 +42,4 @@ vendor/
 - [ ] Без новых слоёв (Services — только если реально нужна переиспользуемая логика).
 - [ ] PDO используется напрямую.
 - [ ] Dashboard и API маршруты разделены.
-- [ ] Middleware не плодятся (только базовые).
+- [ ] Middleware не плодятся (только базовые: Error, Jwt, Csrf, RateLimit, TelegramInitData).
