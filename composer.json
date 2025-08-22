@@ -12,7 +12,14 @@
   ],
   "license": "proprietary",
   "homepage": "https://devbot.pro",
-  "keywords": ["telegram", "bot", "api", "dashboard", "slim", "php"],
+  "keywords": [
+    "telegram",
+    "bot",
+    "api",
+    "dashboard",
+    "slim",
+    "php"
+  ],
   "require": {
     "php": "^8.3",
     "ext-zip": "*",
@@ -47,9 +54,11 @@
   "autoload": {
     "psr-4": {
       "App\\": "app/"
-    }
+    },
+    "files": [
+      "app/Helpers/env.php"
+    ]
   },
-
   "scripts": {
     "serve": "php -S 0.0.0.0:8080 -t public",
     "cs": "php-cs-fixer fix --dry-run --diff",
