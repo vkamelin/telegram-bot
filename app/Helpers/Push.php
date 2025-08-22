@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-require_once __DIR__ . '/../init.php';
-
 use RuntimeException;
 use Throwable;
 
@@ -408,7 +406,10 @@ class Push
                         // ID записанного сообщения
                         $id = $db->lastInsertId();
                     } catch (Throwable $e) {
-                        logMessage("Не удалось добавить в очередь пуш в Телеграм. {$e->getMessage()}.", 'error');
+                        Logger::error(
+                            "Не удалось добавить в очередь пуш в Телеграм. {$e->getMessage()}.",
+                            ['exception' => $e]
+                        );
                         return false;
                     }
                     
@@ -454,7 +455,10 @@ class Push
                 return true;
             }
         } catch (Throwable $e) {
-            logMessage("Не удалось добавить в очередь пуш в Телеграм.", 'error', $e);
+            Logger::error(
+                "Не удалось добавить в очередь пуш в Телеграм.",
+                ['exception' => $e]
+            );
         }
         
         return false;
