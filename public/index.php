@@ -4,8 +4,11 @@ declare(strict_types=1);
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
+use Dotenv\Dotenv;
 
 require __DIR__ . '/../vendor/autoload.php';
+
+Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
 
 $config = require __DIR__ . '/../app/Config/config.php';
 
@@ -36,19 +39,48 @@ $app->add(function (Req $req, $handler) use ($config) {
 
 // === Группы маршрутов ===
 
-// Dashboard (/admin/*) — CSRF/сессия
-$app->group('/admin', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
+// Dashboard (/dashboard/*) — CSRF/сессия
+$app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
     $g->get('', [\App\Controllers\Dashboard\HomeController::class, 'index']);
     // добавляйте страницы админки здесь
 })->add(new \App\Middleware\CsrfMiddleware());
 
-// API (/api/*) — JWT + RateLimit
-$app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
+// API (/api/*)
+$app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $config) {
+    $g->get('/health', fn(Req $req, Res $res): Res => \App\Helpers\Response::json($res, 200, ['status' => 'ok']));
     $g->post('/auth/login', [\App\Controllers\Api\AuthController::class, 'login']);
-    $g->get('/users', [\App\Controllers\Api\UsersController::class, 'list']);
-    $g->post('/users', [\App\Controllers\Api\UsersController::class, 'create']);
-})->add(new \App\Middleware\RateLimitMiddleware($config['rate_limit']))
-    ->add(new \App\Middleware\JwtMiddleware($config['jwt']));
+
+    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($pdo) {
+        $auth->get('/me', function (Req $req, Res $res) use ($pdo): Res {
+            $jwt = (array)$req->getAttribute('jwt');
+            $uid = (int)($jwt['uid'] ?? 0);
+            if ($uid <= 0) {
+                return \App\Helpers\Response::problem($res, 401, 'Unauthorized');
+            }
+            $stmt = $pdo->prepare('SELECT id, email, created_at FROM users WHERE id = ? LIMIT 1');
+            $stmt->execute([$uid]);
+            $u = $stmt->fetch();
+            if (!$u) {
+                return \App\Helpers\Response::problem($res, 404, 'User not found');
+            }
+            return \App\Helpers\Response::json($res, 200, ['user' => $u]);
+        });
+
+        $auth->get('/items', fn(Req $req, Res $res): Res => \App\Helpers\Response::json($res, 200, ['items' => []]));
+
+        $auth->post('/order', function (Req $req, Res $res): Res {
+            $data = (array)$req->getParsedBody();
+            if (empty($data['item_id'])) {
+                return \App\Helpers\Response::problem($res, 400, 'Validation error', ['errors' => ['item_id' => 'required']]);
+            }
+            return \App\Helpers\Response::json($res, 201, ['status' => 'created']);
+        });
+
+        $auth->get('/users', [\App\Controllers\Api\UsersController::class, 'list']);
+        $auth->post('/users', [\App\Controllers\Api\UsersController::class, 'create']);
+    })->add(new \App\Middleware\RateLimitMiddleware($config['rate_limit']))
+      ->add(new \App\Middleware\JwtMiddleware($config['jwt']));
+})->add(new \App\Middleware\TelegramInitDataMiddleware(getenv('BOT_TOKEN') ?: ''));
 
 // === Запуск ===
 $app->run();
