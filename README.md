@@ -65,6 +65,14 @@ composer serve
 * Dashboard: [http://localhost:8080/dashboard/](http://localhost:8080/dashboard/)\*
 * Health: [http://localhost:8080/api/health](http://localhost:8080/api/health)
 
+## 🗄️ Миграции
+
+```bash
+php bin/console migrate:create AddUsersTable
+php bin/console migrate:run
+php bin/console migrate:rollback
+```
+
 ---
 
 ## 🛡️ Middleware
