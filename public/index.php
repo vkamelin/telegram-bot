@@ -34,11 +34,12 @@ $app->add(new \App\Middleware\ErrorMiddleware($config['debug']));
 
 // === Группы маршрутов ===
 
-// Dashboard (/dashboard/*) — CSRF/сессия
+// Dashboard (/dashboard/*) — session + CSRF
 $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
     $g->get('', [\App\Controllers\Dashboard\HomeController::class, 'index']);
     // добавляйте страницы админки здесь
-})->add(new \App\Middleware\CsrfMiddleware());
+})->add(new \App\Middleware\CsrfMiddleware())
+  ->add(new \App\Middleware\SessionMiddleware());
 
 // API (/api/*)
 $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $config) {
