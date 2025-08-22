@@ -56,7 +56,7 @@
     "cs:fix": "php-cs-fixer fix",
     "tests": "phpunit",
     "analyse": "phpstan analyse --memory-limit=1G",
-    "migrate": "vendor/bin/phinx migrate",
+    "migrate": "vendor/bin/phinx migrate -c phinx.php",
     "build:css": "npx tailwindcss -c tailwind.config.js -i assets/css/tailwind.css -o public/assets/css/tailwind.css --minify",
     "arch:check": "php tools/ci/validate-architecture.php"
   },
