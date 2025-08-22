@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use Dotenv\Dotenv;
+
 abstract class Command
 {
     public string $signature = '';
@@ -17,6 +19,8 @@ abstract class Command
      */
     public function run(array $arguments, Kernel $kernel): int
     {
+        Dotenv::createImmutable(dirname(__DIR__, 2))->safeLoad();
+
         return $this->handle($arguments, $kernel);
     }
 }

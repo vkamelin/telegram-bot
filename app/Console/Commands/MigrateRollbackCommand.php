@@ -26,10 +26,11 @@ class MigrateRollbackCommand extends Command
         $command->setApplication($application);
 
         $config = dirname(__DIR__, 3) . '/phinx.php';
+        $env = $_ENV['APP_ENV'] ?? 'development';
 
         $input = new ArrayInput([
             '--configuration' => $config,
-            '--environment' => 'default',
+            '--environment' => $env,
         ]);
         $output = new ConsoleOutput();
 
