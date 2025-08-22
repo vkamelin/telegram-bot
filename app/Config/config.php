@@ -2,15 +2,19 @@
 
 declare(strict_types=1);
 
+use Dotenv\Dotenv;
+
+Dotenv::createImmutable(dirname(__DIR__, 2))->safeLoad();
+
 return [
-    'app_env' => getenv('APP_ENV') ?: 'prod',
-    'debug' => (bool)(getenv('APP_DEBUG') ?: false),
-    'bot_token' => getenv('BOT_TOKEN'),
+    'app_env' => $_ENV['APP_ENV'] ?? 'prod',
+    'debug' => (bool)($_ENV['APP_DEBUG'] ?? false),
+    'bot_token' => $_ENV['BOT_TOKEN'] ?? null,
 
     'db' => [
-        'dsn' => getenv('DB_DSN'),   // 'mysql:host=127.0.0.1;dbname=app;charset=utf8mb4'
-        'user' => getenv('DB_USER'),
-        'pass' => getenv('DB_PASS'),
+        'dsn' => $_ENV['DB_DSN'] ?? null,   // 'mysql:host=127.0.0.1;dbname=app;charset=utf8mb4'
+        'user' => $_ENV['DB_USER'] ?? null,
+        'pass' => $_ENV['DB_PASS'] ?? null,
         'opts' => [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -20,13 +24,13 @@ return [
     ],
     
     'jwt' => [
-        'secret' => getenv('JWT_SECRET'),
+        'secret' => $_ENV['JWT_SECRET'] ?? null,
         'alg' => 'HS256',
         'ttl' => 3600,
     ],
     
     'cors' => [
-        'origins' => explode(',', getenv('CORS_ORIGINS') ?: ''),
+        'origins' => explode(',', $_ENV['CORS_ORIGINS'] ?? ''),
         'methods' => 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
         'headers' => 'Authorization,Content-Type,X-Request-Id',
     ],

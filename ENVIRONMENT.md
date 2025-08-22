@@ -44,12 +44,12 @@ REDIS_DSN="tcp://127.0.0.1:6379"
 В `app/Config/config.php`:
 
 ```php
-'bot_token' => getenv('BOT_TOKEN'),
+'bot_token' => $_ENV['BOT_TOKEN'] ?? null,
 
 'db' => [
-    'dsn'  => getenv('DB_DSN'),
-    'user' => getenv('DB_USER'),
-    'pass' => getenv('DB_PASS'),
+    'dsn'  => $_ENV['DB_DSN'] ?? null,
+    'user' => $_ENV['DB_USER'] ?? null,
+    'pass' => $_ENV['DB_PASS'] ?? null,
 ],
 ```
 

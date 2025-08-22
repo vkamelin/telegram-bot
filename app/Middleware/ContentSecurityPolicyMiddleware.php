@@ -18,10 +18,10 @@ class ContentSecurityPolicyMiddleware
         ?string $img = null,
         ?string $connect = null,
     ) {
-        $scriptSrc = $this->buildSources($script ?? getenv('CSP_SCRIPT_SRC') ?: '');
-        $styleSrc = $this->buildSources($style ?? getenv('CSP_STYLE_SRC') ?: '', true);
-        $imgSrc = $this->buildSources($img ?? getenv('CSP_IMG_SRC') ?: '');
-        $connectSrc = $this->buildSources($connect ?? getenv('CSP_CONNECT_SRC') ?: '');
+        $scriptSrc = $this->buildSources($script ?? ($_ENV['CSP_SCRIPT_SRC'] ?? ''));
+        $styleSrc = $this->buildSources($style ?? ($_ENV['CSP_STYLE_SRC'] ?? ''), true);
+        $imgSrc = $this->buildSources($img ?? ($_ENV['CSP_IMG_SRC'] ?? ''));
+        $connectSrc = $this->buildSources($connect ?? ($_ENV['CSP_CONNECT_SRC'] ?? ''));
 
         $this->policy = sprintf(
             "default-src 'self'; connect-src %s; img-src %s data:; script-src %s; style-src %s; frame-ancestors 'none'",
