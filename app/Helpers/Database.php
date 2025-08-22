@@ -66,7 +66,7 @@ class Database
         try {
             return ((int)$pdo->query('SELECT 1')->fetchColumn() === 1);
         } catch (PDOException $e) {
-            logMessage("Ping не прошёл: {$e->getMessage()}", 'warning', $e);
+            Logger::warning("Ping не прошёл: {$e->getMessage()}", ['exception' => $e]);
             return false;
         }
     }
@@ -97,10 +97,9 @@ class Database
                 return $pdo;
             } catch (PDOException $e) {
                 $lastException = $e;
-                logMessage(
+                Logger::warning(
                     "Попытка #{$attempt} подключения не удалась: {$e->getMessage()}",
-                    'warning',
-                    $e
+                    ['exception' => $e]
                 );
                 // Ждём перед следующим повтором, если он будет
                 if ($attempt < self::MAX_TRIES) {
@@ -108,12 +107,11 @@ class Database
                 }
             }
         }
-        
+
         // Все попытки исчерпаны — фатальная ошибка
-        logMessage(
+        Logger::error(
             "Не удалось подключиться к БД после " . self::MAX_TRIES . " попыток",
-            'error',
-            $lastException
+            ['exception' => $lastException]
         );
         throw new RuntimeException('Невозможно подключиться к базе данных');
     }
