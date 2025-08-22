@@ -2,18 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Middleware;
+namespace App\Handlers;
 
 use App\Exceptions\ValidationException;
 use App\Logger;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
 
-class JsonErrorMiddleware
+final class ApiErrorHandler
 {
     private ResponseFactory $responseFactory;
 
@@ -22,16 +20,9 @@ class JsonErrorMiddleware
         $this->responseFactory = $responseFactory ?? new ResponseFactory();
     }
 
-    public function __invoke(Request $request, RequestHandler $handler): Response
+    public function handle(Throwable $e): Response
     {
-        $path = $request->getUri()->getPath();
-        if (!str_starts_with($path, '/api')) {
-            return $handler->handle($request);
-        }
-
-        try {
-            return $handler->handle($request);
-        } catch (ValidationException $e) {
+        if ($e instanceof ValidationException) {
             $payload = json_encode([
                 'type' => 'https://example.com/validation-error',
                 'title' => 'Validation Error',
@@ -40,12 +31,14 @@ class JsonErrorMiddleware
                 'errors' => $e->getErrors(),
             ], JSON_UNESCAPED_UNICODE);
             if (!is_string($payload)) {
-                $payload = '{"type":"https://example.com/validation-error","title":"Validation Error","status":400,"detail":"Validation failed","errors":[]}';
+                $payload = '{"type":"https://example.com/validation-error","title":"Validation Error","status":400,"detail":"Validation failed","errors":[]}' ;
             }
             $response = $this->responseFactory->createResponse(400);
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/problem+json');
-        } catch (HttpException $e) {
+        }
+
+        if ($e instanceof HttpException) {
             $status = $e->getCode();
             $title = method_exists($e, 'getTitle') ? $e->getTitle() : 'HTTP Error';
             $payload = json_encode([
@@ -61,21 +54,21 @@ class JsonErrorMiddleware
             $response = $this->responseFactory->createResponse($status);
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/problem+json');
-        } catch (Throwable $e) {
-            Logger::error($e->getMessage(), ['exception' => $e]);
-            $payload = json_encode([
-                'type' => 'about:blank',
-                'title' => 'Internal Server Error',
-                'status' => 500,
-                'detail' => 'Internal Server Error',
-                'errors' => [],
-            ], JSON_UNESCAPED_UNICODE);
-            if (!is_string($payload)) {
-                $payload = '{"type":"about:blank","title":"Internal Server Error","status":500,"detail":"Internal Server Error","errors":[]}';
-            }
-            $response = $this->responseFactory->createResponse(500);
-            $response->getBody()->write($payload);
-            return $response->withHeader('Content-Type', 'application/problem+json');
         }
+
+        Logger::error($e->getMessage(), ['exception' => $e]);
+        $payload = json_encode([
+            'type' => 'about:blank',
+            'title' => 'Internal Server Error',
+            'status' => 500,
+            'detail' => 'Internal Server Error',
+            'errors' => [],
+        ], JSON_UNESCAPED_UNICODE);
+        if (!is_string($payload)) {
+            $payload = '{"type":"about:blank","title":"Internal Server Error","status":500,"detail":"Internal Server Error","errors":[]}' ;
+        }
+        $response = $this->responseFactory->createResponse(500);
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/problem+json');
     }
 }
