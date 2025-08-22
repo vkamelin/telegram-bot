@@ -5,11 +5,9 @@ use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use Dotenv\Dotenv;
-use App\Middleware\CorsMiddleware;
 use App\Middleware\RequestIdMiddleware;
 use App\Middleware\RequestSizeLimitMiddleware;
-use App\Middleware\ContentSecurityPolicyMiddleware;
-use App\Middleware\XFrameOptionsMiddleware;
+use App\Middleware\SecurityHeadersMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -25,13 +23,11 @@ $app = AppFactory::create();
 $app->add(new RequestIdMiddleware());
 $app->add(new RequestSizeLimitMiddleware($config['request_size_limit']));
 $app->addBodyParsingMiddleware();
-$app->add(new ContentSecurityPolicyMiddleware());
-$app->add(new XFrameOptionsMiddleware());
-$app->add(new CorsMiddleware(
-    $config['cors']['origins'],
-    $config['cors']['methods'],
-    $config['cors']['headers'],
-));
+$app->add(new SecurityHeadersMiddleware([
+    'cors' => $config['cors'],
+    'csp' => [],
+    'x_frame_options' => 'DENY',
+]));
 
 // === Error handler (RFC7807) ===
 $app->add(new \App\Middleware\ErrorMiddleware($config['debug']));
