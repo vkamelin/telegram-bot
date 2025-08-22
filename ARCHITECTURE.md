@@ -14,8 +14,7 @@ app/
 Controllers/
 Api/          # API эндпойнты (/api/*)
 Dashboard/    # Dashboard (/dashboard/*)
-Middleware/   # Jwt, Csrf, RateLimit, Error
-Services/     # Доп. классы (опционально)
+Middleware/   # Error, RequestId, RequestSizeLimit, SecurityHeaders, Session, Jwt, Csrf, RateLimit, TelegramInitData
 Helpers/      # Утилиты (Response, Arr и др.)
 Config/       # config.php (DB, JWT, CORS и т.д.)
 public/
@@ -28,7 +27,7 @@ vendor/
 1. **Единый вход** — `public/index.php`.
 2. **Контроллеры** — простые классы, работа напрямую с PDO.
 3. **PDO напрямую** — `$pdo->query()`, `$pdo->prepare()->execute()`.
-4. **Middleware** — только Jwt, Csrf, RateLimit, TelegramInitData, Error.
+4. **Middleware** — базовый набор: Error, RequestId, RequestSizeLimit, SecurityHeaders, Session, Jwt, Csrf, RateLimit, TelegramInitData.
 5. **Helpers\Response** — единый способ ответов (json/problem).
 6. **Dashboard и API** — разделены префиксами (`/dashboard`, `/api`).
 7. **Воркеры** — не изменяются.
@@ -39,7 +38,7 @@ vendor/
 
 - [ ] Новая фича = контроллер + маршрут (макс. 2–3 файла).
 - [ ] Ответы только через Helpers\Response.
-- [ ] Без новых слоёв (Services — только если реально нужна переиспользуемая логика).
+- [ ] Без новых слоёв (сервисы вводятся только при реальной необходимости).
 - [ ] PDO используется напрямую.
 - [ ] Dashboard и API маршруты разделены.
-- [ ] Middleware не плодятся (только базовые: Error, Jwt, Csrf, RateLimit, TelegramInitData).
+- [ ] Middleware не плодятся (только базовые: Error, RequestId, RequestSizeLimit, SecurityHeaders, Session, Jwt, Csrf, RateLimit, TelegramInitData).
