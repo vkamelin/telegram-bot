@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Logger;
-use App\Services\Db;
-use App\Services\RedisService;
+use App\Helpers\Database;
+use App\Helpers\RedisHelper;
 use App\Telemetry;
 use App\Config;
 use App\Support\RedisKeyHelper;
@@ -42,10 +42,10 @@ $perWorkerRps = max(1, intdiv($globalMaxRps, $workerCount));
  */
 function dispatchScheduledMessages(): void
 {
-    $db = Db::get();
+    $db = Database::getInstance();
     try {
-        $redis = RedisService::get();
-    } catch (RuntimeException $e) {
+        $redis = RedisHelper::getInstance();
+    } catch (\RedisException $e) {
         Logger::error('Redis connection failed: ' . $e->getMessage());
         return;
     }
@@ -113,10 +113,10 @@ function runWorker(): void
         $startTime = microtime(true);
         $messagesProcessed = 0;
 
-        $db = Db::get();
+        $db = Database::getInstance();
         try {
-            $redis = RedisService::get();
-        } catch (RuntimeException $e) {
+            $redis = RedisHelper::getInstance();
+        } catch (\RedisException $e) {
             Logger::error('Redis connection failed: ' . $e->getMessage());
             return;
         }
@@ -282,10 +282,10 @@ function runWorker(): void
  */
 function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
 {
-    $db = Db::get();
+    $db = Database::getInstance();
     try {
-        $redis = RedisService::get();
-    } catch (RuntimeException $e) {
+        $redis = RedisHelper::getInstance();
+    } catch (\RedisException $e) {
         Logger::error('Redis connection failed: ' . $e->getMessage());
         return;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Logger;
 use App\Services\GPTService;
-use App\Services\RedisService;
+use App\Helpers\RedisHelper;
 use App\Config;
 use App\Support\RedisKeyHelper;
 
@@ -14,8 +14,8 @@ $config = Config::getInstance();
 
 $redis = null;
 try {
-    $redis = RedisService::get();
-} catch (RuntimeException $e) {
+    $redis = RedisHelper::getInstance();
+} catch (\RedisException $e) {
     Logger::error('Redis connection failed: ' . $e->getMessage());
     exit();
 }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 require __DIR__ . '/../bootstrap.php';
 
 use App\Domain\RefreshTokenTable;
-use App\Services\Db;
+use App\Helpers\Database;
 
-$repo = new RefreshTokenTable(Db::get());
+$repo = new RefreshTokenTable(Database::getInstance());
 $count = $repo->deleteExpired();
 echo "Purged {$count} expired tokens." . PHP_EOL;
