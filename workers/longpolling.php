@@ -3,24 +3,20 @@
 declare(strict_types=1);
 
 use App\Logger;
-use App\Services\Db;
-use App\Services\RedisService;
-use App\Config;
-use App\Support\Path;
+use App\Helpers\Database;
+use App\Helpers\RedisHelper;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use App\Telegram\UpdateHelper;
-use RuntimeException;
 
 /** @var \Slim\App $app */
 $app = require __DIR__ . '/../bootstrap.php';
-$config = Config::getInstance();
 
-$db = Db::get();
+$db = Database::getInstance();
 try {
-    $redis = RedisService::get();
-} catch (RuntimeException $e) {
+    $redis = RedisHelper::getInstance();
+} catch (\RedisException $e) {
     Logger::error('Redis connection failed: ' . $e->getMessage());
     exit();
 }
@@ -98,7 +94,7 @@ try {
 
                 $offset = $update->getUpdateId() + 1;
                 
-                $redis->set($config->get('REDIS_LONGPOLLING_OFFSET_KEY'), $offset);
+                $redis->set(RedisHelper::REDIS_LONGPOLLING_OFFSET_KEY, $offset);
                 
                 $updateType = $update->getUpdateType();
                 
@@ -128,7 +124,7 @@ try {
                 if ($handled) {
                     // Используем функцию для запуска обработки в отдельном процессе
                     $updateData = base64_encode(json_encode($update));
-                    $command = 'php ' . Path::base('run') . ' worker:handler ' . escapeshellarg($updateData);
+                    $command = 'php ' . dirname(__DIR__) . '/run worker:handler ' . escapeshellarg($updateData);
                     shell_exec($command);
                     Logger::debug('Обновление передано в обработчик', [
                         'id' => $update->getUpdateId(),
@@ -153,10 +149,10 @@ function getLongPollingOffset(): int
 {
     try {
         // Получаем инстанс RedisHelper (Redis)
-        $redis = RedisService::get();
+        $redis = RedisHelper::getInstance();
 
         // Получаем offset из Redis
-        $offset = $redis->get($config->get('REDIS_LONGPOLLING_OFFSET_KEY'));
+        $offset = $redis->get(RedisHelper::REDIS_LONGPOLLING_OFFSET_KEY);
 
         // Если offset не существует или равен false, то устанавливаем его в 0
         if ($offset === false) {
@@ -173,7 +169,7 @@ function getLongPollingOffset(): int
         
         // Возвращаем offset
         return $offset;
-    } catch (RedisException|RuntimeException $e) {
+    } catch (\RedisException|\RuntimeException $e) {
         Logger::error("Failed to get long polling offset");
     }
     
@@ -182,7 +178,7 @@ function getLongPollingOffset(): int
 
 function getLongPollingOffsetFromDb(): int
 {
-    $db = Db::get(); // Получаем инстанс DatabaseHelper (PDO)
+    $db = Database::getInstance(); // Получаем инстанс DatabaseHelper (PDO)
     
     $stmt = $db->query("SELECT `update_id` FROM `telegram_updates` ORDER BY `created_at` DESC LIMIT 1");
     $result = $stmt->fetchColumn();

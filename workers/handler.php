@@ -8,8 +8,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../bootstrap.php';
 
 use App\Logger;
-use App\Services\Db;
-use App\Services\RedisService;
+use App\Helpers\Database;
+use App\Helpers\RedisHelper;
 use App\Handlers\Telegram\CallbackQueryHandler;
 use App\Handlers\Telegram\MessageHandler;
 use App\Handlers\Telegram\EditedMessageHandler;
@@ -62,14 +62,14 @@ try {
     $messageReactionCount = TelegramUpdateHelper::getMessageReactionCount($update);
 
     try {
-        $redis = RedisService::get();
+        $redis = RedisHelper::getInstance();
         $dedupKey = RedisKeyHelper::key('telegram', 'update', (string)$update->getUpdateId());
         $stored = $redis->set($dedupKey, 1, ['nx', 'ex' => 60]);
         if ($stored === false) {
             Logger::info('Duplicate update skipped', ['id' => $update->getUpdateId()]);
             exit();
         }
-    } catch (RuntimeException $e) {
+    } catch (\RedisException $e) {
         Logger::error('Redis initialization failed: ' . $e->getMessage());
     }
     
@@ -77,7 +77,7 @@ try {
         throw new RuntimeException("Не удалось декодировать данные.");
     }
     
-    $db = Db::get();
+    $db = Database::getInstance();
     
     $userId = UpdateHelper::getUserId($update);
     if ($userId === null) {
