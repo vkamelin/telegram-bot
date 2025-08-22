@@ -12,10 +12,23 @@ use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
 
+/**
+ * Контроллер для получения информации о текущем пользователе.
+ */
 final class MeController
 {
+    /**
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(private PDO $pdo) {}
 
+    /**
+     * Возвращает данные авторизованного пользователя.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Res $res HTTP-ответ
+     * @return Res JSON с данными пользователя
+     */
     public function show(Req $req, Res $res): Res
     {
         $jwt = (array)$req->getAttribute('jwt');

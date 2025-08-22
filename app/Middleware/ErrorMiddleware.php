@@ -16,17 +16,32 @@ use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
 
+/**
+ * Middleware для обработки исключений и преобразования их в HTTP-ответы.
+ */
 final class ErrorMiddleware implements MiddlewareInterface
 {
     private ApiErrorHandler $apiHandler;
     private ResponseFactory $responseFactory;
 
+    /**
+     * @param bool $debug Режим отладки
+     * @param ApiErrorHandler|null $apiHandler Обработчик ошибок API
+     * @param ResponseFactory|null $responseFactory Фабрика ответов
+     */
     public function __construct(private bool $debug, ?ApiErrorHandler $apiHandler = null, ?ResponseFactory $responseFactory = null)
     {
         $this->apiHandler = $apiHandler ?? new ApiErrorHandler();
         $this->responseFactory = $responseFactory ?? new ResponseFactory();
     }
 
+    /**
+     * Перехватывает ошибки и формирует ответ.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Handler $handler Следующий обработчик
+     * @return Res Ответ после обработки
+     */
     public function process(Req $req, Handler $handler): Res
     {
         try {

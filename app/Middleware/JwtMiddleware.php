@@ -16,10 +16,23 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Throwable;
 
+/**
+ * Middleware для проверки JWT токена.
+ */
 final class JwtMiddleware implements MiddlewareInterface
 {
+    /**
+     * @param array $cfg Настройки JWT
+     */
     public function __construct(private array $cfg) {}
-    
+
+    /**
+     * Проверяет JWT и добавляет его данные в запрос.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Handler $handler Следующий обработчик
+     * @return Res Ответ после проверки
+     */
     public function process(Req $req, Handler $handler): Res
     {
         $auth = $req->getHeaderLine('Authorization');

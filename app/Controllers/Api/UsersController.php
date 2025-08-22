@@ -12,10 +12,25 @@ use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
 
+/**
+ * Контроллер для управления пользователями.
+ *
+ * Обрабатывает маршруты /api/users.
+ */
 final class UsersController
 {
+    /**
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(private PDO $pdo) {}
-    
+
+    /**
+     * Возвращает список пользователей.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Res $res HTTP-ответ
+     * @return Res JSON со списком пользователей
+     */
     public function list(Req $req, Res $res): Res
     {
         $q = $this->pdo->query('SELECT id, email, created_at FROM users ORDER BY id DESC LIMIT 100');
@@ -23,6 +38,13 @@ final class UsersController
         return Response::json($res, 200, ['items' => $rows]);
     }
     
+    /**
+     * Создаёт нового пользователя.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Res $res HTTP-ответ
+     * @return Res JSON с идентификатором созданного пользователя или ошибкой
+     */
     public function create(Req $req, Res $res): Res
     {
         $data = (array)$req->getParsedBody();

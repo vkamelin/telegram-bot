@@ -10,11 +10,20 @@ use Monolog\Processor\UidProcessor;
 use RuntimeException;
 use App\Config;
 
+/**
+ * Обёртка над Monolog для централизованного логирования.
+ */
 class Logger
 {
     private static ?MonologLogger $instance = null;
     private static ?string $requestId = null;
 
+    /**
+     * Устанавливает идентификатор текущего запроса.
+     *
+     * @param string|null $id Идентификатор запроса
+     * @return void
+     */
     public static function setRequestId(?string $id): void
     {
         self::$requestId = $id;
@@ -41,6 +50,11 @@ class Logger
         return $data;
     }
 
+    /**
+     * Возвращает экземпляр логгера.
+     *
+     * @return MonologLogger Экземпляр Monolog
+     */
     public static function get(): MonologLogger
     {
         if (self::$instance === null) {
@@ -98,7 +112,11 @@ class Logger
     }
 
     /**
-     * @param array<string, mixed> $context
+     * Записывает сообщение уровня info.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string, mixed> $context Дополнительный контекст
+     * @return void
      */
     public static function info(string $message, array $context = []): void
     {
@@ -106,7 +124,11 @@ class Logger
     }
 
     /**
-     * @param array<string, mixed> $context
+     * Записывает сообщение уровня error.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string, mixed> $context Дополнительный контекст
+     * @return void
      */
     public static function error(string $message, array $context = []): void
     {
@@ -119,7 +141,11 @@ class Logger
     }
 
     /**
-     * @param array<string, mixed> $context
+     * Записывает сообщение уровня debug.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string, mixed> $context Дополнительный контекст
+     * @return void
      */
     public static function debug(string $message, array $context = []): void
     {
@@ -132,7 +158,11 @@ class Logger
     }
 
     /**
-     * @param array<string, mixed> $context
+     * Записывает сообщение уровня warning.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string, mixed> $context Дополнительный контекст
+     * @return void
      */
     public static function warning(string $message, array $context = []): void
     {
@@ -140,7 +170,11 @@ class Logger
     }
 
     /**
-     * @param array<string, mixed> $context
+     * Записывает сообщение уровня critical.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string, mixed> $context Дополнительный контекст
+     * @return void
      */
     public static function critical(string $message, array $context = []): void
     {

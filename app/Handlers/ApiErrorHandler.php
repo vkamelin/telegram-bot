@@ -11,15 +11,27 @@ use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
 
+/**
+ * Обработчик ошибок для API.
+ */
 final class ApiErrorHandler
 {
     private ResponseFactory $responseFactory;
 
+    /**
+     * @param ResponseFactory|null $responseFactory Фабрика ответов
+     */
     public function __construct(?ResponseFactory $responseFactory = null)
     {
         $this->responseFactory = $responseFactory ?? new ResponseFactory();
     }
 
+    /**
+     * Формирует ответ JSON для исключения.
+     *
+     * @param Throwable $e Перехваченное исключение
+     * @return Response Ответ в формате application/problem+json
+     */
     public function handle(Throwable $e): Response
     {
         if ($e instanceof ValidationException) {

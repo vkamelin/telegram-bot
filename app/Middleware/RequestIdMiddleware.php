@@ -10,15 +10,28 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 
+/**
+ * Middleware для назначения идентификатора запросу.
+ */
 class RequestIdMiddleware
 {
     private string $header;
 
+    /**
+     * @param string $header Название заголовка с идентификатором запроса
+     */
     public function __construct(string $header = 'X-Request-Id')
     {
         $this->header = $header;
     }
 
+    /**
+     * Добавляет идентификатор запроса и устанавливает его в логере.
+     *
+     * @param Request $request HTTP-запрос
+     * @param RequestHandler $handler Следующий обработчик
+     * @return Response Ответ с заголовком Request-Id
+     */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
         $requestId = $request->getHeaderLine($this->header);

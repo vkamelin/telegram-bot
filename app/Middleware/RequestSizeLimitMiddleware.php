@@ -10,15 +10,28 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Response;
 
+/**
+ * Middleware для ограничения размера тела запроса.
+ */
 class RequestSizeLimitMiddleware implements MiddlewareInterface
 {
     private int $maxBytes;
 
+    /**
+     * @param int $maxBytes Максимальный размер тела запроса в байтах
+     */
     public function __construct(int $maxBytes)
     {
         $this->maxBytes = $maxBytes;
     }
 
+    /**
+     * Проверяет размер запроса и отклоняет слишком большие тела.
+     *
+     * @param Request $request HTTP-запрос
+     * @param RequestHandlerInterface $handler Следующий обработчик
+     * @return ResponseInterface Ответ после проверки
+     */
     public function process(Request $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $length = $request->getServerParams()['CONTENT_LENGTH'] ?? $request->getHeaderLine('Content-Length');

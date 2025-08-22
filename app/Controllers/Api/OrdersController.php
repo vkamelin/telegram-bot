@@ -11,8 +11,18 @@ use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
 
+/**
+ * Контроллер для управления заказами.
+ */
 final class OrdersController
 {
+    /**
+     * Создаёт заказ.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Res $res HTTP-ответ
+     * @return Res JSON с информацией о созданном заказе или ошибкой
+     */
     public function create(Req $req, Res $res): Res
     {
         $data = (array)$req->getParsedBody();
