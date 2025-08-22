@@ -19,7 +19,7 @@ class CorsMiddleware
 
     public function __construct(?string $origins = null, ?ResponseFactory $responseFactory = null)
     {
-        $origins = $origins ?? getenv('CORS_ORIGIN') ?: '';
+        $origins = $origins ?? ($_ENV['CORS_ORIGIN'] ?? '');
         $this->allowedOrigins = array_filter(array_map('trim', explode(',', $origins)));
         $this->responseFactory = $responseFactory ?? new ResponseFactory();
     }
