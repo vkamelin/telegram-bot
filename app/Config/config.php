@@ -39,4 +39,6 @@ return [
         'bucket' => 'ip',   // 'ip' или 'user'
         'limit' => 60,     // запросов в минуту
     ],
+
+    'request_size_limit' => (int)($_ENV['REQUEST_SIZE_LIMIT'] ?? 1048576),
 ];
