@@ -13,7 +13,7 @@
 app/
 Controllers/
 Api/          # API эндпойнты (/api/*)
-Dashboard/    # Dashboard (/admin/*)
+Dashboard/    # Dashboard (/dashboard/*)
 Middleware/   # Jwt, Csrf, RateLimit, Error
 Services/     # Доп. классы (опционально)
 Helpers/      # Утилиты (Response, Arr и др.)
@@ -30,7 +30,7 @@ vendor/
 3. **PDO напрямую** — `$pdo->query()`, `$pdo->prepare()->execute()`.
 4. **Middleware** — только Jwt, Csrf, RateLimit, Error.
 5. **Helpers\Response** — единый способ ответов (json/problem).
-6. **Dashboard и API** — разделены префиксами (`/admin`, `/api`).
+6. **Dashboard и API** — разделены префиксами (`/dashboard`, `/api`).
 7. **Воркеры** — не изменяются.
 
 ## Чек-лист Code Review

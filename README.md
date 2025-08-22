@@ -5,7 +5,7 @@
 - Slim 4
 - Единый вход (`public/index.php`)
 - API (`/api/*`) с JWT и rate-limit
-- Dashboard (`/admin/*`) с CSRF
+- Dashboard (`/dashboard/*`) с CSRF
 - PDO напрямую (без ORM)
 - Воркеры — отдельно, без изменений
 

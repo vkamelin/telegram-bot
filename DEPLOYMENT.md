@@ -37,7 +37,7 @@ docker compose logs -f
 Проверка:
 
 * API: `http://localhost:8080/api/health`
-* Dashboard: `http://localhost:8080/admin`
+* Dashboard: `http://localhost:8080/dashboard`
 
 ### 4) Миграции
 
@@ -413,4 +413,4 @@ $api->get('/health', \App\Controllers\Api\HealthController::class);
 * Docker: включите OPcache (`docker-php-ext-enable opcache`, ini-настройки) — можно расширить Dockerfile.
 * VPS: включите OPcache в `php.ini`, запретите `display_errors` в prod.
 * Обновите `JWT_SECRET` на уникальный, храните `.env` вне репозитория.
-* Ограничьте доступ к `/admin` по IP/базовой авторизации (Nginx), если админка приватная.
+* Ограничьте доступ к `/dashboard` по IP/базовой авторизации (Nginx), если админка приватная.
