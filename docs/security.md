@@ -1,16 +1,18 @@
 # Безопасность
 
 ## Аутентификация
-- JWT
-- OAuth2
+- JWT через `JwtMiddleware`
+- Проверка `initData` от Telegram
 
 ## Авторизация
-- RBAC
+- Роли не реализованы, выполняется только идентификация
 
 ## Данные
-- Шифрование паролей
-- TLS
+- Пароли хешируются через `password_hash`
+- Трафик шифруется TLS
+- Ограничение размера тела запроса (`RequestSizeLimitMiddleware`)
 
 ## Зависимости
+- Composer Audit для поиска уязвимостей
+- Регулярные обновления библиотек Telegram и Monolog
 - Renovate
-- Composer audit
