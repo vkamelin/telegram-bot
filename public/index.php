@@ -8,7 +8,6 @@ use Dotenv\Dotenv;
 use App\Middleware\CorsMiddleware;
 use App\Middleware\RequestIdMiddleware;
 use App\Middleware\RequestSizeLimitMiddleware;
-use App\Middleware\JsonErrorMiddleware;
 use App\Middleware\ContentSecurityPolicyMiddleware;
 use App\Middleware\XFrameOptionsMiddleware;
 
@@ -26,7 +25,6 @@ $app = AppFactory::create();
 $app->add(new RequestIdMiddleware());
 $app->add(new RequestSizeLimitMiddleware($config['request_size_limit']));
 $app->addBodyParsingMiddleware();
-$app->add(new JsonErrorMiddleware());
 $app->add(new ContentSecurityPolicyMiddleware());
 $app->add(new XFrameOptionsMiddleware());
 $app->add(new CorsMiddleware(
