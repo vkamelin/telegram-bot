@@ -14,9 +14,7 @@ use Longman\TelegramBot\Telegram;
 
 /** @var \Slim\App $app */
 $app = require __DIR__ . '/../bootstrap.php';
-/** @var \Psr\Container\ContainerInterface $container */
-$container = $app->getContainer();
-$config = $container->get(Config::class);
+$config = Config::getInstance();
 
 try {
     if ($_ENV['TELEGRAM_API_SERVER'] === 'local') {

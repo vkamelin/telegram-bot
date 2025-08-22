@@ -15,9 +15,7 @@ use RuntimeException;
 
 /** @var \Slim\App $app */
 $app = require __DIR__ . '/../bootstrap.php';
-/** @var \Psr\Container\ContainerInterface $container */
-$container = $app->getContainer();
-$config = $container->get(Config::class);
+$config = Config::getInstance();
 
 $db = Db::get();
 try {
