@@ -14,10 +14,23 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
 use Vlsv\TelegramDataValidator\TelegramDataValidator;
 
+/**
+ * Middleware для проверки и извлечения Telegram init data.
+ */
 final class TelegramInitDataMiddleware implements MiddlewareInterface
 {
+    /**
+     * @param string $botToken Токен бота для проверки подписи
+     */
     public function __construct(private string $botToken) {}
 
+    /**
+     * Валидирует init data и добавляет данные пользователя в запрос.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Handler $handler Следующий обработчик
+     * @return Res Ответ после обработки
+     */
     public function process(Req $req, Handler $handler): Res
     {
         $init = '';

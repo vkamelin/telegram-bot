@@ -13,10 +13,23 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
 use App\Helpers\Response;
 
+/**
+ * Middleware для ограничения количества запросов.
+ */
 final class RateLimitMiddleware implements MiddlewareInterface
 {
+    /**
+     * @param array $cfg Параметры лимитирования
+     */
     public function __construct(private array $cfg) {}
-    
+
+    /**
+     * Применяет лимит запросов на основе IP или пользователя.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Handler $handler Следующий обработчик
+     * @return Res Ответ после проверки
+     */
     public function process(Req $req, Handler $handler): Res
     {
         // Простой лимит по IP в памяти процесса (для прод — подключите Redis)

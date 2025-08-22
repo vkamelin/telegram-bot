@@ -9,6 +9,9 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Psr7\Factory\ResponseFactory;
 
+/**
+ * Middleware для установки заголовков безопасности и CORS.
+ */
 class SecurityHeadersMiddleware
 {
     private array $cors;
@@ -17,6 +20,10 @@ class SecurityHeadersMiddleware
     private array $headers;
     private ResponseFactory $responseFactory;
 
+    /**
+     * @param array $options Настройки заголовков
+     * @param ResponseFactory|null $responseFactory Фабрика ответов
+     */
     public function __construct(array $options = [], ?ResponseFactory $responseFactory = null)
     {
         $this->cors = $options['cors'] ?? [];
@@ -26,6 +33,13 @@ class SecurityHeadersMiddleware
         $this->responseFactory = $responseFactory ?? new ResponseFactory();
     }
 
+    /**
+     * Добавляет заголовки безопасности к ответу.
+     *
+     * @param Request $request HTTP-запрос
+     * @param RequestHandler $handler Следующий обработчик
+     * @return Response Ответ с заголовками
+     */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
         $isPreflight = strtoupper($request->getMethod()) === 'OPTIONS';

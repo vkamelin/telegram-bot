@@ -12,10 +12,26 @@ use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
 
+/**
+ * Контроллер авторизации пользователей.
+ *
+ * Обрабатывает выдачу JWT токена.
+ */
 final class AuthController
 {
+    /**
+     * @param PDO   $pdo    Подключение к базе данных
+     * @param array $jwtCfg Настройки JWT (secret, alg, ttl)
+     */
     public function __construct(private PDO $pdo, private array $jwtCfg) {}
-    
+
+    /**
+     * Выполняет вход пользователя и возвращает JWT.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Res $res HTTP-ответ
+     * @return Res JSON с токеном или сообщением об ошибке
+     */
     public function login(Req $req, Res $res): Res
     {
         $data = (array)$req->getParsedBody();

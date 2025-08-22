@@ -1,9 +1,4 @@
 <?php
-/**
- * Session middleware.
- *
- * Starts PHP session and validates session id from cookies.
- */
 declare(strict_types=1);
 
 namespace App\Middleware;
@@ -14,7 +9,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
 
 /**
- * Middleware for starting and validating a PHP session.
+ * Middleware для запуска и проверки PHP-сессии.
  */
 final class SessionMiddleware implements MiddlewareInterface
 {
@@ -25,8 +20,8 @@ final class SessionMiddleware implements MiddlewareInterface
     private array $options;
 
     /**
-     * @param string $name    Session cookie name
-     * @param array  $options Options passed to session_start
+     * @param string $name    Имя cookie сессии
+     * @param array  $options Опции для session_start()
      */
     public function __construct(string $name = 'SID', array $options = [])
     {
@@ -38,6 +33,13 @@ final class SessionMiddleware implements MiddlewareInterface
         ];
     }
 
+    /**
+     * Запускает сессию и передаёт запрос дальше.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Handler $handler Следующий обработчик
+     * @return Res Ответ после обработки
+     */
     public function process(Req $req, Handler $handler): Res
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {

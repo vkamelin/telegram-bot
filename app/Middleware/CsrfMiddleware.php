@@ -13,8 +13,18 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
 use App\Helpers\Response;
 
+/**
+ * Middleware для проверки CSRF-токена.
+ */
 final class CsrfMiddleware implements MiddlewareInterface
 {
+    /**
+     * Проверяет CSRF-токен для небезопасных методов.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Handler $handler Следующий обработчик
+     * @return Res Ответ после проверки
+     */
     public function process(Req $req, Handler $handler): Res
     {
         if (in_array($req->getMethod(), ['POST','PUT','PATCH','DELETE'], true)) {
