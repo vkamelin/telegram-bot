@@ -12,20 +12,6 @@ class Kernel
         Commands\HelpCommand::class,
         Commands\CacheClearCommand::class,
         Commands\RefreshTokenPurgeCommand::class,
-        Commands\PrometheusPasswordCommand::class,
-        Commands\DeployBlueCommand::class,
-        Commands\DeployGreenCommand::class,
-        Commands\SwitchCommand::class,
-        Commands\TelegramDlqRequeueCommand::class,
-        Commands\MakeModuleCommand::class,
-        Commands\WorkerTelegramCommand::class,
-        Commands\WorkerTelegramAliasCommand::class,
-        Commands\WorkerGptCommand::class,
-        Commands\WorkerGptAliasCommand::class,
-        Commands\WorkerLongPollingCommand::class,
-        Commands\WorkerLongPollingAliasCommand::class,
-        Commands\WorkerHandlerCommand::class,
-        Commands\WorkerHandlerAliasCommand::class,
     ];
 
     /**
