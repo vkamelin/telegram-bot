@@ -20,17 +20,6 @@
    ```bash
    curl -H 'Authorization: Bearer <token>' /api/me
    ```
-2. **Список товаров**
-   ```bash
-   curl -H 'Authorization: Bearer <token>' /api/items
-   ```
-3. **Создание заказа**
-   ```bash
-   curl -X POST /api/orders \
-        -H 'Content-Type: application/json' \
-        -H 'Authorization: Bearer <token>' \
-        -d '{"items":[1,2]}'
-   ```
 
 ## Частые вопросы
 - Как восстановить пароль?

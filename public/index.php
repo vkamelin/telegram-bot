@@ -51,10 +51,6 @@ $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $
               return (new \App\Controllers\Api\MeController($pdo))->show($req, $res);
           });
 
-          $auth->get('/items', [\App\Controllers\Api\ItemsController::class, 'list']);
-
-          $auth->post('/orders', [\App\Controllers\Api\OrdersController::class, 'create']);
-
         $auth->get('/users', [\App\Controllers\Api\UsersController::class, 'list']);
         $auth->post('/users', [\App\Controllers\Api\UsersController::class, 'create']);
     })->add(new \App\Middleware\RateLimitMiddleware($config['rate_limit']))

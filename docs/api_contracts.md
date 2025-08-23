@@ -51,23 +51,6 @@
 }
 ```
 
-## POST /api/orders
-### Заголовки
-- `Authorization: Bearer <token>`
-- `X-Request-Id: <uuid>`
-### Запрос
-```json
-{
-  "item_id": 1
-}
-```
-### Ответ
-```json
-{
-  "status": "created"
-}
-```
-
 ## GET /api/users
 ### Заголовки
 - `Authorization: Bearer <token>`

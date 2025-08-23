@@ -8,7 +8,6 @@
 - `POST /api/auth/login` — выдача JWT-токена по email и паролю
 - `GET /api/me` — данные текущего пользователя
 - `GET /api/items` — список товаров
-- `POST /api/orders` — создание заказа
 - `GET /api/users` — список пользователей
 - `POST /api/users` — создание пользователя
 
@@ -61,19 +60,6 @@ curl http://localhost:8080/api/items \
 **Ответ:**
 ```json
 {"items":[]}
-```
-
-### `POST /api/orders`
-```bash
-curl -X POST http://localhost:8080/api/orders \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <jwt>" \
-  -H "X-Telegram-Init-Data: <initData>" \
-  -d '{"item_id":123}'
-```
-**Ответ:**
-```json
-{"status":"created"}
 ```
 
 ### `GET /api/users`
