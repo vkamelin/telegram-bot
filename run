@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Config;
+
 // Проверка существования файла autoload.php
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
     echo "Файл автозагрузки не найден. Установите зависимости через Composer.\n";
@@ -11,14 +13,8 @@ if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
 // Подключаем autoload
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Проверка наличия файла init.php
-if (!file_exists(__DIR__ . '/init.php')) {
-    echo "Конфигурационный файл не найден.\n";
-    exit(1);
-}
-
-// Подключаем файл инициализации
-require_once __DIR__ . '/init.php';
+// Загружаем конфигурацию приложения
+Config::getInstance();
 
 // Базовый каталог для команд
 $commandsPath = __DIR__ . '/commands';
