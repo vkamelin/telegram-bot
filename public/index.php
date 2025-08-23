@@ -54,6 +54,12 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/tg-users', [\App\Controllers\Dashboard\TgUsersController::class, 'index']);
         $auth->post('/tg-users/data', [\App\Controllers\Dashboard\TgUsersController::class, 'data']);
         $auth->get('/tg-users/{id}', [\App\Controllers\Dashboard\TgUsersController::class, 'view']);
+        $auth->get('/users', [\App\Controllers\Dashboard\PanelUsersController::class, 'index']);
+        $auth->post('/users/data', [\App\Controllers\Dashboard\PanelUsersController::class, 'data']);
+        $auth->get('/users/create', [\App\Controllers\Dashboard\PanelUsersController::class, 'create']);
+        $auth->post('/users', [\App\Controllers\Dashboard\PanelUsersController::class, 'store']);
+        $auth->get('/users/{id}/edit', [\App\Controllers\Dashboard\PanelUsersController::class, 'edit']);
+        $auth->post('/users/{id}', [\App\Controllers\Dashboard\PanelUsersController::class, 'update']);
         $auth->get('/scheduled', [\App\Controllers\Dashboard\ScheduledController::class, 'index']);
         $auth->post('/scheduled/data', [\App\Controllers\Dashboard\ScheduledController::class, 'data']);
         $auth->post('/scheduled/{id}/send-now', [\App\Controllers\Dashboard\ScheduledController::class, 'sendNow']);
