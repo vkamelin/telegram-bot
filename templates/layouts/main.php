@@ -27,7 +27,7 @@ $messages = Flash::get();
     <link href="<?= url('/assets/fonts/bootstrap-icons/bootstrap-icons.min.css'); ?>" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
     <link href="<?= url('/assets/css/styles.css') ?>" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -41,7 +41,7 @@ $messages = Flash::get();
                 <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
                     <i class="bi bi-list"></i>
                 </button>
-                <a class="navbar-brand mx-1" href="<?= url('/dashboard') ?>">Reeel</a>
+                <a class="navbar-brand mx-1" href="<?= url('/dashboard') ?>">Dashboard</a>
             </div>
             <div class="d-flex align-items-center">
                 <!-- Правая панель -->
@@ -49,7 +49,7 @@ $messages = Flash::get();
             <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasNavbarDark"
                  aria-labelledby="offcanvasNavbarDarkLabel">
                 <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasNavbarDarkLabel">Reeel</h5>
+                    <h5 class="offcanvas-title" id="offcanvasNavbarDarkLabel">Dashboard</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
                             aria-label="Close"></button>
                 </div>
