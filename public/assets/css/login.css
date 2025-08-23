@@ -1,3 +1,11 @@
+*, html, body {
+    font-family: "Inter", Aptos, Helvetica, Arial, sans-serif !important;
+}
+
+code, pre {
+    font-family: "Martian Mono", monospace !important;
+}
+
 html,
 body {
     height: 100%;
