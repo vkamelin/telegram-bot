@@ -12,7 +12,7 @@ use App\Middleware\ErrorMiddleware;
 use App\Controllers\Api\MeController;
 use App\Helpers\Response;
 use Firebase\JWT\JWT;
-use PDO;
+use Slim\Psr7\Response as PsrResponse;
 
 final class ApiTest extends TestCase
 {
@@ -37,16 +37,16 @@ final class ApiTest extends TestCase
         return http_build_query($data);
     }
 
-    private function createApp(PDO $pdo): \Slim\App
+    private function createApp(): \Slim\App
     {
         $app = AppFactory::create();
         $app->addBodyParsingMiddleware();
         $app->add(new ErrorMiddleware(true));
-        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
+        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) {
             $g->get('/health', fn($req, $res) => Response::json($res, 200, ['status' => 'ok']));
-            $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($pdo) {
-                $auth->get('/me', function ($req, $res) use ($pdo) {
-                    return (new MeController($pdo))->show($req, $res);
+            $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
+                $auth->get('/me', function ($req, $res) {
+                    return (new MeController())->show($req, $res);
                 });
             })->add(new RateLimitMiddleware(['bucket' => 'ip', 'limit' => 60]))
               ->add(new JwtMiddleware(['secret' => $this->jwtSecret, 'alg' => 'HS256', 'ttl' => 3600]));
@@ -56,8 +56,7 @@ final class ApiTest extends TestCase
 
     public function testHealthEndpoint(): void
     {
-        $pdo = new PDO('sqlite::memory:');
-        $app = $this->createApp($pdo);
+        $app = $this->createApp();
         $init = $this->buildInitData();
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/api/health')
             ->withHeader('X-Telegram-Init-Data', $init);
@@ -67,10 +66,7 @@ final class ApiTest extends TestCase
 
     public function testMeWithValidInitData(): void
     {
-        $pdo = new PDO('sqlite::memory:');
-        $pdo->exec('CREATE TABLE users(id INTEGER PRIMARY KEY, email TEXT, created_at TEXT);');
-        $pdo->exec("INSERT INTO users(id, email, created_at) VALUES(1, 'a@b.c', '2025-01-01');");
-        $app = $this->createApp($pdo);
+        $app = $this->createApp();
         $init = $this->buildInitData();
         $token = JWT::encode(['uid' => 1, 'exp' => time() + 3600], $this->jwtSecret, 'HS256');
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/api/me')
@@ -78,20 +74,28 @@ final class ApiTest extends TestCase
             ->withHeader('Authorization', 'Bearer ' . $token);
         $res = $app->handle($req);
         $this->assertSame(200, $res->getStatusCode());
+        $body = json_decode((string)$res->getBody(), true);
+        $this->assertSame(['user' => ['id' => 1]], $body);
     }
 
     public function testMeWithInvalidInitData(): void
     {
-        $pdo = new PDO('sqlite::memory:');
-        $pdo->exec('CREATE TABLE users(id INTEGER PRIMARY KEY, email TEXT, created_at TEXT);');
-        $pdo->exec("INSERT INTO users(id, email, created_at) VALUES(1, 'a@b.c', '2025-01-01');");
-        $app = $this->createApp($pdo);
+        $app = $this->createApp();
         $init = $this->buildInitData() . 'broken';
         $token = JWT::encode(['uid' => 1, 'exp' => time() + 3600], $this->jwtSecret, 'HS256');
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/api/me')
             ->withHeader('X-Telegram-Init-Data', $init)
             ->withHeader('Authorization', 'Bearer ' . $token);
         $res = $app->handle($req);
+        $this->assertSame(403, $res->getStatusCode());
+    }
+
+    public function testShowWithoutTelegramUserAttribute(): void
+    {
+        $controller = new MeController();
+        $req = (new ServerRequestFactory())->createServerRequest('GET', '/api/me');
+        $res = new PsrResponse();
+        $res = $controller->show($req, $res);
         $this->assertSame(403, $res->getStatusCode());
     }
 }

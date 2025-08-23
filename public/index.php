@@ -40,7 +40,7 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
     $g->post('/login', [\App\Controllers\Dashboard\AuthController::class, 'login']);
     $g->post('/logout', [\App\Controllers\Dashboard\AuthController::class, 'logout']);
 
-    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($pdo) {
+    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
         $auth->get('', [\App\Controllers\Dashboard\HomeController::class, 'index']);
         // добавляйте страницы админки здесь
     })->add(new \App\Middleware\AuthMiddleware());
@@ -52,9 +52,9 @@ $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $
     $g->get('/health', fn(Req $req, Res $res): Res => \App\Helpers\Response::json($res, 200, ['status' => 'ok']));
     $g->post('/auth/login', [\App\Controllers\Api\AuthController::class, 'login']);
 
-    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($pdo) {
-          $auth->get('/me', function (Req $req, Res $res) use ($pdo): Res {
-              return (new \App\Controllers\Api\MeController($pdo))->show($req, $res);
+    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
+          $auth->get('/me', function (Req $req, Res $res): Res {
+              return (new \App\Controllers\Api\MeController())->show($req, $res);
           });
 
         $auth->get('/users', [\App\Controllers\Api\UsersController::class, 'list']);
