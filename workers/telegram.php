@@ -229,11 +229,15 @@ function runWorker(): void
                 }
 
                 if ($response->isOk()) {
-                    Telemetry::incrementTelegramSent();
+                    if (Telemetry::enabled()) {
+                        Telemetry::incrementTelegramSent();
+                    }
                 } else {
                     $rawResp = $response->getRawData();
                     $reason = $rawResp['description'] ?? 'unknown';
-                    Telemetry::recordTelegramSendFailure($reason);
+                    if (Telemetry::enabled()) {
+                        Telemetry::recordTelegramSendFailure($reason);
+                    }
                     if ($attempts + 1 >= MAX_ATTEMPTS) {
                         $redis->rPush(RedisKeyHelper::key('telegram', 'dlq'), [
                             'id' => $id,
@@ -242,7 +246,9 @@ function runWorker(): void
                             'attempts' => $attempts + 1,
                         ]);
                         $dlqLen = $redis->lLen(RedisKeyHelper::key('telegram', 'dlq'));
-                        Telemetry::setDlqSize(\is_int($dlqLen) ? $dlqLen : 0);
+                        if (Telemetry::enabled()) {
+                            Telemetry::setDlqSize(\is_int($dlqLen) ? $dlqLen : 0);
+                        }
                     } else {
                         $messageData['attempts'] = $attempts + 1;
                         $messageData['send_after'] = time() + (2 ** $attempts);
@@ -260,9 +266,11 @@ function runWorker(): void
         }
     }
 
-    Telemetry::setTelegramQueueSize($totalQueue);
-    $dlqLen = $redis->lLen(RedisKeyHelper::key('telegram', 'dlq'));
-    Telemetry::setDlqSize(\is_int($dlqLen) ? $dlqLen : 0);
+    if (Telemetry::enabled()) {
+        Telemetry::setTelegramQueueSize($totalQueue);
+        $dlqLen = $redis->lLen(RedisKeyHelper::key('telegram', 'dlq'));
+        Telemetry::setDlqSize(\is_int($dlqLen) ? $dlqLen : 0);
+    }
     
     // Пауза, чтобы не превышать лимит запросов
     $elapsed = microtime(true) - $startTime;

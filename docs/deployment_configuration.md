@@ -10,6 +10,7 @@
 - `RATE_LIMIT` — количество запросов в минуту
 - `REQUEST_SIZE_LIMIT` — максимальный размер тела запроса
 - `BOT_TOKEN` — токен Telegram‑бота
+- `TELEMETRY_ENABLED` — включить метрики и трассировку (`true`/`false`)
 
 ## Среды
 
