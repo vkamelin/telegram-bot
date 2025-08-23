@@ -49,6 +49,8 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/updates', [\App\Controllers\Dashboard\UpdatesController::class, 'index']);
         $auth->post('/updates/data', [\App\Controllers\Dashboard\UpdatesController::class, 'data']);
         $auth->get('/updates/{id}', [\App\Controllers\Dashboard\UpdatesController::class, 'show']);
+        $auth->get('/sessions', [\App\Controllers\Dashboard\SessionsController::class, 'index']);
+        $auth->post('/sessions/data', [\App\Controllers\Dashboard\SessionsController::class, 'data']);
         $auth->get('/tg-users', [\App\Controllers\Dashboard\TgUsersController::class, 'index']);
         $auth->post('/tg-users/data', [\App\Controllers\Dashboard\TgUsersController::class, 'data']);
         $auth->get('/tg-users/{id}', [\App\Controllers\Dashboard\TgUsersController::class, 'view']);
