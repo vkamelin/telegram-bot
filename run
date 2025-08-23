@@ -1,0 +1,137 @@
+<?php
+
+declare(strict_types=1);
+
+// Проверка существования файла autoload.php
+if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+    echo "Файл автозагрузки не найден. Установите зависимости через Composer.\n";
+    exit(1);
+}
+
+// Подключаем autoload
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Проверка наличия файла init.php
+if (!file_exists(__DIR__ . '/init.php')) {
+    echo "Конфигурационный файл не найден.\n";
+    exit(1);
+}
+
+// Подключаем файл инициализации
+require_once __DIR__ . '/init.php';
+
+// Базовый каталог для команд
+$commandsPath = __DIR__ . '/commands';
+
+// Получаем имя команды и аргументы
+$inputArgs = $argv;
+array_shift($inputArgs); // Убираем первый элемент (имя файла)
+
+// Проверка на наличие команды
+if (empty($inputArgs)) {
+    echo "Необходимо указать команду.\n";
+    exit(1);
+}
+
+// Функция для преобразования строки из snake_case в CamelCase
+function toCamelCase(string $string): string
+{
+    return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
+}
+
+// Функция для преобразования строки из snake_case в camelCase
+function toLowerCamelCase(string $string): string
+{
+    $camelCase = toCamelCase($string);
+    return lcfirst($camelCase);
+}
+
+// Имя команды
+$commandName = array_shift($inputArgs);
+
+// Проверка корректности формата команды
+/*if (!strpos($commandName, ':')) {
+    echo "Команда должна быть в формате 'имяКоманды:методКоманды'.\n";
+    exit(1);
+}*/
+
+// Формат команды: "hello:handle"
+[$className, $methodName] = explode(':', $commandName) + [1 => 'handle'];
+$className = toCamelCase($className) . 'Command'; // Преобразуем в CamelCase
+$methodName = toLowerCamelCase($methodName);
+
+// Имя файла класса команды
+$commandFile = $commandsPath . '/' . $className . '.php';
+
+// Проверка существования файла класса
+if (!file_exists($commandFile)) {
+    echo "Команда {$className} не найдена.\n";
+    exit(1);
+}
+
+// Подключаем файл команды
+require_once $commandFile;
+
+$className = "App\\Commands\\" . $className;
+
+// Проверка существования класса и метода
+if (!class_exists($className) || !method_exists($className, $methodName)) {
+    echo "Класс {$className} или метод {$methodName} не найдены.\n";
+    exit(1);
+}
+
+// Парсинг аргументов
+$args = [];
+$namedArgs = [];
+
+foreach ($inputArgs as $arg) {
+    $arg = trim($arg);
+    if (str_starts_with($arg, '--')) {
+        // Обработка именованных параметров
+        [$key, $value] = explode('=', substr($arg, 2), 2) + [1 => true];
+        $namedArgs[$key] = $value;
+    } else {
+        // Обработка позиционных параметров
+        $args[] = $arg;
+    }
+}
+
+// Объединяем позиционные и именованные параметры
+$args = array_merge($args, $namedArgs);
+
+// Установка аргумента args по умолчанию, если он не задан
+if (!isset($args['args'])) {
+    $args['args'] = [];
+}
+
+try {
+    $reflectionMethod = new ReflectionMethod($className, $methodName);
+    $parameters = $reflectionMethod->getParameters();
+    $orderedArgs = [];
+    
+    foreach ($parameters as $param) {
+        $paramName = $param->getName();
+        
+        // Сначала проверяем именованные параметры
+        if (array_key_exists($paramName, $namedArgs)) {
+            $orderedArgs[] = $namedArgs[$paramName];
+        } // Затем проверяем позиционные параметры
+        elseif (!empty($args)) {
+            $orderedArgs[] = array_shift($args); // Берем первый элемент из позиционных параметров
+        } // Если параметр необязателен, используем значение по умолчанию
+        elseif ($param->isOptional()) {
+            $orderedArgs[] = $param->getDefaultValue();
+        } // Если параметр обязателен, но не передан, выбрасываем ошибку
+        else {
+            echo "Отсутствует обязательный аргумент: {$paramName}\n";
+            exit(1);
+        }
+    }
+    
+    // Вызываем метод с отсортированными аргументами
+    $command = new $className();
+    $reflectionMethod->invokeArgs($command, $orderedArgs);
+} catch (Exception $e) {
+    echo $e->getMessage() . "\n";
+    exit(1);
+}
