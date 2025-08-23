@@ -7,8 +7,15 @@ STRIDE
 - Spoofing
 - Tampering
 - DoS
+- SQL-инъекции
+- CSRF (для Dashboard)
+- Утечки токенов
+- Перебор JWT
 
 ## Контрмеры
 - 2FA
 - HMAC
-- Rate limiting
+- `RateLimitMiddleware`
+- Подготовленные выражения PDO
+- `CsrfMiddleware`
+- `SecurityHeadersMiddleware`
