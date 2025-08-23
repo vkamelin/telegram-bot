@@ -21,7 +21,7 @@ DB_USER="root"
 DB_PASS="secret"
 
 # === JWT токены ===
-JWT_SECRET="change_me" # секретный ключ (заменить в проде)
+JWT_SECRET="change_me" # секретный ключ (init.sh генерирует автоматически, если пусто)
 JWT_TTL=3600           # срок жизни токена в секундах
 JWT_ALG=HS256          # алгоритм (обычно HS256)
 

@@ -17,8 +17,11 @@ DB_USER=${DB_USER:-app}
 read -rp "Пароль БД [secret]: " DB_PASS || true
 DB_PASS=${DB_PASS:-secret}
 
-read -rp "Секрет JWT [change_me]: " JWT_SECRET || true
-JWT_SECRET=${JWT_SECRET:-change_me}
+read -rp "Секрет JWT (оставь пустым для генерации): " JWT_SECRET || true
+if [ -z "${JWT_SECRET:-}" ]; then
+    JWT_SECRET="$(php -r 'echo bin2hex(random_bytes(32));')"
+    echo "JWT_SECRET сгенерирован автоматически."
+fi
 
 sed -i "s#^APP_ENV=.*#APP_ENV=${APP_ENV:-dev}#g" $ENV_FILE
 sed -i "s#^APP_DEBUG=.*#APP_DEBUG=${APP_DEBUG:-true}#g" $ENV_FILE
