@@ -61,12 +61,23 @@ final class TelegramInitDataMiddleware implements MiddlewareInterface
 
         parse_str($init, $data);
         $user = json_decode($data['user'] ?? '{}', true);
+        if (!is_array($user)) {
+            $user = [];
+        }
+
+        $telegramUser = [
+            'id' => isset($user['id']) ? (int)$user['id'] : null,
+        ];
+        if (isset($user['username'])) {
+            $telegramUser['username'] = $user['username'];
+        }
+        if (isset($user['language_code'])) {
+            $telegramUser['language_code'] = $user['language_code'];
+        }
 
         $req = $req
-            ->withAttribute('tg_user_id', isset($user['id']) ? (int)$user['id'] : null)
-            ->withAttribute('tg_username', $user['username'] ?? null)
-            ->withAttribute('tg_language_code', $user['language_code'] ?? null)
-            ->withAttribute('tg_init_data', $init);
+            ->withAttribute('telegramUser', $telegramUser)
+            ->withAttribute('rawInitData', $init);
 
         return $handler->handle($req);
     }
