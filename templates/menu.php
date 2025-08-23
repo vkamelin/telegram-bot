@@ -31,4 +31,9 @@ return [
         'title' => 'Рассылки',
         'icon' => 'bi bi-chat-right-text'
     ],
+    [
+        'url' => '/dashboard/system',
+        'title' => 'Система',
+        'icon' => 'bi bi-gear'
+    ],
 ];

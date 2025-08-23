@@ -67,6 +67,7 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/scheduled/data', [\App\Controllers\Dashboard\ScheduledController::class, 'data']);
         $auth->post('/scheduled/{id}/send-now', [\App\Controllers\Dashboard\ScheduledController::class, 'sendNow']);
         $auth->post('/scheduled/{id}/delete', [\App\Controllers\Dashboard\ScheduledController::class, 'delete']);
+        $auth->get('/system', [\App\Controllers\Dashboard\SystemController::class, 'index']);
         // добавляйте страницы админки здесь
     })->add(new \App\Middleware\AuthMiddleware());
 })->add(new \App\Middleware\CsrfMiddleware())
