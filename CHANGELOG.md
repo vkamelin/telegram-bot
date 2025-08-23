@@ -5,6 +5,7 @@
 ### Added
 - Добавлены инструкции по запуску health-эндпойнта, `TelegramInitDataMiddleware` и мини-приложению Telegram.
 - Описана переменная `BOT_TOKEN`, сценарии проверки `initData` и примеры запросов.
+- Страница `/dashboard/system` с env-переменными и командами воркеров.
 
 ### Changed
 - Заменены упоминания `/admin` на `/dashboard` в документации.
