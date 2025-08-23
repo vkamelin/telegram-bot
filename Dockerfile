@@ -12,6 +12,7 @@ RUN apk add --no-cache libzip-dev unzip \
     && composer install --no-dev --prefer-dist --no-progress --no-interaction
 
 FROM php:8.3-cli AS app
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 WORKDIR /var/www/html
 
 RUN apt-get update \
