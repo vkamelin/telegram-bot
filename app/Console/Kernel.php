@@ -15,6 +15,7 @@ class Kernel
         Commands\MigrateCreateCommand::class,
         Commands\MigrateRollbackCommand::class,
         Commands\RefreshTokenPurgeCommand::class,
+        Commands\CreateAdminCommand::class,
     ];
 
     /**

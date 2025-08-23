@@ -73,6 +73,14 @@ php bin/console migrate:run
 php bin/console migrate:rollback
 ```
 
+## 🖥️ Console
+
+```bash
+php bin/console admin:create
+```
+
+Создаёт администратора панели управления, запрашивая email и пароль и добавляя запись в таблицу `users`.
+
 ---
 
 ## 🛡️ Middleware
