@@ -11,7 +11,7 @@
  * @var array $menu Меню
  */
 
-use App\Classes\Flash;
+use App\Helpers\Flash;
 
 $messages = Flash::get();
 ?>

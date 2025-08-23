@@ -9,6 +9,7 @@ namespace App\Controllers\Dashboard;
 
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
+use App\Helpers\View;
 
 /**
  * Контроллер главной страницы панели управления.
@@ -24,7 +25,12 @@ final class HomeController
      */
     public function index(Req $req, Res $res): Res
     {
-        $res->getBody()->write('Dashboard OK');
-        return $res;
+        $data = [
+            'title' => 'Dashboard',
+            'totalTelegramUsers' => 0,
+            'promocodes' => 0,
+        ];
+
+        return View::render($res, 'dashboard/index.php', $data, 'layouts/main.php');
     }
 }

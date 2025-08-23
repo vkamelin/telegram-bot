@@ -51,14 +51,15 @@
     "promphp/prometheus_client_php": "Expose metrics for Prometheus",
     "phpoffice/phpspreadsheet": "Spreadsheet export features"
   },
-  "autoload": {
-    "psr-4": {
-      "App\\": "app/"
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+      "app/Helpers/env.php",
+      "app/Helpers/url.php"
+        ]
     },
-    "files": [
-      "app/Helpers/env.php"
-    ]
-  },
   "scripts": {
     "serve": "php -S 0.0.0.0:8080 -t public",
     "cs": "php-cs-fixer fix --dry-run --diff",
