@@ -42,6 +42,10 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
 
     $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
         $auth->get('', [\App\Controllers\Dashboard\HomeController::class, 'index']);
+        $auth->get('/messages', [\App\Controllers\Dashboard\MessagesController::class, 'index']);
+        $auth->post('/messages/data', [\App\Controllers\Dashboard\MessagesController::class, 'data']);
+        $auth->post('/messages/{id}/resend', [\App\Controllers\Dashboard\MessagesController::class, 'resend']);
+        $auth->get('/messages/{id}/response', [\App\Controllers\Dashboard\MessagesController::class, 'download']);
         // добавляйте страницы админки здесь
     })->add(new \App\Middleware\AuthMiddleware());
 })->add(new \App\Middleware\CsrfMiddleware())
