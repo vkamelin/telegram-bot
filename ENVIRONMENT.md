@@ -39,9 +39,15 @@ RATE_LIMIT=60          # запросов в минуту
 REDIS_DSN="tcp://127.0.0.1:6379"
 # === Telemetry (опционально) ===
 TELEMETRY_ENABLED=false  # включить метрики и трассировку
+
+# === Workers ===
+WORKERS_GPT_PROCS=1       # число процессов GPT
+WORKERS_TELEGRAM_PROCS=1  # число процессов Telegram
 ````
 
 `TELEMETRY_ENABLED=true` включает отправку метрик и трассировку (при наличии зависимостей). При `false` вызовы `App\\Telemetry` становятся no-op.
+
+`WORKERS_GPT_PROCS` и `WORKERS_TELEGRAM_PROCS` задают количество процессов для GPT и Telegram воркеров (по умолчанию 1).
 
 ## Использование
 
