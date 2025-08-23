@@ -58,7 +58,7 @@ class Logger
     public static function get(): MonologLogger
     {
         if (self::$instance === null) {
-            $logDir = __DIR__ . '/../storage/logs/';
+            $logDir = __DIR__ . '/../../storage/logs/';
             if (!is_dir($logDir)) {
                 if (!mkdir($logDir, 0777, true) && !is_dir($logDir)) {
                     throw new RuntimeException(sprintf('Directory "%s" was not created', $logDir));
