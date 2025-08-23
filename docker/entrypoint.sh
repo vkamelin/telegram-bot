@@ -11,7 +11,7 @@ if [ -f vendor/bin/phinx ]; then
 fi
 
 # ensure logs directory exists and is writable
-mkdir -p storage/logs
-chown -R www-data:www-data storage/logs
+mkdir -p /var/www/html/storage/logs
+chown -R www-data:www-data /var/www/html/storage/logs
 
 exec "$@"
