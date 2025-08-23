@@ -30,5 +30,7 @@ sed -i "s#^DB_USER=.*#DB_USER=\\\"${DB_USER}\\\"#g" $ENV_FILE
 sed -i "s#^DB_PASS=.*#DB_PASS=\\\"${DB_PASS}\\\"#g" $ENV_FILE
 sed -i "s#^DB_NAME=.*#DB_NAME=\\\"${DB_NAME}\\\"#g" $ENV_FILE
 sed -i "s#^JWT_SECRET=.*#JWT_SECRET=\\\"${JWT_SECRET}\\\"#g" $ENV_FILE
+sed -i "s#^WORKERS_GPT_PROCS=.*#WORKERS_GPT_PROCS=${WORKERS_GPT_PROCS:-1}#g" $ENV_FILE
+sed -i "s#^WORKERS_TELEGRAM_PROCS=.*#WORKERS_TELEGRAM_PROCS=${WORKERS_TELEGRAM_PROCS:-1}#g" $ENV_FILE
 
 echo "ОК: .env обновлён."
