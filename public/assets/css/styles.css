@@ -1,0 +1,83 @@
+.nav-scroller {
+    position: relative;
+    z-index: 2;
+    height: 2.75rem;
+    overflow-y: hidden;
+}
+
+.nav-scroller .nav {
+    display: flex;
+    flex-wrap: nowrap;
+    padding-bottom: 1rem;
+    margin-top: -1px;
+    overflow-x: auto;
+    text-align: center;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+.nav-scroller .nav {
+    color: rgba(255, 255, 255, .75);
+}
+
+.nav-scroller .nav-link {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    font-size: .875rem;
+    color: #6c757d;
+}
+
+.nav-scroller .nav-link:hover {
+    color: #007bff;
+}
+
+.nav-scroller .active {
+    font-weight: 500;
+    color: #343a40;
+}
+
+.table-header {
+    display: flex !important;
+    align-content: center !important;
+    justify-content: space-between !important;
+}
+
+#checksTable td {
+    font-size: .75rem;
+}
+
+#checkData * {
+    font-family: "Martian Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+.close.fileinput-remove {
+    --bs-btn-close-color: #000;
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e");
+    --bs-btn-close-opacity: 0.5;
+    --bs-btn-close-hover-opacity: 0.75;
+    --bs-btn-close-focus-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    --bs-btn-close-disabled-opacity: 0.25;
+    --bs-btn-close-white-filter: invert(1) grayscale(100%) brightness(200%);
+
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    padding: 0.25rem;
+    background-color: transparent;
+    border: 0;
+    opacity: var(--bs-btn-close-opacity);
+}
+
+.close.fileinput-remove:hover {
+    opacity: var(--bs-btn-close-hover-opacity);
+    cursor: pointer;
+}
+
+.close.fileinput-remove:focus {
+    outline: 0;
+    box-shadow: var(--bs-btn-close-focus-shadow);
+}
