@@ -63,7 +63,9 @@ class GPTService
         ];
         $this->failureThreshold = $failureThreshold;
         $this->openTimeout = $openTimeout;
-        Telemetry::setGptBreakerState('closed');
+        if (Telemetry::enabled()) {
+            Telemetry::setGptBreakerState('closed');
+        }
     }
 
     /**
@@ -82,7 +84,9 @@ class GPTService
             if ((microtime(true) - $this->openedAt) >= $this->openTimeout) {
                 $this->isOpen = false;
                 $this->isHalfOpen = true;
-                Telemetry::setGptBreakerState('half-open');
+                if (Telemetry::enabled()) {
+                    Telemetry::setGptBreakerState('half-open');
+                }
             } else {
                 return [
                     'status' => 0,
@@ -150,7 +154,9 @@ class GPTService
                         'error_code' => 'http_' . $status,
                         'error_message' => $decoded['error']['message'] ?? null,
                     ];
-                    Telemetry::observeGptResponseTime(microtime(true) - $startTime);
+                    if (Telemetry::enabled()) {
+                        Telemetry::observeGptResponseTime(microtime(true) - $startTime);
+                    }
                     $this->updateBreaker(false);
                     return $result;
                 }
@@ -161,7 +167,9 @@ class GPTService
                     'error_code' => null,
                     'error_message' => null,
                 ];
-                Telemetry::observeGptResponseTime(microtime(true) - $startTime);
+                if (Telemetry::enabled()) {
+                    Telemetry::observeGptResponseTime(microtime(true) - $startTime);
+                }
                 $this->updateBreaker(true);
                 return $result;
             } catch (RequestException $e) {
@@ -185,7 +193,9 @@ class GPTService
             'error_code' => $errorCode,
             'error_message' => $errorMessage,
         ];
-        Telemetry::observeGptResponseTime(microtime(true) - $startTime);
+        if (Telemetry::enabled()) {
+            Telemetry::observeGptResponseTime(microtime(true) - $startTime);
+        }
         $this->updateBreaker(false);
         return $result;
     }
@@ -196,7 +206,9 @@ class GPTService
             $this->failureCount = 0;
             $this->isOpen = false;
             $this->isHalfOpen = false;
-            Telemetry::setGptBreakerState('closed');
+            if (Telemetry::enabled()) {
+                Telemetry::setGptBreakerState('closed');
+            }
             return;
         }
 
@@ -205,7 +217,9 @@ class GPTService
             $this->isOpen = true;
             $this->isHalfOpen = false;
             $this->openedAt = microtime(true);
-            Telemetry::setGptBreakerState('open');
+            if (Telemetry::enabled()) {
+                Telemetry::setGptBreakerState('open');
+            }
         }
     }
 
