@@ -5,19 +5,19 @@ ENV_FILE=".env"
 
 cp -n .env.example $ENV_FILE 2>/dev/null || true
 
-read -rp "APP_ENV (dev/prod) [$(grep -E '^APP_ENV=' $ENV_FILE | cut -d= -f2)]: " APP_ENV || true
-read -rp "APP_DEBUG (true/false) [$(grep -E '^APP_DEBUG=' $ENV_FILE | cut -d= -f2)]: " APP_DEBUG || true
+read -rp "Среда приложения APP_ENV (dev/prod) [$(grep -E '^APP_ENV=' $ENV_FILE | cut -d= -f2)]: " APP_ENV || true
+read -rp "Режим отладки APP_DEBUG (true/false) [$(grep -E '^APP_DEBUG=' $ENV_FILE | cut -d= -f2)]: " APP_DEBUG || true
 
-read -rp "DB host [db]: " DB_HOST || true
+read -rp "Хост БД [db]: " DB_HOST || true
 DB_HOST=${DB_HOST:-db}
-read -rp "DB name [app]: " DB_NAME || true
+read -rp "Имя БД [app]: " DB_NAME || true
 DB_NAME=${DB_NAME:-app}
-read -rp "DB user [app]: " DB_USER || true
+read -rp "Пользователь БД [app]: " DB_USER || true
 DB_USER=${DB_USER:-app}
-read -rp "DB pass [secret]: " DB_PASS || true
+read -rp "Пароль БД [secret]: " DB_PASS || true
 DB_PASS=${DB_PASS:-secret}
 
-read -rp "JWT secret [change_me]: " JWT_SECRET || true
+read -rp "Секрет JWT [change_me]: " JWT_SECRET || true
 JWT_SECRET=${JWT_SECRET:-change_me}
 
 sed -i "s#^APP_ENV=.*#APP_ENV=${APP_ENV:-dev}#g" $ENV_FILE
@@ -28,4 +28,4 @@ sed -i "s#^DB_PASS=.*#DB_PASS=\\\"${DB_PASS}\\\"#g" $ENV_FILE
 sed -i "s#^DB_NAME=.*#DB_NAME=\\\"${DB_NAME}\\\"#g" $ENV_FILE
 sed -i "s#^JWT_SECRET=.*#JWT_SECRET=\\\"${JWT_SECRET}\\\"#g" $ENV_FILE
 
-echo "OK: .env updated."
+echo "ОК: .env обновлён."
