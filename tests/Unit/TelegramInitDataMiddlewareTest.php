@@ -14,10 +14,10 @@ final class TelegramInitDataMiddlewareTest extends TestCase
 {
     private string $botToken = 'TEST_TOKEN';
 
-    private function buildInitData(array $user): string
+    private function buildInitData(array $user, ?int $authDate = null): string
     {
         $data = [
-            'auth_date' => '123',
+            'auth_date' => (string)($authDate ?? 123),
             'user' => json_encode($user, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
         ];
         ksort($data);
@@ -61,6 +61,24 @@ final class TelegramInitDataMiddlewareTest extends TestCase
         $middleware = new TelegramInitDataMiddleware($this->botToken);
         $init = $this->buildInitData(['id' => 1]);
         $init .= 'broken';
+        $req = (new ServerRequestFactory())->createServerRequest('GET', '/')
+            ->withHeader('X-Telegram-Init-Data', $init);
+        $handler = new class implements RequestHandlerInterface {
+            public function handle(Req $request): Res
+            {
+                return new Psr7Response();
+            }
+        };
+        $res = $middleware->process($req, $handler);
+        $this->assertSame(403, $res->getStatusCode());
+        $this->assertStringContainsString('Invalid init data', (string)$res->getBody());
+    }
+
+    public function testExpiredInitDataFails(): void
+    {
+        $middleware = new TelegramInitDataMiddleware($this->botToken);
+        $expired = time() - 86400 - 1;
+        $init = $this->buildInitData(['id' => 1], $expired);
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/')
             ->withHeader('X-Telegram-Init-Data', $init);
         $handler = new class implements RequestHandlerInterface {
