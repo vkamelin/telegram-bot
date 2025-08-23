@@ -46,6 +46,7 @@ JWT_SECRET="secret"                                      # секретный к
 CORS_ORIGINS="*"                                         # разрешённые origin через запятую
 RATE_LIMIT_BUCKET=ip                                     # тип лимита: ip или user
 RATE_LIMIT=60                                            # запросов в минуту
+REQUEST_SIZE_LIMIT=1048576                               # максимальный размер тела запроса в байтах
 BOT_TOKEN="0000000000:AA..."                            # токен Telegram-бота
 ```
 
