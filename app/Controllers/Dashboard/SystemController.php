@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace App\Controllers\Dashboard;
 
+use App\Helpers\Database;
+use App\Helpers\RedisHelper;
 use App\Helpers\View;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface as Res;
@@ -55,11 +57,40 @@ final class SystemController
             ],
         ];
 
+        $queueSizes = null;
+        $sendSpeed  = null;
+        if (filter_var($_ENV['TELEMETRY_ENABLED'] ?? false, FILTER_VALIDATE_BOOL)) {
+            try {
+                $redis = RedisHelper::getInstance();
+                $queueSizes = [
+                    'p2' => (int)$redis->lLen('telegram:queue:2'),
+                    'p1' => (int)$redis->lLen('telegram:queue:1'),
+                    'p0' => (int)$redis->lLen('telegram:queue:0'),
+                    'dlq' => (int)$redis->lLen('telegram:dlq'),
+                ];
+            } catch (\RedisException) {
+                $queueSizes = null;
+            }
+
+            try {
+                $pdo = Database::getInstance();
+                $stmt = $pdo->query(
+                    "SELECT COUNT(*) FROM telegram_messages " .
+                    "WHERE status='success' AND processed_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)"
+                );
+                $sendSpeed = (int)$stmt->fetchColumn();
+            } catch (\Throwable) {
+                $sendSpeed = null;
+            }
+        }
+
         $data = [
             'title'          => 'System',
             'health'         => $health,
             'env'            => $env,
             'workerCommands' => $workerCommands,
+            'queueSizes'     => $queueSizes,
+            'sendSpeed'      => $sendSpeed,
         ];
 
         return View::render($res, 'dashboard/system.php', $data, 'layouts/main.php');

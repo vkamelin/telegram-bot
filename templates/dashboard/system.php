@@ -5,6 +5,8 @@
  * @var array|null $health
  * @var array $env
  * @var array $workerCommands
+ * @var array|null $queueSizes
+ * @var int|null $sendSpeed
  */
 ?>
 
@@ -39,3 +41,13 @@
         <pre class="bg-dark text-white p-2 rounded-3"><code><?= implode("\n", $workerCommands['restart']) ?></code></pre>
     </div>
 </div>
+
+<?php if (!empty($queueSizes)): ?>
+<div class="row mt-3">
+    <div class="col-md-6">
+        <h4>Очереди</h4>
+        <p class="lead">p2: <?= $queueSizes['p2'] ?>, p1: <?= $queueSizes['p1'] ?>, p0: <?= $queueSizes['p0'] ?></p>
+        <small>DLQ: <?= $queueSizes['dlq'] ?>; RPS: <?= $sendSpeed ?></small>
+    </div>
+</div>
+<?php endif; ?>
