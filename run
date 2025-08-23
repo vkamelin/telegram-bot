@@ -2,62 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Config;
-use App\Console\Kernel;
-
-// Проверка существования файла autoload.php
-if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
-    echo "Файл автозагрузки не найден. Установите зависимости через Composer.\n";
-    exit(1);
-}
-
-// Подключаем autoload
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Загружаем конфигурацию приложения
-Config::getInstance();
-
-// Базовый каталог для команд
-$commandsPath = __DIR__ . '/app/Console/Commands';
-
-// Получаем имя команды и аргументы
-$inputArgs = $argv;
-array_shift($inputArgs); // Убираем первый элемент (имя файла)
-
-if (empty($inputArgs)) {
-    echo "Необходимо указать команду.\n";
-    exit(1);
-}
-
-$commandName = array_shift($inputArgs);
-
-// Поиск и выполнение команды по сигнатуре
-$commandFiles = glob($commandsPath . '/*Command.php');
-
-foreach ($commandFiles as $file) {
-    require_once $file;
-
-    $className = pathinfo($file, PATHINFO_FILENAME);
-    $fqcn = "App\\Console\\Commands\\{$className}";
-
-    if (!class_exists($fqcn)) {
-        continue;
-    }
-
-    $command = new $fqcn();
-
-    if ($command->signature === $commandName) {
-        try {
-            $kernel = new Kernel();
-            $exitCode = $command->run($inputArgs, $kernel);
-            exit($exitCode);
-        } catch (Throwable $e) {
-            echo $e->getMessage() . "\n";
-            exit(1);
-        }
-    }
-}
-
-echo "Команда {$commandName} не найдена.\n";
-exit(1);
+$kernel = new App\Console\Kernel();
+exit($kernel->handle($argv));
 
