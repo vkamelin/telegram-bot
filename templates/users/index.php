@@ -45,4 +45,5 @@
 <script src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>          <!-- Экспорт HTML5 (excelHtml5, csvHtml5, pdfHtml5) :contentReference[oaicite:7]{index=7} -->
 <script src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.bootstrap5.min.js"></script>     <!-- Стили для Bootstrap 5 -->
 
+<script src="<?= url('/assets/js/datatable.common.js') ?>"></script>
 <script src="<?= url('/assets/js/datatable.users.js') ?>"></script>

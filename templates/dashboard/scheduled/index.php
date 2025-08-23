@@ -45,4 +45,5 @@
 <script src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.bootstrap5.min.js"></script>
 
+<script src="<?= url('/assets/js/datatable.common.js') ?>"></script>
 <script src="<?= url('/assets/js/datatable.scheduled.js') ?>"></script>
