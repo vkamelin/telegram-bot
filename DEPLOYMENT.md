@@ -50,7 +50,7 @@ php vendor/bin/phinx migrate -e production
 
 ### 3) Nginx
 
-Скопируй `deploy/nginx/default.conf` в `/etc/nginx/sites-available/yourapp.conf`, обнови домен и путь, затем включи сайт:
+Скопируй `docker/nginx/default.conf` в `/etc/nginx/sites-available/yourapp.conf` (все конфиги для VPS лежат в каталоге `docker/`), обнови домен и путь, затем включи сайт:
 
 ```bash
 ln -s /etc/nginx/sites-available/yourapp.conf /etc/nginx/sites-enabled/yourapp.conf
@@ -61,9 +61,11 @@ nginx -t && systemctl reload nginx
 
 ### 4) Supervisor
 
+Скопируй конфиги Supervisor из `docker/supervisor` и включи службу:
+
 ```bash
 apt-get install -y supervisor
-cp -r docker/supervisor /etc/supervisor
+cp -r docker/supervisor/* /etc/supervisor/
 supervisorctl reread
 supervisorctl update
 systemctl enable --now supervisor

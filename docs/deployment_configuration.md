@@ -12,6 +12,9 @@
 - `BOT_TOKEN` — токен Telegram‑бота
 - `TELEMETRY_ENABLED` — включить метрики и трассировку (`true`/`false`)
 
+## Конфиги
+Готовые конфиги Nginx и Supervisor лежат в каталоге `docker/`.
+
 ## Среды
 
 ### Dev
