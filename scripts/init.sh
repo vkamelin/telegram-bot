@@ -7,6 +7,7 @@ cp -n .env.example $ENV_FILE 2>/dev/null || true
 
 # ensure default DB_DSN exists
 grep -q '^DB_DSN=' "$ENV_FILE" || echo 'DB_DSN="mysql:host=db;dbname=app;charset=utf8mb4"' >> "$ENV_FILE"
+grep -q '^DB_NAME=' "$ENV_FILE" || echo 'DB_NAME="app"' >> "$ENV_FILE"
 
 read -rp "Среда приложения APP_ENV (dev/prod) [$(grep -E '^APP_ENV=' $ENV_FILE | cut -d= -f2)]: " APP_ENV || true
 read -rp "Режим отладки APP_DEBUG (true/false) [$(grep -E '^APP_DEBUG=' $ENV_FILE | cut -d= -f2)]: " APP_DEBUG || true

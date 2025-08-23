@@ -12,6 +12,7 @@ $adapter = explode(':', $dsn, 2)[0] ?: 'mysql';
 $db = [
     'adapter' => $adapter,
     'dsn' => $dsn,
+    'name' => $_ENV['DB_NAME'] ?? null,
     'user' => $_ENV['DB_USER'] ?? null,
     'pass' => $_ENV['DB_PASS'] ?? null,
 ];
