@@ -1,39 +1,59 @@
 <?php
 
-return [
+$menu = [
     [
-        'url' => '/dashboard',
-        'title' => 'Главная',
-        'icon' => 'bi bi-speedometer2'
+        'url'   => '/dashboard',
+        'title' => 'Overview',
+        'icon'  => 'bi bi-speedometer2',
     ],
     [
-        'url' => '/dashboard/tg-users',
-        'title' => 'Пользователи',
-        'icon' => 'bi bi-people-fill'
+        'url'   => '/dashboard/messages',
+        'title' => 'Messages',
+        'icon'  => 'bi bi-chat-right-text',
     ],
     [
-        'url' => '/dashboard/users',
-        'title' => 'Админы',
-        'icon' => 'bi bi-person-gear'
+        'url'   => '/dashboard/scheduled',
+        'title' => 'Scheduled',
+        'icon'  => 'bi bi-clock',
     ],
     [
-        'url' => '/dashboard/checks',
-        'title' => 'Чеки',
-        'icon' => 'bi bi-card-checklist'
+        'url'   => '/dashboard/updates',
+        'title' => 'Updates',
+        'icon'  => 'bi bi-arrow-repeat',
     ],
     [
-        'url' => '/dashboard/utm',
-        'title' => 'UTM',
-        'icon' => 'bi bi-tags-fill'
+        'url'   => '/dashboard/tg-users',
+        'title' => 'TG Users',
+        'icon'  => 'bi bi-people-fill',
     ],
     [
-        'url' => '/dashboard/pushes',
-        'title' => 'Рассылки',
-        'icon' => 'bi bi-chat-right-text'
+        'url'   => '/dashboard/sessions',
+        'title' => 'Sessions',
+        'icon'  => 'bi bi-clock-history',
     ],
     [
-        'url' => '/dashboard/system',
-        'title' => 'Система',
-        'icon' => 'bi bi-gear'
+        'url'   => '/dashboard/users',
+        'title' => 'Users',
+        'icon'  => 'bi bi-person-gear',
+    ],
+    [
+        'url'   => '/dashboard/tokens',
+        'title' => 'Tokens',
+        'icon'  => 'bi bi-key',
+    ],
+    [
+        'url'   => '/dashboard/system',
+        'title' => 'System',
+        'icon'  => 'bi bi-gear',
     ],
 ];
+
+if (is_dir(__DIR__ . '/dashboard/metrics') || file_exists(__DIR__ . '/dashboard/metrics.php')) {
+    $menu[] = [
+        'url'   => '/dashboard/metrics',
+        'title' => 'Metrics',
+        'icon'  => 'bi bi-graph-up',
+    ];
+}
+
+return $menu;
