@@ -7,7 +7,7 @@ return [
         'icon' => 'bi bi-speedometer2'
     ],
     [
-        'url' => '/dashboard/users',
+        'url' => '/dashboard/tg-users',
         'title' => 'Пользователи',
         'icon' => 'bi bi-people-fill'
     ],
