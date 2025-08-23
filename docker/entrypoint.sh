@@ -10,4 +10,8 @@ if [ -f vendor/bin/phinx ]; then
     fi
 fi
 
+# ensure logs directory exists and is writable
+mkdir -p storage/logs
+chown -R www-data:www-data storage/logs
+
 exec "$@"
