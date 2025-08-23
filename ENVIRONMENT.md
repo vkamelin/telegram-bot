@@ -18,7 +18,8 @@ APP_DEBUG=true         # включить подробные ошибки (true/
 
 # === База данных ===
 DB_DSN="mysql:host=db;dbname=app;charset=utf8mb4"
-DB_USER="root"
+DB_NAME="app"
+DB_USER="app"
 DB_PASS="secret"
 
 # === JWT токены ===
