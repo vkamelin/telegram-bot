@@ -10,7 +10,7 @@ use App\Middleware\JwtMiddleware;
 use App\Middleware\RateLimitMiddleware;
 use App\Middleware\ErrorMiddleware;
 use App\Controllers\Api\MeController;
-use App\Helpers\Response;
+use App\Controllers\Api\HealthController;
 use Firebase\JWT\JWT;
 use Slim\Psr7\Response as PsrResponse;
 
@@ -42,8 +42,9 @@ final class ApiTest extends TestCase
         $app = AppFactory::create();
         $app->addBodyParsingMiddleware();
         $app->add(new ErrorMiddleware(true));
-        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) {
-            $g->get('/health', fn($req, $res) => Response::json($res, 200, ['status' => 'ok']));
+        $pdo = new PDO('sqlite::memory:');
+        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
+            $g->get('/health', new HealthController($pdo));
             $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
                 $auth->get('/me', function ($req, $res) {
                     return (new MeController())->show($req, $res);

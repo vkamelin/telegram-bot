@@ -49,7 +49,7 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
 
 // API (/api/*)
 $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $config) {
-    $g->get('/health', fn(Req $req, Res $res): Res => \App\Helpers\Response::json($res, 200, ['status' => 'ok']));
+    $g->get('/health', new \App\Controllers\Api\HealthController($pdo));
     $g->post('/auth/login', [\App\Controllers\Api\AuthController::class, 'login']);
 
     $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
