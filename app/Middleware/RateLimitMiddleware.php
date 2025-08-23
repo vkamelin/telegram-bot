@@ -24,7 +24,7 @@ final class RateLimitMiddleware implements MiddlewareInterface
     public function __construct(private array $cfg) {}
 
     /**
-     * Применяет лимит запросов на основе IP или пользователя.
+     * Применяет лимит запросов на основе IP или Telegram пользователя.
      *
      * @param Req $req HTTP-запрос
      * @param Handler $handler Следующий обработчик
@@ -34,8 +34,9 @@ final class RateLimitMiddleware implements MiddlewareInterface
     {
         // Простой лимит по IP в памяти процесса (для прод — подключите Redis)
         static $hits = [];
+        // Используем ID Telegram пользователя, при его отсутствии — IP
         $key = $this->cfg['bucket'] === 'user'
-            ? ($req->getAttribute('jwt')['uid'] ?? $req->getServerParams()['REMOTE_ADDR'] ?? 'anon')
+            ? ($req->getAttribute('telegramUser')['id'] ?? $req->getServerParams()['REMOTE_ADDR'] ?? 'anon')
             : ($req->getServerParams()['REMOTE_ADDR'] ?? 'anon');
         
         $window = (int)(time() / 60);
