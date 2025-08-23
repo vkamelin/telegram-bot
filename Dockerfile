@@ -3,15 +3,22 @@
 FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --prefer-dist --no-progress --no-interaction
+RUN apt-get update \
+    && apt-get install -y libzip-dev unzip \
+    && docker-php-ext-install zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && composer install --no-dev --prefer-dist --no-progress --no-interaction
 
 FROM php:8.3-cli AS app
 WORKDIR /var/www/html
 
 RUN apt-get update \
-    && apt-get install -y supervisor \
-    && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-install pdo_mysql opcache
+    && apt-get install -y supervisor libzip-dev unzip \
+    && docker-php-ext-install pdo_mysql opcache zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY docker/supervisor /etc/supervisor
 
