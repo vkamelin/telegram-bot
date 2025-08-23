@@ -29,9 +29,14 @@ final class View
         }
 
         $currentPath = strtok($_SERVER['REQUEST_URI'] ?? '/', '?') ?: '/';
-        $menu = require $basePath . 'menu.php';
+        $menu        = require $basePath . 'menu.php';
         foreach ($menu as &$item) {
-            $item['class'] = ($item['url'] === $currentPath) ? 'active' : '';
+            $url = rtrim($item['url'], '/');
+            if ($url === '/dashboard') {
+                $item['class'] = $currentPath === '/dashboard' ? 'active' : '';
+                continue;
+            }
+            $item['class'] = ($currentPath === $url || str_starts_with($currentPath, $url . '/')) ? 'active' : '';
         }
         unset($item);
 
