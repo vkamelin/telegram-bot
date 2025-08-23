@@ -46,6 +46,9 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/messages/data', [\App\Controllers\Dashboard\MessagesController::class, 'data']);
         $auth->post('/messages/{id}/resend', [\App\Controllers\Dashboard\MessagesController::class, 'resend']);
         $auth->get('/messages/{id}/response', [\App\Controllers\Dashboard\MessagesController::class, 'download']);
+        $auth->get('/updates', [\App\Controllers\Dashboard\UpdatesController::class, 'index']);
+        $auth->post('/updates/data', [\App\Controllers\Dashboard\UpdatesController::class, 'data']);
+        $auth->get('/updates/{id}', [\App\Controllers\Dashboard\UpdatesController::class, 'show']);
         $auth->get('/scheduled', [\App\Controllers\Dashboard\ScheduledController::class, 'index']);
         $auth->post('/scheduled/data', [\App\Controllers\Dashboard\ScheduledController::class, 'data']);
         $auth->post('/scheduled/{id}/send-now', [\App\Controllers\Dashboard\ScheduledController::class, 'sendNow']);
