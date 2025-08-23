@@ -8,6 +8,7 @@
 - Для новых переменных добавляй их в `.env.example` с комментарием.
 - В коде использовать только `$_ENV` или обёртку в `config.php`.
 - Значения хранятся в **строковом формате**, при необходимости кастуются в PHP.
+- Перед запуском контейнеров убедись, что задан `DB_DSN`.
 
 ## Пример `.env.example` с комментариями
 ```ini
@@ -16,7 +17,7 @@ APP_ENV=dev            # окружение: dev, prod
 APP_DEBUG=true         # включить подробные ошибки (true/false)
 
 # === База данных ===
-DB_DSN="mysql:host=127.0.0.1;dbname=app;charset=utf8mb4"
+DB_DSN="mysql:host=db;dbname=app;charset=utf8mb4"
 DB_USER="root"
 DB_PASS="secret"
 
