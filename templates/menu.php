@@ -12,6 +12,11 @@ return [
         'icon' => 'bi bi-people-fill'
     ],
     [
+        'url' => '/dashboard/users',
+        'title' => 'Админы',
+        'icon' => 'bi bi-person-gear'
+    ],
+    [
         'url' => '/dashboard/checks',
         'title' => 'Чеки',
         'icon' => 'bi bi-card-checklist'
