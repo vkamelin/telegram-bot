@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Config;
+use App\Console\Kernel;
 
 // Проверка существования файла autoload.php
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
@@ -17,117 +18,46 @@ require_once __DIR__ . '/vendor/autoload.php';
 Config::getInstance();
 
 // Базовый каталог для команд
-$commandsPath = __DIR__ . '/commands';
+$commandsPath = __DIR__ . '/app/Console/Commands';
 
 // Получаем имя команды и аргументы
 $inputArgs = $argv;
 array_shift($inputArgs); // Убираем первый элемент (имя файла)
 
-// Проверка на наличие команды
 if (empty($inputArgs)) {
     echo "Необходимо указать команду.\n";
     exit(1);
 }
 
-// Функция для преобразования строки из snake_case в CamelCase
-function toCamelCase(string $string): string
-{
-    return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
-}
-
-// Функция для преобразования строки из snake_case в camelCase
-function toLowerCamelCase(string $string): string
-{
-    $camelCase = toCamelCase($string);
-    return lcfirst($camelCase);
-}
-
-// Имя команды
 $commandName = array_shift($inputArgs);
 
-// Проверка корректности формата команды
-/*if (!strpos($commandName, ':')) {
-    echo "Команда должна быть в формате 'имяКоманды:методКоманды'.\n";
-    exit(1);
-}*/
+// Поиск и выполнение команды по сигнатуре
+$commandFiles = glob($commandsPath . '/*Command.php');
 
-// Формат команды: "hello:handle"
-[$className, $methodName] = explode(':', $commandName) + [1 => 'handle'];
-$className = toCamelCase($className) . 'Command'; // Преобразуем в CamelCase
-$methodName = toLowerCamelCase($methodName);
+foreach ($commandFiles as $file) {
+    require_once $file;
 
-// Имя файла класса команды
-$commandFile = $commandsPath . '/' . $className . '.php';
+    $className = pathinfo($file, PATHINFO_FILENAME);
+    $fqcn = "App\\Console\\Commands\\{$className}";
 
-// Проверка существования файла класса
-if (!file_exists($commandFile)) {
-    echo "Команда {$className} не найдена.\n";
-    exit(1);
-}
-
-// Подключаем файл команды
-require_once $commandFile;
-
-$className = "App\\Commands\\" . $className;
-
-// Проверка существования класса и метода
-if (!class_exists($className) || !method_exists($className, $methodName)) {
-    echo "Класс {$className} или метод {$methodName} не найдены.\n";
-    exit(1);
-}
-
-// Парсинг аргументов
-$args = [];
-$namedArgs = [];
-
-foreach ($inputArgs as $arg) {
-    $arg = trim($arg);
-    if (str_starts_with($arg, '--')) {
-        // Обработка именованных параметров
-        [$key, $value] = explode('=', substr($arg, 2), 2) + [1 => true];
-        $namedArgs[$key] = $value;
-    } else {
-        // Обработка позиционных параметров
-        $args[] = $arg;
+    if (!class_exists($fqcn)) {
+        continue;
     }
-}
 
-// Объединяем позиционные и именованные параметры
-$args = array_merge($args, $namedArgs);
+    $command = new $fqcn();
 
-// Установка аргумента args по умолчанию, если он не задан
-if (!isset($args['args'])) {
-    $args['args'] = [];
-}
-
-try {
-    $reflectionMethod = new ReflectionMethod($className, $methodName);
-    $parameters = $reflectionMethod->getParameters();
-    $orderedArgs = [];
-    
-    foreach ($parameters as $param) {
-        $paramName = $param->getName();
-        
-        // Сначала проверяем именованные параметры
-        if (array_key_exists($paramName, $namedArgs)) {
-            $orderedArgs[] = $namedArgs[$paramName];
-        } // Затем проверяем позиционные параметры
-        elseif (!empty($args)) {
-            $orderedArgs[] = array_shift($args); // Берем первый элемент из позиционных параметров
-        } // Если параметр необязателен, используем значение по умолчанию
-        elseif ($param->isOptional()) {
-            $orderedArgs[] = $param->getDefaultValue();
-        } // Если параметр обязателен, но не передан, выбрасываем ошибку
-        else {
-            echo "Отсутствует обязательный аргумент: {$paramName}\n";
+    if ($command->signature === $commandName) {
+        try {
+            $kernel = new Kernel();
+            $exitCode = $command->run($inputArgs, $kernel);
+            exit($exitCode);
+        } catch (Throwable $e) {
+            echo $e->getMessage() . "\n";
             exit(1);
         }
     }
-    
-    // Вызываем метод с отсортированными аргументами
-    $command = new $className();
-    $reflectionMethod->invokeArgs($command, $orderedArgs);
-} catch (Exception $e) {
-    echo $e->getMessage() . "\n";
-    exit(1);
 }
+
+echo "Команда {$commandName} не найдена.\n";
+exit(1);
+
