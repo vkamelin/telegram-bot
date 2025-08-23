@@ -10,12 +10,31 @@
 - **gpt.php** — обрабатывает задания для GPT из очереди Redis `gpt:queue` и сохраняет результаты. Постоянный воркер.
 - **purge_refresh_tokens.php** — удаляет просроченные refresh-токены из базы данных. Запускать по cron, например раз в сутки.
 
+## Телеметрия
+Отправка метрик и трассировки управляется переменной окружения `TELEMETRY_ENABLED`.
+
+```bash
+# .env
+TELEMETRY_ENABLED=true   # включить
+TELEMETRY_ENABLED=false  # выключить
+```
+
+При значении `false` или отсутствии зависимостей вызовы `App\\Telemetry` игнорируются.
+
+## Supervisor
+Все воркеры управляются через Supervisor. Готовые конфиги лежат в `docker/supervisor`.
+
+```bash
+supervisorctl status workers:*
+supervisorctl restart workers:longpolling
+```
+
+После изменения конфигов выполните `supervisorctl reread && supervisorctl update`.
+
 ## Мониторинг
-- Метрики отправляются через `App\\Telemetry` и активируются переменной `TELEMETRY_ENABLED`.
 - **Метрики**:
   - `Telemetry::incrementTelegramSent` и `Telemetry::recordTelegramSendFailure` — счётчики успешных и неуспешных отправок сообщений.
   - `Telemetry::setTelegramQueueSize` и `Telemetry::setDlqSize` — размер очереди и DLQ.
   - `Telemetry::setGptBreakerState` и `Telemetry::observeGptResponseTime` — состояние цепочки GPT и время ответа.
 - **Логи**: все процессы пишут JSON‑логи через `App\Helpers\Logger` в `storage/logs/app.log`.
-- **Перезапуск**: при росте очередей или ошибках перезапускайте воркеры через supervisor (`supervisorctl restart workers:*`), предварительно убедившись в корректном завершении.
 - **Алёрты**: на превышение размеров очередей, ошибки отправки и открытый GPT breaker.
