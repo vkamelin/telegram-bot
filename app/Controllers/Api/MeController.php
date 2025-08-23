@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api;
 
-use PDO;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
@@ -17,10 +16,6 @@ use App\Helpers\Response;
  */
 final class MeController
 {
-    /**
-     * @param PDO $pdo Подключение к базе данных
-     */
-    public function __construct(private PDO $pdo) {}
 
     /**
      * Возвращает данные авторизованного пользователя.
@@ -31,17 +26,10 @@ final class MeController
      */
     public function show(Req $req, Res $res): Res
     {
-        $jwt = (array)$req->getAttribute('jwt');
-        $uid = (int)($jwt['uid'] ?? 0);
-        if ($uid <= 0) {
-            return Response::problem($res, 401, 'Unauthorized');
+        $telegramUser = $req->getAttribute('telegramUser');
+        if (!is_array($telegramUser)) {
+            return Response::problem($res, 403, 'Forbidden');
         }
-        $stmt = $this->pdo->prepare('SELECT id, email, created_at FROM users WHERE id = ? LIMIT 1');
-        $stmt->execute([$uid]);
-        $u = $stmt->fetch();
-        if (!$u) {
-            return Response::problem($res, 404, 'User not found');
-        }
-        return Response::json($res, 200, ['user' => $u]);
+        return Response::json($res, 200, ['user' => $telegramUser]);
     }
 }
