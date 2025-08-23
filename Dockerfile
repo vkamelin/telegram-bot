@@ -8,14 +8,17 @@ RUN composer install --no-dev --prefer-dist --no-progress --no-interaction
 FROM php:8.3-cli AS app
 WORKDIR /var/www/html
 
-RUN docker-php-ext-install pdo_mysql opcache
+RUN apt-get update \
+    && apt-get install -y supervisor \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-install pdo_mysql opcache
+
+COPY docker/supervisor /etc/supervisor
 
 COPY --from=vendor /app/vendor vendor
 COPY . .
 
 RUN chmod +x docker/entrypoint.sh
 
-EXPOSE 8080
-
 ENTRYPOINT ["docker/entrypoint.sh"]
-CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
