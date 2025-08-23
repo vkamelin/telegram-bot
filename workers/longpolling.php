@@ -9,6 +9,7 @@ use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use App\Telegram\UpdateHelper;
+use App\Telegram\UpdateFilter;
 
 /** @var \Slim\App $app */
 $app = require __DIR__ . '/../bootstrap.php';
@@ -93,9 +94,28 @@ try {
                 ]);
 
                 $offset = $update->getUpdateId() + 1;
-                
+
                 $redis->set(RedisHelper::REDIS_LONGPOLLING_OFFSET_KEY, $offset);
-                
+
+                try {
+                    $redisFilter = RedisHelper::getInstance();
+                } catch (\RedisException $e) {
+                    $redisFilter = null;
+                }
+                $filter = new UpdateFilter(
+                    $redisFilter,
+                    getenv('TG_FILTERS_REDIS_PREFIX') ?: 'tg:filters'
+                );
+                $reason = null;
+                if (!$filter->shouldProcess($update, $reason)) {
+                    Logger::info('Update skipped', [
+                        'id' => $update->getUpdateId(),
+                        'type' => $update->getUpdateType(),
+                        'reason' => $reason,
+                    ]);
+                    continue;
+                }
+
                 $updateType = $update->getUpdateType();
                 
                 // Обрабатываем обновления
