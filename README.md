@@ -52,6 +52,20 @@ BOT_TOKEN="0000000000:AA..."                            # токен Telegram-б
 
 BOT_TOKEN — токен бота для проверки `initData` из Telegram WebApp.
 
+## 🐳 Docker
+
+```bash
+chmod +x scripts/init.sh scripts/deploy.sh docker/entrypoint.sh
+./scripts/init.sh
+docker compose up -d --build
+```
+
+Миграции:
+
+```bash
+docker compose exec app php vendor/bin/phinx migrate
+```
+
 ---
 
 ## ▶️ Запуск
