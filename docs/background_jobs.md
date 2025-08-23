@@ -1,7 +1,7 @@
 # Фоновые задачи
 
 ## Назначение
-Почему нужны фоновые задачи. Описание воркеров в supervisor
+Почему нужны фоновые задачи. Воркеры запускаются и перезапускаются через Supervisor; конфиги лежат в `docker/supervisor`.
 
 ## Список задач
 - **longpolling.php** — получает обновления от Telegram через long polling, хранит offset в Redis и передаёт данные в обработчики. Постоянный процесс под supervisor.
@@ -11,6 +11,7 @@
 - **purge_refresh_tokens.php** — удаляет просроченные refresh-токены из базы данных. Запускать по cron, например раз в сутки.
 
 ## Мониторинг
+- Метрики отправляются через `App\\Telemetry` и активируются переменной `TELEMETRY_ENABLED`.
 - **Метрики**:
   - `Telemetry::incrementTelegramSent` и `Telemetry::recordTelegramSendFailure` — счётчики успешных и неуспешных отправок сообщений.
   - `Telemetry::setTelegramQueueSize` и `Telemetry::setDlqSize` — размер очереди и DLQ.
