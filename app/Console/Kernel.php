@@ -16,6 +16,7 @@ class Kernel
         Commands\MigrateRollbackCommand::class,
         Commands\RefreshTokenPurgeCommand::class,
         Commands\CreateAdminCommand::class,
+        Commands\UpdateFilterCommand::class,
     ];
 
     /**
