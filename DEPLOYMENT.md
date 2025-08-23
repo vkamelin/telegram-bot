@@ -37,6 +37,7 @@ docker compose exec app php vendor/bin/phinx migrate
 
 * Nginx, PHP-FPM 8.3 (`php8.3-fpm php8.3-cli php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip php8.3-mysql`)
 * Composer 2
+* Supervisor
 
 ### 2) Первая настройка
 
@@ -58,14 +59,24 @@ nginx -t && systemctl reload nginx
 
 Убедись, что путь к сокету PHP-FPM совпадает с `fastcgi_pass`.
 
-### 4) Обновление
+### 4) Supervisor
+
+```bash
+apt-get install -y supervisor
+cp -r docker/supervisor /etc/supervisor
+supervisorctl reread
+supervisorctl update
+systemctl enable --now supervisor
+```
+
+### 5) Обновление
 
 ```bash
 git pull
 composer install --no-dev --optimize-autoloader
 php vendor/bin/phinx migrate -e production
 # Docker: docker compose up -d --build
-# VPS: systemctl reload nginx && systemctl reload php8.3-fpm
+# VPS: systemctl reload nginx && systemctl reload php8.3-fpm && supervisorctl reload
 ```
 
 ## Проверка

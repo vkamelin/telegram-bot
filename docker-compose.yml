@@ -4,11 +4,10 @@ services:
   app:
     build: .
     container_name: app
+    command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
     env_file: .env
     volumes:
       - .:/var/www/html
-    ports:
-      - "8080:8080"
     depends_on:
       - db
       - redis
