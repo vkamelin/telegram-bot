@@ -38,10 +38,8 @@ final class TelegramInitDataMiddlewareTest extends TestCase
         $init = $this->buildInitData(['id' => 1, 'username' => 'test']);
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/')
             ->withHeader('X-Telegram-Init-Data', $init);
-        $captured = null;
-        $handler = new class(&$captured) implements RequestHandlerInterface {
-            private $captured;
-            public function __construct(& $captured) { $this->captured =& $captured; }
+        $handler = new class implements RequestHandlerInterface {
+            public ?Req $captured = null;
             public function handle(Req $request): Res
             {
                 $this->captured = $request;
@@ -50,9 +48,12 @@ final class TelegramInitDataMiddlewareTest extends TestCase
         };
         $res = $middleware->process($req, $handler);
         $this->assertSame(200, $res->getStatusCode());
-        $this->assertInstanceOf(Req::class, $captured);
-        $this->assertSame(1, $captured->getAttribute('tg_user_id'));
-        $this->assertSame('test', $captured->getAttribute('tg_username'));
+        $this->assertInstanceOf(Req::class, $handler->captured);
+        $this->assertSame(
+            ['id' => 1, 'username' => 'test'],
+            $handler->captured->getAttribute('telegramUser'),
+        );
+        $this->assertSame($init, $handler->captured->getAttribute('rawInitData'));
     }
 
     public function testInvalidInitDataFails(): void
