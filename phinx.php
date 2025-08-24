@@ -31,9 +31,9 @@ return [
     ],
     'environments' => [
         'default_migration_table' => 'phinxlog',
-        'default_environment' => $_ENV['APP_ENV'] ?? 'development',
-        'development' => $db,
-        'production' => $db,
+        'default_environment' => $_ENV['APP_ENV'] ?? 'dev',
+        'dev' => $db,
+        'prod' => $db,
     ],
 ];
 
