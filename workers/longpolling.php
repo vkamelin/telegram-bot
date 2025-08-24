@@ -24,13 +24,13 @@ try {
 }
 
 try {
-    if ($_ENV['TELEGRAM_API_SERVER'] === 'local') {
-        $apiBaseUri = 'http://' . $_ENV['TELEGRAM_LOCAL_API_HOST'] . ':' . $_ENV['TELEGRAM_LOCAL_API_PORT'];
-        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['TELEGRAM_BOT_TOKEN'];
+    if ($_ENV['BOT_API_SERVER'] === 'local') {
+        $apiBaseUri = 'http://' . $_ENV['BOT_LOCAL_API_HOST'] . ':' . $_ENV['BOT_LOCAL_API_PORT'];
+        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['BOT_TOKEN'];
         Request::setCustomBotApiUri($apiBaseUri, $apiBaseDownloadUri);
     }
     
-    $telegram = new Telegram($_ENV['TELEGRAM_BOT_TOKEN'], $_ENV['TELEGRAM_BOT_NAME']);
+    $telegram = new Telegram($_ENV['BOT_TOKEN'], $_ENV['BOT_NAME']);
     Logger::info('Long polling запущен');
 } catch (Longman\TelegramBot\Exception\TelegramException $e) {
     Logger::error("Telegram initialization failed: {$e->getMessage()}");
