@@ -6,6 +6,8 @@ namespace App\Handlers\Telegram\ChosenInlineResults;
 
 use JsonException;
 use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Request;
+use App\Helpers\Database;
 
 class DefaultChosenInlineResultHandler extends AbstractChosenInlineResultHandler
 {
@@ -13,5 +15,33 @@ class DefaultChosenInlineResultHandler extends AbstractChosenInlineResultHandler
     {
         $chosen = $update->getChosenInlineResult();
         $location = $chosen->getLocation();
+
+        $locationData = null;
+
+        try {
+            if ($location !== null) {
+                $locationData = json_encode([
+                    'latitude' => $location->getLatitude(),
+                    'longitude' => $location->getLongitude(),
+                ], JSON_THROW_ON_ERROR);
+            }
+        } catch (JsonException $e) {
+            $locationData = null;
+        }
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare(
+            'INSERT INTO `chosen_inline_results` (`query_id`, `result`, `location`) VALUES (:query_id, :result, :location)'
+        );
+        $stmt->execute([
+            'query_id' => $chosen->getQuery(),
+            'result' => $chosen->getResultId(),
+            'location' => $locationData,
+        ]);
+
+        Request::sendMessage([
+            'chat_id' => $chosen->getFrom()->getId(),
+            'text' => 'Пример ответа пользователю: результат сохранён.',
+        ]);
     }
 }
