@@ -66,6 +66,7 @@ chmod +x scripts/init.sh scripts/deploy.sh docker/entrypoint.sh
 ./scripts/init.sh
 docker compose up -d --build
 ```
+В Windows используйте `scripts\deploy.bat`.
 
 Миграции:
 
