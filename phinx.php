@@ -7,6 +7,16 @@ use Dotenv\Dotenv;
 Dotenv::createImmutable(__DIR__)->safeLoad();
 
 $dsn = $_ENV['DB_DSN'] ?? '';
+
+if ($dsn === '') {
+    $host = $_ENV['DB_HOST'] ?? 'localhost';
+    $port = $_ENV['DB_PORT'] ?? '3306';
+    $dbname = $_ENV['DB_NAME'] ?? '';
+    $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
+
+    $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+}
+
 $adapter = explode(':', $dsn, 2)[0] ?: 'mysql';
 
 $db = [
