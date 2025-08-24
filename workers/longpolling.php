@@ -11,7 +11,10 @@ use Longman\TelegramBot\Telegram;
 use App\Telegram\UpdateHelper;
 use App\Telegram\UpdateFilter;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 $db = Database::getInstance();
+
 try {
     $redis = RedisHelper::getInstance();
 } catch (\RedisException $e) {

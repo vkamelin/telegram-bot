@@ -9,6 +9,8 @@ use App\Config;
 use App\Helpers\RedisKeyHelper;
 use Slim\App;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 /** @var App $app */
 $config = Config::getInstance();
 

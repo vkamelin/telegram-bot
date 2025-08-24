@@ -12,6 +12,8 @@ use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 $config = Config::getInstance();
 
 try {
