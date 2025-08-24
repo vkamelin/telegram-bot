@@ -318,7 +318,7 @@ function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
     
     try {
         $stmt = $db->prepare(
-            "UPDATE BOT_messages
+            "UPDATE `telegram_messages`
                SET message_id   = :message_id,
                    status       = :status,
                    response     = :response,
