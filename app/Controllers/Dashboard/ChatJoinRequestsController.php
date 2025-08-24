@@ -130,6 +130,14 @@ final class ChatJoinRequestsController
             'user_id' => $userId,
         ]);
 
+        $stmt2 = $this->pdo->prepare('INSERT INTO chat_members (chat_id, user_id, role, state) VALUES (:chat_id, :user_id, :role, :state) ON DUPLICATE KEY UPDATE role = VALUES(role), state = VALUES(state)');
+        $stmt2->execute([
+            'chat_id' => $chatId,
+            'user_id' => $userId,
+            'role' => 'member',
+            'state' => 'approved',
+        ]);
+
         return $res->withHeader('Location', '/dashboard/join-requests')->withStatus(302);
     }
 
@@ -147,6 +155,13 @@ final class ChatJoinRequestsController
             'decided_by' => $_SESSION['user_id'] ?? null,
             'chat_id' => $chatId,
             'user_id' => $userId,
+        ]);
+
+        $stmt2 = $this->pdo->prepare('INSERT INTO chat_members (chat_id, user_id, role, state) VALUES (:chat_id, :user_id, NULL, :state) ON DUPLICATE KEY UPDATE role = VALUES(role), state = VALUES(state)');
+        $stmt2->execute([
+            'chat_id' => $chatId,
+            'user_id' => $userId,
+            'state' => 'declined',
         ]);
 
         return $res->withHeader('Location', '/dashboard/join-requests')->withStatus(302);
