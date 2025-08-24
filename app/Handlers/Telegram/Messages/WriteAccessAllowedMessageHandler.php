@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Handlers\Telegram\Messages;
 
 use App\Handlers\Telegram\Commands\StartCommandHandler;
-use App\Logger;
+use App\Helpers\Logger;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Entities\WriteAccessAllowed;
 use Throwable;

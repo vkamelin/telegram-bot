@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\CallbackQueries;
 
-use App\Logger;
+use App\Helpers\Logger;
 use App\Helpers\Database;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
@@ -62,9 +62,5 @@ abstract class AbstractCallbackQueryHandler
         }
 
         $response = Request::answerCallbackQuery($data);
-
-        if ($response->isOk()) {
-            // $stmt = $this->db->prepare("INSERT INTO telegram_messages ()");
-        }
     }
 }
