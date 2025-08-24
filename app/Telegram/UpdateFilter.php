@@ -73,12 +73,12 @@ final class UpdateFilter
             }
         }
 
-        $this->allowUpdates   = $this->normalizeList(env('TG_ALLOW_UPDATES', ''));
-        $this->denyUpdates    = $this->normalizeList(env('TG_DENY_UPDATES', ''));
-        $this->allowChats     = $this->normalizeList(env('TG_ALLOW_CHATS', ''));
-        $this->denyChats      = $this->normalizeList(env('TG_DENY_CHATS', ''));
-        $this->allowCommands  = $this->normalizeList(env('TG_ALLOW_COMMANDS', ''));
-        $this->denyCommands   = $this->normalizeList(env('TG_DENY_COMMANDS', ''));
+        $this->allowUpdates   = $this->normalizeList($_ENV['TG_ALLOW_UPDATES'] ?? '');
+        $this->denyUpdates    = $this->normalizeList($_ENV['TG_DENY_UPDATES'] ?? '');
+        $this->allowChats     = $this->normalizeList($_ENV['TG_ALLOW_CHATS'] ?? '');
+        $this->denyChats      = $this->normalizeList($_ENV['TG_DENY_CHATS'] ?? '');
+        $this->allowCommands  = $this->normalizeList($_ENV['TG_ALLOW_COMMANDS'] ?? '');
+        $this->denyCommands   = $this->normalizeList($_ENV['TG_DENY_COMMANDS'] ?? '');
     }
 
     /**
