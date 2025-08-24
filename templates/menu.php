@@ -32,6 +32,11 @@ $menu = [
         'icon'  => 'bi bi-person-plus',
     ],
     [
+        'url'   => '/dashboard/chat-members',
+        'title' => 'Chat Members',
+        'icon'  => 'bi bi-people',
+    ],
+    [
         'url'   => '/dashboard/sessions',
         'title' => 'Sessions',
         'icon'  => 'bi bi-clock-history',
