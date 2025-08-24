@@ -5,8 +5,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../bootstrap.php';
-
 use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Helpers\RedisHelper;
@@ -31,11 +29,18 @@ use App\Handlers\Telegram\RemovedChatBoostHandler;
 use App\Telegram\UpdateHelper as TelegramUpdateHelper;
 use App\Helpers\RedisKeyHelper;
 use App\Telegram\UpdateHelper;
+use Dotenv\Dotenv;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
+
 $payload = $payload ?? ($argv[1] ?? null);
+
+file_put_contents(__DIR__ . '/../updates.log', 'payload: ' . $payload . "\n", FILE_APPEND);
 
 try {
     if ($_ENV['BOT_API_SERVER'] === 'local') {
@@ -46,12 +51,13 @@ try {
     
     $telegram = new Telegram($_ENV['BOT_TOKEN'], $_ENV['BOT_NAME']);
 } catch (Longman\TelegramBot\Exception\TelegramException $e) {
-    file_put_contents('error.log', "Telegram initialization failed: {$e->getMessage()}\n", FILE_APPEND);
+    logMessage("error", "Telegram initialization failed: {$e->getMessage()}");
     exit();
 }
 
 try {
     if (empty($payload)) {
+        logMessage("error", "Empty payload provided");
         throw new RuntimeException('Empty payload provided');
     }
 
@@ -64,20 +70,23 @@ try {
     $updateType = $update->getUpdateType();
     $messageReaction = TelegramUpdateHelper::getMessageReaction($update);
     $messageReactionCount = TelegramUpdateHelper::getMessageReactionCount($update);
+    
+    logMessage("info", "Update type: {$updateType}");
 
     try {
         $redis = RedisHelper::getInstance();
         $dedupKey = RedisKeyHelper::key('telegram', 'update', (string)$update->getUpdateId());
         $stored = $redis->set($dedupKey, 1, ['nx', 'ex' => 60]);
         if ($stored === false) {
-            Logger::info('Duplicate update skipped', ['id' => $update->getUpdateId()]);
+            logMessage("Duplicate update skipped. Update ID: {$update->getUpdateId()}");
             exit();
         }
     } catch (\RedisException $e) {
-        Logger::error('Redis initialization failed: ' . $e->getMessage());
+        logMessage("error",  "Redis initialization failed: {$e->getMessage()}");
     }
     
     if (empty($updateData)) {
+        logger::error("error", 'Empty update data');
         throw new RuntimeException("Не удалось декодировать данные.");
     }
     
@@ -88,6 +97,7 @@ try {
         if ($updateType === Update::TYPE_POLL || in_array($updateType, ['message_reaction_count', 'chat_boost', 'removed_chat_boost'], true)) {
             $userId = 0;
         } else {
+            logMessage("error", 'User ID not found in update');
             throw new RuntimeException('User ID not found in update');
         }
     }
@@ -129,8 +139,7 @@ try {
     
     if (!$result) {
         echo "Не удалось сохранить данные обновления в базу данных: {$stmt->errorInfo()[2]}";
-        file_put_contents('error.log', "Не удалось сохранить данные обновления в базу данных: {$stmt->errorInfo()[2]}\n", FILE_APPEND);
-        Logger::error("Не удалось сохранить данные обновления в базу данных: {$stmt->errorInfo()[2]}");
+        logMessage('error', "Не удалось сохранить данные обновления в базу данных: {$stmt->errorInfo()[2]}");
     }
     
     // Определяем обработчик в зависимости от типа обновления
@@ -160,6 +169,10 @@ try {
     $handler->handle($update);
 } catch (\Throwable $e) {
     echo "Ошибка при обработке обновления: {$e->getMessage()}";
-    file_put_contents('error.log', "Ошибка при обработке обновления: {$e->getMessage()}\n", FILE_APPEND);
-    Logger::error("Ошибка при обработке обновления: {$e->getMessage()}\n" . $e->getTraceAsString());
+    logMessage('error', "Ошибка при обработке обновления: {$e->getMessage()}");
+}
+
+function logMessage(string $logFile = 'error', string $message = null): void
+{
+    file_put_contents($logFile, $message . PHP_EOL, FILE_APPEND);
 }

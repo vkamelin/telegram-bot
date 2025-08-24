@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\Commands;
 
-use App\Services\Db;
+use App\Helpers\Database;
 use Longman\TelegramBot\Entities\Update;
 use PDO;
 
@@ -14,7 +14,7 @@ abstract class AbstractCommandHandler
 
     public function __construct()
     {
-        $this->db = Db::get();
+        $this->db = Database::getInstance();
     }
 
     /**

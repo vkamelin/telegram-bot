@@ -88,16 +88,16 @@ try {
             foreach ($updates as $update) {
                 // Получаем данные обновления
                 $updateData = $update->getRawData();
-
+                
                 Logger::debug('Получено обновление', [
                     'id' => $update->getUpdateId(),
                     'type' => $update->getUpdateType(),
                 ]);
-
+                
                 $offset = $update->getUpdateId() + 1;
-
+                
                 $redis->set(RedisHelper::REDIS_LONGPOLLING_OFFSET_KEY, $offset);
-
+                
                 try {
                     $redisFilter = RedisHelper::getInstance();
                 } catch (\RedisException $e) {
@@ -116,7 +116,7 @@ try {
                     ]);
                     continue;
                 }
-
+                
                 $updateType = $update->getUpdateType();
                 
                 // Обрабатываем обновления
@@ -140,7 +140,8 @@ try {
                     'chat_boost' => UpdateHelper::getChatBoost($update) !== null,
                     'removed_chat_boost' => UpdateHelper::getRemovedChatBoost($update) !== null,
                     default => false,
-                  };
+                };
+                
                 
                 if ($handled) {
                     // Используем функцию для запуска обработки в отдельном процессе
@@ -150,6 +151,7 @@ try {
                         escapeshellarg(__DIR__ . '/handler.php'),
                         escapeshellarg($updateData)
                     );
+                    
                     shell_exec($command);
                     Logger::debug('Обновление передано в обработчик', [
                         'id' => $update->getUpdateId(),
@@ -175,10 +177,10 @@ function getLongPollingOffset(): int
     try {
         // Получаем инстанс RedisHelper (Redis)
         $redis = RedisHelper::getInstance();
-
+        
         // Получаем offset из Redis
         $offset = $redis->get(RedisHelper::REDIS_LONGPOLLING_OFFSET_KEY);
-
+        
         // Если offset не существует или равен false, то устанавливаем его в 0
         if ($offset === false) {
             $offset = 0;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\Commands;
 
-use App\Logger;
-use App\Services\Push;
-use App\Support\MessageStorage;
+use App\Helpers\Logger;
+use App\Helpers\Push;
+use App\Helpers\MessageStorage;
 use Exception;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Update;
@@ -14,7 +14,6 @@ use Longman\TelegramBot\Request;
 
 class StartCommandHandler extends AbstractCommandHandler
 {
-    private string $imageFileId = 'AgACAgIAAxkDAAMSaIMWBMKXTAkQR0xAGV5oPt-B9N4AAvLsMRtDxBlIN2kjlvVCmNsBAAMCAANzAAM2BA';
 
     /**
      * @param Update $update
@@ -108,7 +107,7 @@ class StartCommandHandler extends AbstractCommandHandler
         $caption = MessageStorage::read('start') ?? '';
 
         // Отправляем стартовое сообщение с кнопкой
-        Push::photo($chatId, $this->imageFileId, $caption, 'start', 2, [
+        Push::text($chatId, $caption, 'start', 2, [
             'reply_markup' => $keyboard,
             'link_preview_options' => ['is_disabled' => true],
         ]);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram;
 
-use App\Handlers\Telegram\CallbackQueries\NewFlowHandler;
 use App\Handlers\Telegram\Commands\AboutCommandHandler;
 use App\Handlers\Telegram\Commands\ResetCommandHandler;
 use App\Handlers\Telegram\Commands\StartCommandHandler;
