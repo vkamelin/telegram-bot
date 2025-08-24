@@ -6,6 +6,7 @@
 - Добавлены инструкции по запуску health-эндпойнта, `TelegramInitDataMiddleware` и мини-приложению Telegram.
 - Описана переменная `BOT_TOKEN`, сценарии проверки `initData` и примеры запросов.
 - Страница `/dashboard/system` с env-переменными и командами воркеров.
+- Миграция: добавлен индекс `idx_chat_join_requests_status` на `chat_join_requests.status`.
 
 ### Changed
 - Заменены упоминания `/admin` на `/dashboard` в документации.
