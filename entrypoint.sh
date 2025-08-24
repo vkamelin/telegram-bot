@@ -5,9 +5,6 @@ set -e
 mkdir -p /var/www/html/storage/logs /var/www/html/runtime/logs
 chown -R www-data:www-data /var/www/html/storage/logs /var/www/html/runtime/logs
 
-echo "==> Initialize application"
-/var/www/html/scripts/init.sh </dev/null
-
 echo "==> Start php-fpm"
 /usr/local/sbin/php-fpm --nodaemonize &
 
