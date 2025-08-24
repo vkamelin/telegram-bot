@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Console\Command;
 use App\Console\Kernel;
+use App\Helpers\Logger;
 
 final class WorkerHandlerCommand extends Command
 {
@@ -19,16 +20,18 @@ final class WorkerHandlerCommand extends Command
     {
         $payload = $arguments[0] ?? null;
         if ($payload === null) {
-            echo 'Missing argument: base64-encoded payload required.' . PHP_EOL;
+            Logger::error('Missing argument: payload');
             return 1;
         }
 
         if (base64_decode($payload, true) === false) {
-            echo 'Invalid argument: payload must be base64-encoded.' . PHP_EOL;
+            Logger::error('Invalid argument: payload must be base64-encoded.');
             return 1;
         }
 
         $handler = $_ENV['WORKER_HANDLER_PATH'] ?? dirname(__DIR__, 3) . '/workers/handler.php';
+        
+        Logger::info('Handling update payload', ['path' => $handler]);
 
         require $handler;
 

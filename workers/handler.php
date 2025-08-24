@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../bootstrap.php';
 
-use App\Logger;
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use App\Helpers\RedisHelper;
 use App\Handlers\Telegram\CallbackQueryHandler;
 use App\Handlers\Telegram\MessageHandler;
@@ -29,24 +29,23 @@ use App\Handlers\Telegram\ChatJoinRequestHandler;
 use App\Handlers\Telegram\ChatBoostHandler;
 use App\Handlers\Telegram\RemovedChatBoostHandler;
 use App\Telegram\UpdateHelper as TelegramUpdateHelper;
-use App\Support\RedisKeyHelper;
-use App\Support\UpdateHelper;
+use App\Helpers\RedisKeyHelper;
+use App\Telegram\UpdateHelper;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 
 
 try {
-    if ($_ENV['TELEGRAM_API_SERVER'] === 'local') {
-        $apiBaseUri = 'http://' . $_ENV['TELEGRAM_LOCAL_API_HOST'] . ':' . $_ENV['TELEGRAM_LOCAL_API_PORT'];
-        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['TELEGRAM_BOT_TOKEN'];
+    if ($_ENV['BOT_API_SERVER'] === 'local') {
+        $apiBaseUri = 'http://' . $_ENV['BOT_LOCAL_API_HOST'] . ':' . $_ENV['BOT_LOCAL_API_PORT'];
+        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['BOT_TOKEN'];
         Request::setCustomBotApiUri($apiBaseUri, $apiBaseDownloadUri);
     }
     
-    $telegram = new Telegram($_ENV['TELEGRAM_BOT_TOKEN'], $_ENV['TELEGRAM_BOT_NAME']);
+    $telegram = new Telegram($_ENV['BOT_TOKEN'], $_ENV['BOT_NAME']);
 } catch (Longman\TelegramBot\Exception\TelegramException $e) {
     file_put_contents('error.log', "Telegram initialization failed: {$e->getMessage()}\n", FILE_APPEND);
-    Logger::error("Telegram initialization failed: {$e->getMessage()}");
     exit();
 }
 
@@ -59,7 +58,7 @@ try {
     $updateData = json_decode(base64_decode($payload, true), true, 512, JSON_THROW_ON_ERROR);
     
     // Передаем данные обновления в экземпляр класса Longman\TelegramBot\Entities\Update
-    $update = new Update($updateData, $_ENV['TELEGRAM_BOT_NAME']);
+    $update = new Update($updateData, $_ENV['BOT_NAME']);
     // Получаем тип обновления
     $updateType = $update->getUpdateType();
     $messageReaction = TelegramUpdateHelper::getMessageReaction($update);
