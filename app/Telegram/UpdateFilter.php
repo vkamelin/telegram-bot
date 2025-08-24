@@ -7,6 +7,7 @@ namespace App\Telegram;
 use App\Helpers\Logger;
 use App\Helpers\RedisHelper;
 use Longman\TelegramBot\Entities\Update;
+use Redis;
 use RedisException;
 
 /**
@@ -28,32 +29,48 @@ final class UpdateFilter
     private array $denyCommands = [];
 
     private int $debounceSeconds;
+    private ?Redis $redis;
+    private string $redisPrefix;
 
     /** @var array<string, int> */
     private static array $lastLog = [];
 
-    public function __construct(int $debounceSeconds = 60)
+    public function __construct(?Redis $redis = null, string $redisPrefix = 'tg:filters', int $debounceSeconds = 60)
     {
         $this->debounceSeconds = $debounceSeconds;
+        $this->redis = $redis;
+        $this->redisPrefix = rtrim($redisPrefix, ':');
         $this->loadFilters();
     }
 
     private function loadFilters(): void
     {
+        $redis = $this->redis;
+
         if (env('TG_FILTERS_FROM_REDIS', false)) {
-            try {
-                $redis = RedisHelper::getInstance();
-                $this->allowUpdates   = $this->normalizeList($redis->get('tg:allow_updates'));
-                $this->denyUpdates    = $this->normalizeList($redis->get('tg:deny_updates'));
-                $this->allowChats     = $this->normalizeList($redis->get('tg:allow_chats'));
-                $this->denyChats      = $this->normalizeList($redis->get('tg:deny_chats'));
-                $this->allowCommands  = $this->normalizeList($redis->get('tg:allow_commands'));
-                $this->denyCommands   = $this->normalizeList($redis->get('tg:deny_commands'));
-                return;
-            } catch (RedisException $e) {
-                $this->debouncedLog('redis_unreachable');
-            } catch (\Throwable) {
-                $this->debouncedLog('redis_unreachable');
+            if ($redis === null) {
+                try {
+                    $redis = RedisHelper::getInstance();
+                } catch (RedisException) {
+                    $redis = null;
+                }
+            }
+
+            if ($redis instanceof Redis) {
+                try {
+                    $prefix = $this->redisPrefix;
+                    $this->allowUpdates  = $this->normalizeList($redis->sMembers("{$prefix}:allow_updates"));
+                    $this->denyUpdates   = $this->normalizeList($redis->sMembers("{$prefix}:deny_updates"));
+                    $this->allowChats    = $this->normalizeList($redis->sMembers("{$prefix}:allow_chats"));
+                    $this->denyChats     = $this->normalizeList($redis->sMembers("{$prefix}:deny_chats"));
+                    $this->allowCommands = $this->normalizeList($redis->sMembers("{$prefix}:allow_commands"));
+                    $this->denyCommands  = $this->normalizeList($redis->sMembers("{$prefix}:deny_commands"));
+                    return;
+                } catch (RedisException $e) {
+                    $this->debouncedLog('redis_unreachable');
+                } catch (\Throwable) {
+                    $this->debouncedLog('redis_unreachable');
+                }
             }
         }
 
