@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Helpers\Logger;
 use App\Helpers\Database;
 use App\Helpers\RedisHelper;
+use Dotenv\Dotenv;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
@@ -13,7 +14,7 @@ use App\Telegram\UpdateFilter;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$db = Database::getInstance();
+Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
 
 try {
     $redis = RedisHelper::getInstance();
