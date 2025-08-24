@@ -26,7 +26,7 @@ class MigrateRunCommand extends Command
         $command->setApplication($application);
 
         $config = dirname(__DIR__, 3) . '/phinx.php';
-        $env = $_ENV['APP_ENV'] ?? 'development';
+        $env = $_ENV['APP_ENV'] ?? 'dev';
 
         $input = new ArrayInput([
             '--configuration' => $config,
