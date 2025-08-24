@@ -19,11 +19,11 @@ $config = Config::getInstance();
 try {
     if ($_ENV['BOT_API_SERVER'] === 'local') {
         $apiBaseUri = 'http://' . $_ENV['BOT_LOCAL_API_HOST'] . ':' . $_ENV['BOT_LOCAL_API_PORT'];
-        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['BOT_BOT_TOKEN'];
+        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['BOT_TOKEN'];
         Request::setCustomBotApiUri($apiBaseUri, $apiBaseDownloadUri);
     }
     
-    $telegram = new Telegram($_ENV['BOT_BOT_TOKEN'], $_ENV['BOT_BOT_NAME']);
+    $telegram = new Telegram($_ENV['BOT_TOKEN'], $_ENV['BOT_NAME']);
     Logger::info('Процесс отправки Telegram запущен');
 } catch (Longman\TelegramBot\Exception\TelegramException $e) {
     Logger::error("Telegram initialization failed: {$e->getMessage()}");
