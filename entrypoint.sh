@@ -11,7 +11,7 @@ mkdir -p /var/www/html/storage/logs /var/www/html/runtime/logs
 chown -R www-data:www-data /var/www/html/storage/logs /var/www/html/runtime/logs
 
 echo "==> Run migrations"
-php /var/www/html/run migrate
+php /var/www/html/run migrate:run
 
 echo "==> Start php-fpm"
 /usr/local/sbin/php-fpm --nodaemonize &
