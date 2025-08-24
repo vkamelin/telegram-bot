@@ -73,22 +73,20 @@ function dispatchScheduledMessages(): void
             $messageKey = RedisKeyHelper::key('telegram', 'message', (string)$id);
             $queueKey = RedisKeyHelper::key('telegram', 'queue', (string)$msg['priority']);
 
-            $decoded = json_decode($msg['data'], true);
-            if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
-                $decoded = [];
-            }
             $redis->set($messageKey, [
                 'user_id' => $msg['user_id'],
                 'method' => $msg['method'],
-                'data' => $decoded,
+                'data' => $msg['data'],
                 'type' => $msg['type'],
                 'priority' => $msg['priority'],
+                'key' => (string)$id,
             ]);
 
             $redis->rPush($queueKey, [
                 'id' => $id,
                 'send_after' => strtotime($msg['send_after']),
                 'attempts' => 0,
+                'key' => (string)$id,
             ]);
 
             $del = $db->prepare('DELETE FROM `telegram_scheduled_messages` WHERE `id` = :id');
@@ -195,7 +193,7 @@ function runWorker(): void
                 $method = $message['method'];
                 $attempts = (int)($messageData['attempts'] ?? 0);
 
-                $dedupSource = $message['key'] ?? sha1(json_encode([$message['user_id'] ?? null, $method, $data]));
+                $dedupSource = $message['key'] ?? (string)$id;
                 $dedupRedisKey = RedisKeyHelper::key('telegram', 'dedup', (string)$dedupSource);
                 try {
                     $stored = $redis->set($dedupRedisKey, 1, ['nx', 'ex' => $config->get('IDEMPOTENCY_KEY_TTL')]);
@@ -204,6 +202,20 @@ function runWorker(): void
                 }
                 if ($stored === false) {
                     Logger::info('Duplicate message skipped', ['key' => $dedupSource, 'id' => $id]);
+                    $redis->del($messageKey);
+                    try {
+                        $db = Database::getInstance();
+                        $stmt = $db->prepare(
+                            "UPDATE `telegram_messages` SET `status` = :status, `error` = :error, `processed_at` = NOW() WHERE `id` = :id"
+                        );
+                        $stmt->execute([
+                            'status' => 'failed',
+                            'error' => 'duplicate',
+                            'id' => $id,
+                        ]);
+                    } catch (Throwable $e) {
+                        Logger::error('Failed to mark duplicate message: ' . $e->getMessage());
+                    }
                     continue;
                 }
                 

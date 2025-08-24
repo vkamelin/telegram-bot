@@ -41,4 +41,7 @@ return [
     ],
 
     'request_size_limit' => (int)($_ENV['REQUEST_SIZE_LIMIT'] ?? 1048576),
+
+    // Время жизни ключа идемпотентности по умолчанию
+    'IDEMPOTENCY_KEY_TTL' => (int)($_ENV['IDEMPOTENCY_KEY_TTL'] ?? 60),
 ];
