@@ -35,6 +35,7 @@ use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 
+$payload = $payload ?? ($argv[1] ?? null);
 
 try {
     if ($_ENV['BOT_API_SERVER'] === 'local') {
