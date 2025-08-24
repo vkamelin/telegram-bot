@@ -9,6 +9,7 @@ use App\Helpers\RedisHelper;
 use Longman\TelegramBot\Entities\Update;
 use Redis;
 use RedisException;
+use Throwable;
 
 /**
  * Filters incoming Telegram updates based on allow/deny lists.
@@ -47,7 +48,7 @@ final class UpdateFilter
     {
         $redis = $this->redis;
 
-        if (env('TG_FILTERS_FROM_REDIS', false)) {
+        if ($_ENV['TG_FILTERS_FROM_REDIS'] ?? '') {
             if ($redis === null) {
                 try {
                     $redis = RedisHelper::getInstance();
@@ -66,9 +67,7 @@ final class UpdateFilter
                     $this->allowCommands = $this->normalizeList($redis->sMembers("{$prefix}:allow_commands"));
                     $this->denyCommands  = $this->normalizeList($redis->sMembers("{$prefix}:deny_commands"));
                     return;
-                } catch (RedisException $e) {
-                    $this->debouncedLog('redis_unreachable');
-                } catch (\Throwable) {
+                } catch (RedisException|Throwable $e) {
                     $this->debouncedLog('redis_unreachable');
                 }
             }
