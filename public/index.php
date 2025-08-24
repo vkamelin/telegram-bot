@@ -57,6 +57,11 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/tg-users', [\App\Controllers\Dashboard\TgUsersController::class, 'index']);
         $auth->post('/tg-users/data', [\App\Controllers\Dashboard\TgUsersController::class, 'data']);
         $auth->get('/tg-users/{id}', [\App\Controllers\Dashboard\TgUsersController::class, 'view']);
+        $auth->get('/join-requests', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'index']);
+        $auth->post('/join-requests/data', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'data']);
+        $auth->get('/join-requests/{chat_id}/{user_id}', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'view']);
+        $auth->post('/join-requests/{chat_id}/{user_id}/approve', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'approve']);
+        $auth->post('/join-requests/{chat_id}/{user_id}/decline', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'decline']);
         $auth->get('/users', [\App\Controllers\Dashboard\PanelUsersController::class, 'index']);
         $auth->post('/users/data', [\App\Controllers\Dashboard\PanelUsersController::class, 'data']);
         $auth->get('/users/create', [\App\Controllers\Dashboard\PanelUsersController::class, 'create']);

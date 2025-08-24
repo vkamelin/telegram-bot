@@ -27,6 +27,11 @@ $menu = [
         'icon'  => 'bi bi-people-fill',
     ],
     [
+        'url'   => '/dashboard/join-requests',
+        'title' => 'Join Requests',
+        'icon'  => 'bi bi-person-plus',
+    ],
+    [
         'url'   => '/dashboard/sessions',
         'title' => 'Sessions',
         'icon'  => 'bi bi-clock-history',
