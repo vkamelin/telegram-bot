@@ -67,7 +67,10 @@ class Logger
             try {
                 $config = Config::getInstance();
                 $channel = (string) $config->get('LOG_CHANNEL', 'app');
-                $levelName = (string) $config->get('LOG_LEVEL');
+                $levelName = (string) $config->get('LOG_LEVEL', 'INFO');
+                if ($levelName === '') {
+                    $levelName = 'INFO';
+                }
             } catch (\Throwable) {
                 $channel = 'app';
                 $levelName = 'INFO';
