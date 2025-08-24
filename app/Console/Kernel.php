@@ -17,6 +17,7 @@ class Kernel
         Commands\RefreshTokenPurgeCommand::class,
         Commands\CreateAdminCommand::class,
         Commands\UpdateFilterCommand::class,
+        Commands\WorkerHandlerCommand::class,
     ];
 
     /**
