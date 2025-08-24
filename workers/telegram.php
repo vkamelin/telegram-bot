@@ -51,7 +51,7 @@ function dispatchScheduledMessages(): void
     }
 
     $stmt = $db->prepare(
-        "SELECT * FROM BOT_scheduled_messages WHERE send_after <= NOW() ORDER BY id ASC LIMIT 100"
+        "SELECT * FROM `telegram_scheduled_messages` WHERE `send_after` <= NOW() ORDER BY `id` ASC LIMIT 100"
     );
     $stmt->execute();
     $messages = $stmt->fetchAll();
@@ -59,7 +59,7 @@ function dispatchScheduledMessages(): void
     foreach ($messages as $msg) {
         try {
             $insert = $db->prepare(
-                "INSERT INTO BOT_messages (user_id, method, type, data, priority) VALUES (:user_id, :method, :type, :data, :priority)"
+                "INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)"
             );
             $insert->execute([
                 'user_id' => $msg['user_id'],
@@ -91,7 +91,7 @@ function dispatchScheduledMessages(): void
                 'attempts' => 0,
             ]);
 
-            $del = $db->prepare('DELETE FROM BOT_scheduled_messages WHERE id = :id');
+            $del = $db->prepare('DELETE FROM `telegram_scheduled_messages` WHERE `id` = :id');
             $del->execute(['id' => $msg['id']]);
         } catch (Throwable $e) {
             Logger::error('Failed to dispatch scheduled message: ' . $e->getMessage());
