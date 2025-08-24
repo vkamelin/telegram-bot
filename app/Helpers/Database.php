@@ -113,7 +113,7 @@ class Database
             "Не удалось подключиться к БД после " . self::MAX_TRIES . " попыток",
             ['exception' => $lastException]
         );
-        throw new RuntimeException('Невозможно подключиться к базе данных');
+        throw new RuntimeException('Невозможно подключиться к базе данных. ' . $lastException->getMessage());
     }
     
     /**
@@ -126,7 +126,7 @@ class Database
         $connectionType = $_ENV['DB_CONNECTION_TYPE'] ?? 'tcp';
         $dbName         = $_ENV['DB_NAME'] ?? '';
         $user           = $_ENV['DB_USER'] ?? '';
-        $password       = $_ENV['DB_PASSWORD'] ?? '';
+        $password       = $_ENV['DB_PASS'] ?? '';
         
         if ($connectionType === 'socket') {
             $socket = $_ENV['DB_SOCKET'] ?? '';
