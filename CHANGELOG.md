@@ -15,7 +15,6 @@
 ### Added
 - Добавлены PHPDoc.
 - Добавлен класс `Config`.
-- Реализована функция `env()`.
 
 ### Changed
 - Обновлены middleware.

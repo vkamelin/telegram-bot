@@ -9,7 +9,7 @@
 <h1>UTM</h1>
 
 <form class="row" method="post">
-    <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
+    <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
     
     <div class="col-md-3 d-flex justify-content-start align-items-center">
         <label for="from" class="col-sm-2 control-label">От</label>

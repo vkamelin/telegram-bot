@@ -123,17 +123,17 @@ class Database
      */
     private static function loadConfig(): array
     {
-        $connectionType = env('DB_CONNECTION_TYPE', 'tcp');
-        $dbName         = env('DB_NAME', '');
-        $user           = env('DB_USER', '');
-        $password       = env('DB_PASSWORD', '');
+        $connectionType = $_ENV['DB_CONNECTION_TYPE'] ?? 'tcp';
+        $dbName         = $_ENV['DB_NAME'] ?? '';
+        $user           = $_ENV['DB_USER'] ?? '';
+        $password       = $_ENV['DB_PASSWORD'] ?? '';
         
         if ($connectionType === 'socket') {
-            $socket = env('DB_SOCKET', '');
+            $socket = $_ENV['DB_SOCKET'] ?? '';
             $dsn    = "mysql:unix_socket={$socket};dbname={$dbName};charset=utf8mb4";
         } else {
-            $host = env('DB_HOST', '127.0.0.1');
-            $port = env('DB_PORT', 3306);
+            $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
+            $port = $_ENV['DB_PORT'] ?? '3306';
             $dsn  = sprintf(
                 'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
                 $host,

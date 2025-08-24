@@ -40,14 +40,14 @@ class RedisHelper
         $redis = new Redis();
         
         // Connect via socket or TCP
-        if (env('REDIS_CONNECTION_TYPE') === 'socket') {
-            $redis->pconnect(env('REDIS_SOCKET'), 0, 1.0);
+        if ($_ENV['REDIS_CONNECTION_TYPE'] === 'socket') {
+            $redis->pconnect($_ENV['REDIS_SOCKET'], 0, 1.0);
         } else {
-            $redis->pconnect(env('REDIS_HOST'), (int)env('REDIS_PORT'), 1.0);
+            $redis->pconnect($_ENV['REDIS_HOST'], (int)$_ENV['REDIS_PORT'], 1.0);
         }
         
         // Apply key prefix before selecting the DB
-        $prefix = (string)env('REDIS_PREFIX');
+        $prefix = (string)$_ENV['REDIS_PREFIX'];
         if ($prefix !== '') {
             $redis->setOption(Redis::OPT_PREFIX, $prefix);
         }
@@ -65,7 +65,7 @@ class RedisHelper
         $redis->setOption(Redis::OPT_BACKOFF_CAP, 1000);
         
         // Select the configured database
-        $dbIndex = (int)env('REDIS_DB');
+        $dbIndex = (int)$_ENV['REDIS_DB'];
         $redis->select($dbIndex);
         
         return self::$instance = $redis;

@@ -2,14 +2,14 @@
 declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
-use App\Services\RedisService;
+use App\Helpers\RedisHelper;
 use App\Config;
 
 final class RenameRedisKeys extends AbstractMigration
 {
     public function up(): void
     {
-        $redis = RedisService::get();
+        $redis = RedisHelper::getInstance();
         $config = Config::getInstance();
         $prefix = $config->get('APP_NAME') . ':' . $config->get('PROJECT_ENV') . ':';
         foreach ($redis->keys('gpt:*') as $key) {

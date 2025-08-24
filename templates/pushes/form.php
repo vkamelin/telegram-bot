@@ -30,7 +30,7 @@ $isNew = empty($push['id']); // Новая рассылка или редакт�
 <?php } ?>
 
 <form method="post" enctype="multipart/form-data" class="mb-5" id="push-form">
-    <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
+    <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
     <input type="hidden" name="send" id="send" value="0">
 
     <?php if (!$isNew) { ?>

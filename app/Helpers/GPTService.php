@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Helpers;
 
-use App\Logger;
-use App\Services\PromptLoader;
-use App\Support\JsonHelper;
+use App\Helpers\Logger;
+use App\Helpers\PromptLoader;
+use App\Helpers\JsonHelper;
 use App\Telemetry;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;

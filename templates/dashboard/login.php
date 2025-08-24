@@ -15,7 +15,7 @@
     <?php endif ?>
     
     <form method="POST" action="/dashboard/login">
-        <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
+        <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
         <div class="form-floating">
             <input type="email" name="email" class="form-control" id="email" placeholder="name@example.com">
             <label for="email">Email</label>

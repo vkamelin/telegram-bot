@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Helpers\Logger;
 use App\Logger;
 use App\Helpers\Database;
 use App\Helpers\RedisHelper;
@@ -104,7 +105,7 @@ try {
                 }
                 $filter = new UpdateFilter(
                     $redisFilter,
-                    getenv('TG_FILTERS_REDIS_PREFIX') ?: 'tg:filters'
+                    $_ENV['TG_FILTERS_REDIS_PREFIX'] ?: 'tg:filters'
                 );
                 $reason = null;
                 if (!$filter->shouldProcess($update, $reason)) {
