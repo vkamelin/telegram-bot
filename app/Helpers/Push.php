@@ -421,8 +421,10 @@ class Push
                         (string) $priority
                     );
                     
-                    // Добавляем сообщение в Redis
-                    $addMessageResult = $redis->set($messageKey, $insertData);
+                    // Добавляем сообщение в Redis с уникальным ключом
+                    $redisMessage = $insertData;
+                    $redisMessage['key'] = (string)$id;
+                    $addMessageResult = $redis->set($messageKey, $redisMessage);
                     
                     if (empty($addMessageResult)) {
                         $errorMessage = "Не удалось добавить сообщение в Redis.";
@@ -438,7 +440,8 @@ class Push
                     // Добавляем сообщение в очередь с учетом приоритета
                     $messageData = [
                         'id' => $id,
-                        'send_after' => $sendAfter ? strtotime($sendAfter) : null
+                        'send_after' => $sendAfter ? strtotime($sendAfter) : null,
+                        'key' => (string)$id,
                     ];
                     
                     $addQueueResult = $redis->rPush($queueKey, $messageData);
