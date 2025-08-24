@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\ShippingQueries;
 
-use App\Services\Db;
+use App\Helpers\Database;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use PDO;
@@ -15,7 +15,7 @@ abstract class AbstractShippingQueryHandler
 
     public function __construct()
     {
-        $this->db = Db::get();
+        $this->db = Database::getInstance();
     }
 
     /**
