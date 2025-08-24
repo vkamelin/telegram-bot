@@ -145,7 +145,11 @@ try {
                 if ($handled) {
                     // Используем функцию для запуска обработки в отдельном процессе
                     $updateData = base64_encode(json_encode($update));
-                    $command = 'php ' . dirname(__DIR__) . '/run worker:handler ' . escapeshellarg($updateData);
+                    $command = sprintf(
+                        'php %s %s > /dev/null 2>&1 &',
+                        escapeshellarg(__DIR__ . '/handler.php'),
+                        escapeshellarg($updateData)
+                    );
                     shell_exec($command);
                     Logger::debug('Обновление передано в обработчик', [
                         'id' => $update->getUpdateId(),
