@@ -17,13 +17,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $config = Config::getInstance();
 
 try {
-    if ($_ENV['TELEGRAM_API_SERVER'] === 'local') {
-        $apiBaseUri = 'http://' . $_ENV['TELEGRAM_LOCAL_API_HOST'] . ':' . $_ENV['TELEGRAM_LOCAL_API_PORT'];
-        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['TELEGRAM_BOT_TOKEN'];
+    if ($_ENV['BOT_API_SERVER'] === 'local') {
+        $apiBaseUri = 'http://' . $_ENV['BOT_LOCAL_API_HOST'] . ':' . $_ENV['BOT_LOCAL_API_PORT'];
+        $apiBaseDownloadUri = '/root/telegram-bot-api/' . $_ENV['BOT_BOT_TOKEN'];
         Request::setCustomBotApiUri($apiBaseUri, $apiBaseDownloadUri);
     }
     
-    $telegram = new Telegram($_ENV['TELEGRAM_BOT_TOKEN'], $_ENV['TELEGRAM_BOT_NAME']);
+    $telegram = new Telegram($_ENV['BOT_BOT_TOKEN'], $_ENV['BOT_BOT_NAME']);
     Logger::info('Процесс отправки Telegram запущен');
 } catch (Longman\TelegramBot\Exception\TelegramException $e) {
     Logger::error("Telegram initialization failed: {$e->getMessage()}");
@@ -31,8 +31,8 @@ try {
 }
 
 // Максимальное количество запросов в секунду для всех воркеров
-$globalMaxRps = (int)($_ENV['TELEGRAM_MAX_RPS'] ?? 25);
-$workerCount = max(1, (int)($_ENV['WORKERS_TELEGRAM_PROCS'] ?? 1));
+$globalMaxRps = (int)($_ENV['BOT_MAX_RPS'] ?? 25);
+$workerCount = max(1, (int)($_ENV['WORKERS_BOT_PROCS'] ?? 1));
 const MAX_ATTEMPTS = 5;
 $perWorkerRps = max(1, intdiv($globalMaxRps, $workerCount));
 
@@ -51,7 +51,7 @@ function dispatchScheduledMessages(): void
     }
 
     $stmt = $db->prepare(
-        "SELECT * FROM telegram_scheduled_messages WHERE send_after <= NOW() ORDER BY id ASC LIMIT 100"
+        "SELECT * FROM BOT_scheduled_messages WHERE send_after <= NOW() ORDER BY id ASC LIMIT 100"
     );
     $stmt->execute();
     $messages = $stmt->fetchAll();
@@ -59,7 +59,7 @@ function dispatchScheduledMessages(): void
     foreach ($messages as $msg) {
         try {
             $insert = $db->prepare(
-                "INSERT INTO telegram_messages (user_id, method, type, data, priority) VALUES (:user_id, :method, :type, :data, :priority)"
+                "INSERT INTO BOT_messages (user_id, method, type, data, priority) VALUES (:user_id, :method, :type, :data, :priority)"
             );
             $insert->execute([
                 'user_id' => $msg['user_id'],
@@ -91,7 +91,7 @@ function dispatchScheduledMessages(): void
                 'attempts' => 0,
             ]);
 
-            $del = $db->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id');
+            $del = $db->prepare('DELETE FROM BOT_scheduled_messages WHERE id = :id');
             $del->execute(['id' => $msg['id']]);
         } catch (Throwable $e) {
             Logger::error('Failed to dispatch scheduled message: ' . $e->getMessage());
@@ -318,7 +318,7 @@ function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
     
     try {
         $stmt = $db->prepare(
-            "UPDATE telegram_messages
+            "UPDATE BOT_messages
                SET message_id   = :message_id,
                    status       = :status,
                    response     = :response,

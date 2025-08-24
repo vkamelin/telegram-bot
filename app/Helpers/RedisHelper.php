@@ -40,11 +40,7 @@ class RedisHelper
         $redis = new Redis();
         
         // Connect via socket or TCP
-        if ($_ENV['REDIS_CONNECTION_TYPE'] === 'socket') {
-            $redis->pconnect($_ENV['REDIS_SOCKET'], 0, 1.0);
-        } else {
-            $redis->pconnect($_ENV['REDIS_HOST'], (int)$_ENV['REDIS_PORT'], 1.0);
-        }
+        $redis->pconnect($_ENV['REDIS_HOST'], (int)$_ENV['REDIS_PORT'], 1.0);
         
         // Apply key prefix before selecting the DB
         $prefix = (string)$_ENV['REDIS_PREFIX'];

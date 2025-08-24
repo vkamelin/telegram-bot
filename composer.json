@@ -56,7 +56,6 @@
       "App\\": "app/"
     },
     "files": [
-      "app/Helpers/env.php",
       "app/Helpers/url.php"
     ]
   },
