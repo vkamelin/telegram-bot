@@ -413,8 +413,13 @@ class Push
                         return false;
                     }
                     
-                    $messageKey = RedisHelper::REDIS_MESSAGE_KEY . ':' . $id; // Ключ сообщения
-                    $queueKey = RedisHelper::REDIS_MESSAGES_QUEUE_KEY . ':' . $priority; // Ключ очереди сообщений
+                    // $messageKey = RedisHelper::REDIS_MESSAGE_KEY . ':' . $id; // Ключ сообщения
+                    $messageKey = RedisKeyHelper::key('telegram', 'message', (string)$id);
+                    //  Ключ очереди сообщений
+                    $queueKey = RedisKeyHelper::key(
+                        RedisHelper::REDIS_MESSAGES_QUEUE_KEY,
+                        (string) $priority
+                    );
                     
                     // Добавляем сообщение в Redis
                     $addMessageResult = $redis->set($messageKey, $insertData);

@@ -100,20 +100,22 @@ function dispatchScheduledMessages(): void
 }
 
 $queues = [
-    RedisKeyHelper::key('telegram', 'queue', '2') => ['priority' => 2],
-    RedisKeyHelper::key('telegram', 'queue', '1') => ['priority' => 1],
-    RedisKeyHelper::key('telegram', 'queue', '0') => ['priority' => 0],
+    RedisKeyHelper::get('telegram', 'message:queue', '2') => ['priority' => 2],
+    RedisKeyHelper::get('telegram', 'message:queue', '1') => ['priority' => 1],
+    RedisKeyHelper::get('telegram', 'message:queue', '0') => ['priority' => 0],
 ];
 
+/**
+ * Запускает воркер для отправки сообщений.
+ */
 function runWorker(): void
 {
-    global $queues, $perWorkerRps;
+    global $queues, $perWorkerRps, $config;
 
     while (true) {
         $startTime = microtime(true);
         $messagesProcessed = 0;
-
-        $db = Database::getInstance();
+        
         try {
             $redis = RedisHelper::getInstance();
         } catch (\RedisException $e) {
@@ -182,7 +184,14 @@ function runWorker(): void
                 if (!is_array($message)) {
                     continue;
                 }
-                $data = $message['data'] ?? [];
+                
+                try {
+                    $data = json_decode($message['data'], true, 512, JSON_THROW_ON_ERROR) ?? [];
+                } catch (Throwable $e) {
+                    Logger::error("Invalid JSON for message ID {$id}: {$e->getMessage()}");
+                    continue;
+                }
+                
                 $method = $message['method'];
                 $attempts = (int)($messageData['attempts'] ?? 0);
 
@@ -340,6 +349,5 @@ function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
     }
 }
 
-if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
-    runWorker();
-}
+
+runWorker();
