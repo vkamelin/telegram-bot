@@ -151,3 +151,15 @@ update_env WORKERS_TELEGRAM_PROCS "$WORKERS_TELEGRAM_PROCS"
 
 # Готово
 echo "ОК: .env обновлён."
+
+# Ждём доступности базы данных
+echo "Ожидание базы данных ${DB_HOST}:${DB_PORT}..."
+while ! nc -z "$DB_HOST" "$DB_PORT"; do
+    sleep 1
+done
+echo "База данных доступна."
+
+# Применяем миграции
+echo "Выполнение миграций..."
+php run migrate:run
+echo "Миграции выполнены."
