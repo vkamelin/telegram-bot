@@ -40,5 +40,5 @@ RUN chown -R www-data:www-data /var/www/html/runtime/logs /var/www/html/storage/
 # install PHP dependencies without dev packages
 RUN composer install --no-dev --optimize-autoloader
 
-# entrypoint runs migrations and starts services
+# entrypoint starts services
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
