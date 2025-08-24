@@ -125,8 +125,8 @@ try {
                     Update::TYPE_EDITED_MESSAGE => $update->getEditedMessage() !== null,
                     Update::TYPE_CHANNEL_POST => $update->getChannelPost() !== null,
                     Update::TYPE_EDITED_CHANNEL_POST => $update->getEditedChannelPost() !== null,
-                    'message_reaction' => UpdateHelper::getMessageReaction($update) !== null,
-                    'message_reaction_count' => UpdateHelper::getMessageReactionCount($update) !== null,
+                    Update::TYPE_MESSAGE_REACTION => UpdateHelper::getMessageReaction($update) !== null,
+                    Update::TYPE_MESSAGE_REACTION_COUNT => UpdateHelper::getMessageReactionCount($update) !== null,
                     Update::TYPE_INLINE_QUERY => $update->getInlineQuery() !== null,
                     Update::TYPE_CHOSEN_INLINE_RESULT => $update->getChosenInlineResult() !== null,
                     Update::TYPE_CALLBACK_QUERY => $update->getCallbackQuery() !== null,
@@ -137,8 +137,8 @@ try {
                     Update::TYPE_MY_CHAT_MEMBER => $update->getMyChatMember() !== null,
                     Update::TYPE_CHAT_MEMBER => $update->getChatMember() !== null,
                     Update::TYPE_CHAT_JOIN_REQUEST => $update->getChatJoinRequest() !== null,
-                    'chat_boost' => UpdateHelper::getChatBoost($update) !== null,
-                    'removed_chat_boost' => UpdateHelper::getRemovedChatBoost($update) !== null,
+                    Update::TYPE_CHAT_BOOST => UpdateHelper::getChatBoost($update) !== null,
+                    Update::TYPE_REMOVED_CHAT_BOOST => UpdateHelper::getRemovedChatBoost($update) !== null,
                     default => false,
                 };
                 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\Commands;
 
-use App\Services\Push;
-use App\Support\MessageStorage;
+use App\Helpers\Push;
+use App\Helpers\MessageStorage;
 use Longman\TelegramBot\Entities\Update;
 use Exception;
 

@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\Messages;
 
-use App\Services\FlowState;
-use App\Services\TelegramState;
-use App\Domain\TelegramSessionTable;
-use App\Services\RedisService;
-use App\Services\Push;
-use App\Services\PromptLoader;
-use App\Logger;
+use App\Helpers\FlowState;
+use App\Helpers\TelegramState;
+use App\Helpers\RedisHelper;
+use App\Helpers\Push;
+use App\Helpers\PromptLoader;
+use App\Helpers\Logger;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Update;
 use PDO;
@@ -29,9 +28,6 @@ class TextMessageHandler extends AbstractMessageHandler
         $message = $update->getMessage();
         $chatId = $message->getChat()->getId();
         $messageText = trim($message->getText() ?? '');
-
-        $sessionRepo = new TelegramSessionTable($this->db);
-        $session = $sessionRepo->findByUserId($chatId);
 
         FlowState::update((string) $chatId, ['last_message' => $messageText]);
     }

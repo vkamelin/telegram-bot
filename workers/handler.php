@@ -40,8 +40,6 @@ Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
 
 $payload = $payload ?? ($argv[1] ?? null);
 
-file_put_contents(__DIR__ . '/../updates.log', 'payload: ' . $payload . "\n", FILE_APPEND);
-
 try {
     if ($_ENV['BOT_API_SERVER'] === 'local') {
         $apiBaseUri = 'http://' . $_ENV['BOT_LOCAL_API_HOST'] . ':' . $_ENV['BOT_LOCAL_API_PORT'];
@@ -86,7 +84,7 @@ try {
     }
     
     if (empty($updateData)) {
-        logger::error("error", 'Empty update data');
+        logMessage('error', 'Empty update data');
         throw new RuntimeException("Не удалось декодировать данные.");
     }
     
@@ -94,7 +92,13 @@ try {
     
     $userId = UpdateHelper::getUserId($update);
     if ($userId === null) {
-        if ($updateType === Update::TYPE_POLL || in_array($updateType, ['message_reaction_count', 'chat_boost', 'removed_chat_boost'], true)) {
+        $typesNoUserIdArray = [
+            Update::TYPE_POLL,
+            Update::TYPE_MESSAGE_REACTION_COUNT,
+            Update::TYPE_CHAT_BOOST,
+            Update::TYPE_REMOVED_CHAT_BOOST
+        ];
+        if (in_array($updateType, $typesNoUserIdArray, true)) {
             $userId = 0;
         } else {
             logMessage("error", 'User ID not found in update');
@@ -107,8 +111,8 @@ try {
         Update::TYPE_EDITED_MESSAGE => $update->getEditedMessage()->getMessageId(),
         Update::TYPE_CHANNEL_POST => $update->getChannelPost()->getMessageId(),
         Update::TYPE_EDITED_CHANNEL_POST => $update->getEditedChannelPost()->getMessageId(),
-        'message_reaction' => $messageReaction['message_id'] ?? null,
-        'message_reaction_count' => $messageReactionCount['message_id'] ?? null,
+        Update::TYPE_MESSAGE_REACTION => $messageReaction['message_id'] ?? null,
+        Update::TYPE_MESSAGE_REACTION_COUNT => $messageReactionCount['message_id'] ?? null,
         default => null,
     };
 
@@ -117,8 +121,8 @@ try {
         Update::TYPE_EDITED_MESSAGE => $update->getEditedMessage()->getEditDate() ?? time(),
         Update::TYPE_CHANNEL_POST => $update->getChannelPost()->getDate(),
         Update::TYPE_EDITED_CHANNEL_POST => $update->getEditedChannelPost()->getEditDate() ?? time(),
-        'message_reaction' => $messageReaction['date'] ?? time(),
-        'message_reaction_count' => $messageReactionCount['date'] ?? time(),
+        Update::TYPE_MESSAGE_REACTION => $messageReaction['date'] ?? time(),
+        Update::TYPE_MESSAGE_REACTION_COUNT => $messageReactionCount['date'] ?? time(),
         Update::TYPE_MY_CHAT_MEMBER => $update->getMyChatMember()->getDate(),
         Update::TYPE_CHAT_MEMBER => $update->getChatMember()->getDate(),
         Update::TYPE_CHAT_JOIN_REQUEST => $update->getChatJoinRequest()->getDate(),
@@ -154,8 +158,8 @@ try {
         Update::TYPE_CALLBACK_QUERY => new CallbackQueryHandler(),
         Update::TYPE_SHIPPING_QUERY => new ShippingQueryHandler(),
         Update::TYPE_PRE_CHECKOUT_QUERY => new PreCheckoutQueryHandler(),
-        'message_reaction' => new MessageReactionHandler(),
-        'message_reaction_count' => new MessageReactionCountHandler(),
+        Update::TYPE_MESSAGE_REACTION => new MessageReactionHandler(),
+        Update::TYPE_MESSAGE_REACTION_COUNT => new MessageReactionCountHandler(),
         Update::TYPE_POLL => new PollHandler(),
         Update::TYPE_POLL_ANSWER => new PollAnswerHandler(),
         Update::TYPE_MY_CHAT_MEMBER => new MyChatMemberHandler(),
@@ -174,5 +178,5 @@ try {
 
 function logMessage(string $logFile = 'error', string $message = null): void
 {
-    file_put_contents($logFile, $message . PHP_EOL, FILE_APPEND);
+    file_put_contents($logFile . '.log', $message . PHP_EOL, FILE_APPEND);
 }

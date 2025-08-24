@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\CallbackQueries;
 
-use App\Logger;
-use App\Services\Push;
-use App\Support\MessageStorage;
+use App\Helpers\Logger;
+use App\Helpers\Push;
+use App\Helpers\MessageStorage;
 use Longman\TelegramBot\Entities\ChatMember\ChatMember;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Update;
