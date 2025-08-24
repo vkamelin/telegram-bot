@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Helpers\Logger;
-use App\Logger;
 use App\Helpers\Database;
 use App\Helpers\RedisHelper;
 use Longman\TelegramBot\Entities\Update;
@@ -11,9 +10,6 @@ use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use App\Telegram\UpdateHelper;
 use App\Telegram\UpdateFilter;
-
-/** @var \Slim\App $app */
-$app = require __DIR__ . '/../bootstrap.php';
 
 $db = Database::getInstance();
 try {
@@ -43,8 +39,8 @@ $allowedUpdates = [
     Update::TYPE_EDITED_MESSAGE,
     Update::TYPE_CHANNEL_POST,
     Update::TYPE_EDITED_CHANNEL_POST,
-    'message_reaction',
-    'message_reaction_count',
+    Update::TYPE_MESSAGE_REACTION,
+    Update::TYPE_MESSAGE_REACTION_COUNT,
     Update::TYPE_INLINE_QUERY,
     Update::TYPE_CHOSEN_INLINE_RESULT,
     Update::TYPE_CALLBACK_QUERY,
@@ -55,8 +51,8 @@ $allowedUpdates = [
     Update::TYPE_MY_CHAT_MEMBER,
     Update::TYPE_CHAT_MEMBER,
     Update::TYPE_CHAT_JOIN_REQUEST,
-    'chat_boost',
-    'removed_chat_boost',
+    Update::TYPE_CHAT_BOOST,
+    Update::TYPE_REMOVED_CHAT_BOOST,
 ];
 // Получаем смещение для longpolling
 $offset = getLongPollingOffset();

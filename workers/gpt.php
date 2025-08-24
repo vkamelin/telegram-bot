@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Logger;
-use App\Services\GPTService;
+use App\Helpers\Logger;
+use App\Helpers\GPTService;
 use App\Helpers\RedisHelper;
 use App\Config;
-use App\Support\RedisKeyHelper;
+use App\Helpers\RedisKeyHelper;
+use Slim\App;
 
-/** @var \Slim\App $app */
-$app = require __DIR__ . '/../bootstrap.php';
+/** @var App $app */
 $config = Config::getInstance();
 
 $redis = null;

@@ -2,18 +2,16 @@
 
 declare(strict_types=1);
 
-use App\Logger;
+use App\Helpers\Logger;
 use App\Helpers\Database;
 use App\Helpers\RedisHelper;
 use App\Telemetry;
 use App\Config;
-use App\Support\RedisKeyHelper;
+use App\Helpers\RedisKeyHelper;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 
-/** @var \Slim\App $app */
-$app = require __DIR__ . '/../bootstrap.php';
 $config = Config::getInstance();
 
 try {
