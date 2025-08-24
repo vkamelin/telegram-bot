@@ -51,8 +51,12 @@ try {
 }
 
 try {
+    if (empty($payload)) {
+        throw new RuntimeException('Empty payload provided');
+    }
+
     // Получаем данные из аргументов командной строки
-    $updateData = json_decode(base64_decode($argv[1]), true, 512, JSON_THROW_ON_ERROR);
+    $updateData = json_decode(base64_decode($payload, true), true, 512, JSON_THROW_ON_ERROR);
     
     // Передаем данные обновления в экземпляр класса Longman\TelegramBot\Entities\Update
     $update = new Update($updateData, $_ENV['TELEGRAM_BOT_NAME']);
