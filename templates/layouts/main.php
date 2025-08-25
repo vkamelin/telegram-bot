@@ -46,6 +46,9 @@ $messages = Flash::get();
             </div>
             <div class="d-flex align-items-center">
                 <!-- Правая половина шапки -->
+                <button id="theme-toggle" class="btn btn-outline-light me-2">
+                    <i id="theme-icon" class="bi"></i>
+                </button>
                 <a href="#" class="btn btn-outline-light">
                     <i class="bi bi-box-arrow-right"></i>
                     <span class="d-none d-lg-inline">Выйти</span>

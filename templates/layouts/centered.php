@@ -18,13 +18,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="<?= url('/assets/css/bootstrap.min.css') ?>" rel="stylesheet">
+    <link href="<?= url('/assets/fonts/bootstrap-icons/bootstrap-icons.min.css'); ?>" rel="stylesheet">
     <link href="<?= url('/assets/css/login.css') ?>" rel="stylesheet">
 </head>
 <body class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
 
+<button id="theme-toggle" class="btn btn-link position-absolute top-0 end-0 m-3">
+    <i id="theme-icon" class="bi"></i>
+</button>
+
 <?= $content ?>
 
 <script src="<?= url('/assets/js/bootstrap.bundle.min.js') ?>"></script>
+<script src="<?= url('/assets/js/bootstrap-init.js') ?>"></script>
 
 </body>
 </html>
