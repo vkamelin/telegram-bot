@@ -78,6 +78,14 @@ docker compose exec app php vendor/bin/phinx migrate
 
 Воркеры запускаются через Supervisor. Конфиги лежат в `docker/supervisor`. На VPS скопируй их в `/etc/supervisor/` и включи службу `supervisor`.
 
+Supervisor использует следующие имена процессов:
+
+- Telegram workers: `tg:tg-{index}`
+- Longpolling worker: `lp`
+- GPT workers: `gpt:gpt-{index}`
+
+Проверки здоровья опираются на эти имена.
+
 Управление воркерами:
 
 ```bash
