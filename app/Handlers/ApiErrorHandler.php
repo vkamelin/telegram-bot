@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Handlers;
 
 use App\Exceptions\ValidationException;
-use App\Logger;
+use App\Helpers\Logger;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ResponseFactory;

@@ -21,7 +21,10 @@
       lengthMenu: [[10,25,50,100,1000,-1],[10,25,50,100,1000,"Все"]],
       lengthChange: true,
       dom: "<'d-flex justify-content-between align-items-center'lfB>rtip",
-      buttons: ['excel'],
+      buttons: [{ extend: 'excel',
+        className: 'btn btn-sm',
+        text: '<i class="bi bi-file-earmark-spreadsheet"></i> Excel'
+      }],
       language: {
         url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Russian.json"
       }

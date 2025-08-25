@@ -9,7 +9,7 @@ $(document).ready(function() {
       data: null,
       className: 'text-end',
       render: function(data, type, row) {
-        return `<a href="/dashboard/users/${row.id}/edit"><i class="bi bi-pencil-square" title="Редактировать"></i></a>`;
+        return `<a href="/dashboard/users/${row.id}/edit" class="btn btn-outline-secondary"><i class="bi bi-pencil-square" title="Редактировать"></i></a>`;
       },
       sortable: false,
     },
