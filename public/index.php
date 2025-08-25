@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use App\Helpers\Database;
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
@@ -16,7 +17,7 @@ Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
 $config = require __DIR__ . '/../app/Config/config.php';
 
 // === PDO ===
-$pdo = new PDO($config['db']['dsn'], $config['db']['user'], $config['db']['pass'], $config['db']['opts']);
+$db = Database::getInstance();
 
 // === Slim App ===
 $app = AppFactory::create();
@@ -35,7 +36,7 @@ $app->add(new \App\Middleware\ErrorMiddleware($config['debug']));
 // === Группы маршрутов ===
 
 // Dashboard (/dashboard/*) — session + CSRF + auth
-$app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
+$app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($db) {
     $g->get('/login', [\App\Controllers\Dashboard\AuthController::class, 'showLogin']);
     $g->post('/login', [\App\Controllers\Dashboard\AuthController::class, 'login']);
     $g->post('/logout', [\App\Controllers\Dashboard\AuthController::class, 'logout']);
@@ -87,8 +88,8 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
   ->add(new \App\Middleware\SessionMiddleware());
 
 // API (/api/*)
-$app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo, $config) {
-    $g->get('/health', new \App\Controllers\Api\HealthController($pdo));
+$app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db, $config) {
+    $g->get('/health', new \App\Controllers\Api\HealthController($db));
     $g->post('/auth/login', [\App\Controllers\Api\AuthController::class, 'login']);
 
     $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
