@@ -9,8 +9,8 @@ kubectl get pods
 
 ### Воркеры
 ```bash
-ps aux | grep workers/telegram.php
-tail -n 100 storage/logs/*.log
+supervisorctl status
+supervisorctl tail workers
 ```
 
 ### Redis
@@ -30,8 +30,7 @@ kubectl rollout restart deployment app
 
 ## Перезапуск воркеров
 ```bash
-pkill -f workers/telegram.php
-php workers/telegram.php &
+supervisorctl restart workers
 ```
 
 ## Очистка очередей и логов
