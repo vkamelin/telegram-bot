@@ -28,10 +28,12 @@ final class CsrfMiddleware implements MiddlewareInterface
     public function process(Req $req, Handler $handler): Res
     {
         if (in_array($req->getMethod(), ['POST','PUT','PATCH','DELETE'], true)) {
-            $body = (array)$req->getParsedBody();
-            $h    = $req->getHeaderLine('X-CSRF-Token');
-            $t    = (string)($body['_csrf'] ?? '');
-            if ($h === '' || $t === '' || !hash_equals($h, $t)) {
+            $csrfName    = $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token';
+            $body        = (array)$req->getParsedBody();
+            $formToken   = (string)($body[$csrfName] ?? '');
+            $cookieToken = (string)($req->getCookieParams()[$csrfName] ?? '');
+
+            if ($formToken === '' || $cookieToken === '' || !hash_equals($formToken, $cookieToken)) {
                 return Response::problem(new \Slim\Psr7\Response(), 403, 'CSRF check failed');
             }
         }
