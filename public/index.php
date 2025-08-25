@@ -26,7 +26,11 @@ $app->add(new RequestSizeLimitMiddleware($config['request_size_limit']));
 $app->addBodyParsingMiddleware();
 $app->add(new SecurityHeadersMiddleware([
     'cors' => $config['cors'],
-    'csp' => [],
+    'csp' => [
+        'script' => 'https://code.jquery.com, https://cdn.jsdelivr.net, https://cdn.datatables.net, https://cdn.tailwindcss.com',
+        'style' => 'https://fonts.googleapis.com, https://cdn.jsdelivr.net, https://cdn.datatables.net, https://cdn.tailwindcss.com',
+        'font' => 'https://fonts.gstatic.com',
+    ],
     'x_frame_options' => 'DENY',
 ]));
 
