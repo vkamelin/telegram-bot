@@ -36,12 +36,12 @@ $messages = Flash::get();
 
 <header class="mb-3">
     <nav class="navbar navbar-dark bg-dark" aria-label="Dark offcanvas navbar">
-        <div class="container">
+        <div class="container-fluid">
             <div class="d-flex align-items-center">
                 <button class="btn btn-dark d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
                     <i class="bi bi-list"></i>
                 </button>
-                <a class="navbar-brand mx-1" href="<?= url('/dashboard') ?>">Dashboard</a>
+                <a class="navbar-brand mx-1" href="<?= url('/dashboard') ?>">Панель</a>
             </div>
             <div class="d-flex align-items-center">
                 <!-- Правая панель -->
@@ -49,7 +49,7 @@ $messages = Flash::get();
             <div class="offcanvas offcanvas-start text-bg-dark d-lg-none" tabindex="-1" id="offcanvasNavbarDark"
                  aria-labelledby="offcanvasNavbarDarkLabel">
                 <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasNavbarDarkLabel">Dashboard</h5>
+                    <h5 class="offcanvas-title" id="offcanvasNavbarDarkLabel">Панель</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
                             aria-label="Close"></button>
                 </div>

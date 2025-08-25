@@ -9,17 +9,23 @@
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
         <select name="status" class="form-select">
-            <option value="">status</option>
-            <option value="pending" <?= isset($_GET['status']) && $_GET['status'] === 'pending' ? 'selected' : '' ?>>pending</option>
-            <option value="approved" <?= isset($_GET['status']) && $_GET['status'] === 'approved' ? 'selected' : '' ?>>approved</option>
-            <option value="declined" <?= isset($_GET['status']) && $_GET['status'] === 'declined' ? 'selected' : '' ?>>declined</option>
+            <option value="">статус</option>
+            <option value="pending" <?= isset($_GET['status']) && $_GET['status'] === 'pending' ? 'selected' : '' ?>>
+                ожидает
+            </option>
+            <option value="approved" <?= isset($_GET['status']) && $_GET['status'] === 'approved' ? 'selected' : '' ?>>
+                одобрен
+            </option>
+            <option value="declined" <?= isset($_GET['status']) && $_GET['status'] === 'declined' ? 'selected' : '' ?>>
+                отклонен
+            </option>
         </select>
     </div>
     <div class="col-auto">
         <input type="text" name="chat_id" value="<?= htmlspecialchars($_GET['chat_id'] ?? '') ?>" class="form-control" placeholder="chat_id">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">Фильтр</button>
     </div>
 </form>
 
@@ -29,13 +35,13 @@
         <th>Chat ID</th>
         <th>User ID</th>
         <th>Username</th>
-        <th>Bio</th>
-        <th>Invite Link</th>
-        <th>Requested At</th>
-        <th>Status</th>
-        <th>Decided At</th>
-        <th>Decided By</th>
-        <th>Actions</th>
+        <th>Био</th>
+        <th>Пригласительная ссылка</th>
+        <th>Дата запроса</th>
+        <th>Статус</th>
+        <th>Дата решения</th>
+        <th>Решен</th>
+        <th>Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -44,13 +50,13 @@
         <th>Chat ID</th>
         <th>User ID</th>
         <th>Username</th>
-        <th>Bio</th>
-        <th>Invite Link</th>
-        <th>Requested At</th>
-        <th>Status</th>
-        <th>Decided At</th>
-        <th>Decided By</th>
-        <th>Actions</th>
+        <th>Био</th>
+        <th>Ссылка</th>
+        <th>Дата запроса</th>
+        <th>Статус</th>
+        <th>Дата решения</th>
+        <th>Решен</th>
+        <th>Действия</th>
     </tr>
     </tfoot>
 </table>

@@ -11,13 +11,13 @@
     <tr>
         <th>ID</th>
         <th>User ID</th>
-        <th>Method</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Priority</th>
-        <th>Error</th>
-        <th>Code</th>
-        <th>Processed At</th>
+        <th>Метод</th>
+        <th>Тип</th>
+        <th>Статус</th>
+        <th>Приоритет</th>
+        <th>Ошибка</th>
+        <th>Код ошибки</th>
+        <th>Обработано</th>
         <th>Действия</th>
     </tr>
     </thead>
@@ -26,13 +26,13 @@
     <tr>
         <th>ID</th>
         <th>User ID</th>
-        <th>Method</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Priority</th>
-        <th>Error</th>
-        <th>Code</th>
-        <th>Processed At</th>
+        <th>Метод</th>
+        <th>Тип</th>
+        <th>Статус</th>
+        <th>Приоритет</th>
+        <th>Ошибка</th>
+        <th>Код ошибки</th>
+        <th>Обработано</th>
         <th>Действия</th>
     </tr>
     </tfoot>

@@ -4,28 +4,28 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Pre-checkout</h1>
+<h1>Предварительный заказ</h1>
 
 <table id="preCheckoutTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
         <th>ID</th>
-        <th>From User ID</th>
-        <th>Currency</th>
-        <th>Total Amount</th>
-        <th>Shipping Option ID</th>
-        <th>Received At</th>
+        <th>От User ID</th>
+        <th>Валюта</th>
+        <th>Сумма</th>
+        <th>Опция доставки ID</th>
+        <th>Принят</th>
     </tr>
     </thead>
     <tbody></tbody>
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>From User ID</th>
-        <th>Currency</th>
-        <th>Total Amount</th>
-        <th>Shipping Option ID</th>
-        <th>Received At</th>
+        <th>От User ID</th>
+        <th>Валюта</th>
+        <th>Сумма</th>
+        <th>Опция доставки ID</th>
+        <th>Принят</th>
     </tr>
     </tfoot>
 </table>

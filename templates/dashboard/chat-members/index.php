@@ -4,21 +4,26 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Chat Members</h1>
+<h1>Подписчики</h1>
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
         <select name="state" class="form-select">
-            <option value="">state</option>
-            <option value="approved" <?= isset($_GET['state']) && $_GET['state'] === 'approved' ? 'selected' : '' ?>>approved</option>
-            <option value="declined" <?= isset($_GET['state']) && $_GET['state'] === 'declined' ? 'selected' : '' ?>>declined</option>
+            <option value="">состояние</option>
+            <option value="approved" <?= isset($_GET['state']) && $_GET['state'] === 'approved' ? 'selected' : ''
+            ?>>
+                одобрен
+            </option>
+            <option value="declined" <?= isset($_GET['state']) && $_GET['state'] === 'declined' ? 'selected' : '' ?>>
+                отклонен
+            </option>
         </select>
     </div>
     <div class="col-auto">
         <input type="text" name="chat_id" value="<?= htmlspecialchars($_GET['chat_id'] ?? '') ?>" class="form-control" placeholder="chat_id">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">Фильтр</button>
     </div>
 </form>
 
@@ -28,8 +33,8 @@
         <th>Chat ID</th>
         <th>User ID</th>
         <th>Username</th>
-        <th>Role</th>
-        <th>State</th>
+        <th>Роль</th>
+        <th>Состояние</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -38,8 +43,8 @@
         <th>Chat ID</th>
         <th>User ID</th>
         <th>Username</th>
-        <th>Role</th>
-        <th>State</th>
+        <th>Роль</th>
+        <th>Состояние</th>
     </tr>
     </tfoot>
 </table>
