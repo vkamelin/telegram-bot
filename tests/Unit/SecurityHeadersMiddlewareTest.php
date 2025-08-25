@@ -25,6 +25,7 @@ final class SecurityHeadersMiddlewareTest extends TestCase
                 'style' => 'https://styles.example',
                 'img' => 'https://img.example',
                 'connect' => 'https://api.example',
+                'font' => 'https://fonts.example',
             ],
             'x_frame_options' => 'DENY',
             'headers' => ['X-Test-Header' => 'foo'],
@@ -45,7 +46,11 @@ final class SecurityHeadersMiddlewareTest extends TestCase
         $this->assertSame('DENY', $res->getHeaderLine('X-Frame-Options'));
         $this->assertSame('foo', $res->getHeaderLine('X-Test-Header'));
         $csp = $res->getHeaderLine('Content-Security-Policy');
-        $this->assertStringContainsString('script-src', $csp);
+        $this->assertStringContainsString("script-src 'self' https://scripts.example", $csp);
+        $this->assertStringContainsString("style-src 'self' 'unsafe-inline' https://styles.example", $csp);
+        $this->assertStringContainsString("img-src 'self' https://img.example data:", $csp);
+        $this->assertStringContainsString("connect-src 'self' https://api.example", $csp);
+        $this->assertStringContainsString("font-src 'self' https://fonts.example", $csp);
     }
 
     public function testPreflightReturns204(): void
