@@ -73,8 +73,8 @@ final class SystemController
             }
 
             try {
-                $pdo = Database::getInstance();
-                $stmt = $pdo->query(
+                $db = Database::getInstance();
+                $stmt = $db->query(
                     "SELECT COUNT(*) FROM telegram_messages " .
                     "WHERE status='success' AND processed_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)"
                 );

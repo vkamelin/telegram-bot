@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class TgUsersController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу пользователей.
@@ -68,7 +68,7 @@ final class TgUsersController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, user_id, username, first_name, last_name, language_code, is_premium, is_user_banned, is_bot_banned, is_subscribed, utm, referral_code FROM telegram_users {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -77,14 +77,14 @@ final class TgUsersController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM telegram_users {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_users {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM telegram_users')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM telegram_users')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
@@ -100,18 +100,18 @@ final class TgUsersController
     public function view(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare('SELECT * FROM telegram_users WHERE id = :id');
+        $stmt = $this->db->prepare('SELECT * FROM telegram_users WHERE id = :id');
         $stmt->execute(['id' => $id]);
         $user = $stmt->fetch();
         if (!$user) {
             return $res->withStatus(404);
         }
 
-        $msgStmt = $this->pdo->prepare('SELECT id, method, `type`, status, processed_at FROM telegram_messages WHERE user_id = :uid ORDER BY id DESC LIMIT 10');
+        $msgStmt = $this->db->prepare('SELECT id, method, `type`, status, processed_at FROM telegram_messages WHERE user_id = :uid ORDER BY id DESC LIMIT 10');
         $msgStmt->execute(['uid' => $user['user_id']]);
         $messages = $msgStmt->fetchAll();
 
-        $updStmt = $this->pdo->prepare('SELECT id, update_id, `type`, created_at FROM telegram_updates WHERE user_id = :uid ORDER BY id DESC LIMIT 10');
+        $updStmt = $this->db->prepare('SELECT id, update_id, `type`, created_at FROM telegram_updates WHERE user_id = :uid ORDER BY id DESC LIMIT 10');
         $updStmt->execute(['uid' => $user['user_id']]);
         $updates = $updStmt->fetchAll();
 

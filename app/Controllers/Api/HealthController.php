@@ -19,7 +19,7 @@ use App\Helpers\Response;
  */
 final class HealthController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Проверяет работоспособность базы данных и возвращает статус.
@@ -30,7 +30,7 @@ final class HealthController
      */
     public function __invoke(Req $req, Res $res): Res
     {
-        $this->pdo->query('SELECT 1');
+        $this->db->query('SELECT 1');
         return Response::json($res, 200, ['status' => 'ok']);
     }
 }

@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class ScheduledController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу запланированных сообщений.
@@ -80,7 +80,7 @@ final class ScheduledController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, user_id, method, `type`, priority, send_after, created_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -89,14 +89,14 @@ final class ScheduledController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM telegram_scheduled_messages {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_scheduled_messages {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM telegram_scheduled_messages')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM telegram_scheduled_messages')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
@@ -112,13 +112,13 @@ final class ScheduledController
     public function sendNow(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $insert = $this->pdo->prepare(
+        $insert = $this->db->prepare(
             'INSERT INTO telegram_messages (user_id, method, `type`, data, priority) ' .
             'SELECT user_id, method, `type`, data, priority FROM telegram_scheduled_messages WHERE id = :id'
         );
         $insert->execute(['id' => $id]);
 
-        $del = $this->pdo->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id');
+        $del = $this->db->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id');
         $del->execute(['id' => $id]);
 
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
@@ -130,7 +130,7 @@ final class ScheduledController
     public function delete(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id');
+        $stmt = $this->db->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id');
         $stmt->execute(['id' => $id]);
 
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);

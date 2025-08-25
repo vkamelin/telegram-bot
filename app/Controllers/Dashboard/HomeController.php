@@ -20,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class HomeController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает статус панели.
@@ -32,7 +32,7 @@ final class HomeController
     public function index(Req $req, Res $res): Res
     {
         // 1. COUNT telegram_messages по статусам pending/processing
-        $stmt = $this->pdo->query(
+        $stmt = $this->db->query(
             "SELECT status, COUNT(*) AS cnt FROM telegram_messages WHERE status IN ('pending','processing') GROUP BY status"
         );
         $pending = 0;
@@ -47,13 +47,13 @@ final class HomeController
         }
 
         // 2. COUNT telegram_scheduled_messages с send_after <= NOW()
-        $stmt = $this->pdo->query(
+        $stmt = $this->db->query(
             "SELECT COUNT(*) FROM telegram_scheduled_messages WHERE send_after <= NOW()"
         );
         $scheduled = (int)$stmt->fetchColumn();
 
         // 3. SUM/доля success/failed за последний час
-        $stmt = $this->pdo->query(
+        $stmt = $this->db->query(
             "SELECT status, COUNT(*) AS cnt FROM telegram_messages " .
             "WHERE status IN ('success','failed') AND processed_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR) GROUP BY status"
         );
@@ -72,26 +72,26 @@ final class HomeController
         $failedShare = $totalHour > 0 ? round(($failed / $totalHour) * 100, 2) : 0.0;
 
         // 4. COUNT DISTINCT telegram_updates.user_id за 24ч
-        $stmt = $this->pdo->query(
+        $stmt = $this->db->query(
             "SELECT COUNT(DISTINCT user_id) FROM telegram_updates WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)"
         );
         $distinctUsers = (int)$stmt->fetchColumn();
 
         // 5. COUNT активных telegram_sessions.updated_at за 24ч
-        $stmt = $this->pdo->query(
+        $stmt = $this->db->query(
             "SELECT COUNT(*) FROM telegram_sessions WHERE updated_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)"
         );
         $activeSessions = (int)$stmt->fetchColumn();
 
         // Последние 10 ошибок
-        $stmt = $this->pdo->query(
+        $stmt = $this->db->query(
             "SELECT id, user_id, error, code, processed_at FROM telegram_messages " .
             "WHERE status='failed' ORDER BY processed_at DESC LIMIT 10"
         );
         $lastErrors = $stmt->fetchAll();
 
         // Агрегат success/failed по минутам за 60 минут
-        $stmt = $this->pdo->query(
+        $stmt = $this->db->query(
             "SELECT DATE_FORMAT(processed_at, '%Y-%m-%d %H:%i') AS minute, " .
             "SUM(CASE WHEN status='success' THEN 1 ELSE 0 END) AS success_cnt, " .
             "SUM(CASE WHEN status='failed' THEN 1 ELSE 0 END) AS failed_cnt " .
@@ -143,7 +143,7 @@ final class HomeController
                 $queueSizes = null;
             }
 
-            $stmt = $this->pdo->query(
+            $stmt = $this->db->query(
                 "SELECT COUNT(*) FROM telegram_messages WHERE status='success' " .
                 "AND processed_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)"
             );

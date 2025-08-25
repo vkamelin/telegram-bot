@@ -13,20 +13,20 @@ use ReflectionClass;
 
 final class PushInvoiceTest extends TestCase
 {
-    private PDO $pdo;
+    private PDO $db;
 
     protected function setUp(): void
     {
         $_ENV['APP_ENV'] = 'test';
 
-        $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->exec('CREATE TABLE telegram_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, method TEXT, type TEXT, data TEXT, priority INTEGER)');
+        $this->db = new PDO('sqlite::memory:');
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->db->exec('CREATE TABLE telegram_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, method TEXT, type TEXT, data TEXT, priority INTEGER)');
 
         $dbRef = new ReflectionClass(Database::class);
         $prop = $dbRef->getProperty('instance');
         $prop->setAccessible(true);
-        $prop->setValue(null, $this->pdo);
+        $prop->setValue(null, $this->db);
 
         $redisStub = new class {
             public array $data = [];
@@ -54,7 +54,7 @@ final class PushInvoiceTest extends TestCase
         $result = Push::invoice(123, $invoice);
         $this->assertTrue($result);
 
-        $row = $this->pdo->query('SELECT user_id, method, type, data, priority FROM telegram_messages')->fetch();
+        $row = $this->db->query('SELECT user_id, method, type, data, priority FROM telegram_messages')->fetch();
         $this->assertSame(123, (int)$row['user_id']);
         $this->assertSame('sendInvoice', $row['method']);
         $data = json_decode($row['data'], true);

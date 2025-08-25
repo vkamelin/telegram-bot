@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class PreCheckoutController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу pre-checkout запросов.
@@ -77,7 +77,7 @@ final class PreCheckoutController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT pre_checkout_query_id, from_user_id, currency, total_amount, shipping_option_id, received_at FROM tg_pre_checkout {$whereSql} ORDER BY received_at DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -86,14 +86,14 @@ final class PreCheckoutController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM tg_pre_checkout {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM tg_pre_checkout {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM tg_pre_checkout')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM tg_pre_checkout')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,

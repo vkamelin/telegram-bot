@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class MessagesController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу сообщений.
@@ -81,7 +81,7 @@ final class MessagesController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, user_id, method, `type`, status, priority, error, code, processed_at FROM telegram_messages {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -90,14 +90,14 @@ final class MessagesController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM telegram_messages {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_messages {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM telegram_messages')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM telegram_messages')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
@@ -113,7 +113,7 @@ final class MessagesController
     public function resend(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare("INSERT INTO telegram_messages (user_id, method, `type`, data, priority) SELECT user_id, method, `type`, data, priority FROM telegram_messages WHERE id = :id");
+        $stmt = $this->db->prepare("INSERT INTO telegram_messages (user_id, method, `type`, data, priority) SELECT user_id, method, `type`, data, priority FROM telegram_messages WHERE id = :id");
         $stmt->execute(['id' => $id]);
         return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
     }
@@ -124,7 +124,7 @@ final class MessagesController
     public function download(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare('SELECT response FROM telegram_messages WHERE id = :id');
+        $stmt = $this->db->prepare('SELECT response FROM telegram_messages WHERE id = :id');
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
         if (!$row || $row['response'] === null) {

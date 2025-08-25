@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class ShippingQueriesController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу запросов на доставку.
@@ -70,7 +70,7 @@ final class ShippingQueriesController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT shipping_query_id, from_user_id, invoice_payload, shipping_address, received_at FROM tg_shipping_queries {$whereSql} ORDER BY received_at DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -79,14 +79,14 @@ final class ShippingQueriesController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM tg_shipping_queries {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM tg_shipping_queries {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM tg_shipping_queries')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM tg_shipping_queries')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
