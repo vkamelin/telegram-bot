@@ -54,7 +54,7 @@ final class TelegramInitDataMiddleware implements MiddlewareInterface
         }
 
         try {
-            $initDataResult = InitData::isValid($init, env('TELEGRAM_TOKEN'), true);
+            $initDataResult = InitData::isValid($init, $_ENV['BOT_TOKEN'], true);
         } catch (\Throwable $e) {
             return Response::problem(new \Slim\Psr7\Response(), 403, 'Invalid init data');
         }
