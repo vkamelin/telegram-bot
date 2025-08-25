@@ -65,10 +65,14 @@ final class HealthService
      */
     private static function checkWorker(): bool
     {
-        $workers = ['gpt', 'lp', 'tg'];
+        $patterns = [
+            'gpt' => '/^gpt:gpt-\d+\s+RUNNING\b/',
+            'tg'  => '/^tg:tg-\d+\s+RUNNING\b/',
+            'lp'  => '/^lp\s+RUNNING\b/',
+        ];
 
         try {
-            $command   = 'supervisorctl status ' . implode(' ', $workers);
+            $command   = 'supervisorctl status ' . implode(' ', array_keys($patterns));
             $output    = [];
             $returnVar = 0;
             @exec($command, $output, $returnVar);
@@ -76,10 +80,10 @@ final class HealthService
                 return false;
             }
 
-            foreach ($workers as $worker) {
+            foreach ($patterns as $pattern) {
                 $found = false;
                 foreach ($output as $line) {
-                    if (preg_match('/^' . preg_quote($worker, '/') . '\s+RUNNING\b/', $line)) {
+                    if (preg_match($pattern, $line)) {
                         $found = true;
                         break;
                     }
