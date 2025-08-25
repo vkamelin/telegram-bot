@@ -12,6 +12,11 @@ $menu = [
         'icon'  => 'bi bi-people-fill',
     ],
     [
+        'url'   => '/dashboard/tg-groups',
+        'title' => 'Группы',
+        'icon'  => 'bi bi-people',
+    ],
+    [
         'url'   => '/dashboard/updates',
         'title' => 'Входяшие',
         'icon'  => 'bi bi-telegram',
