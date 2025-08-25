@@ -119,7 +119,6 @@ final class HomeController
 
         // Проверка компонентов приложения
         $health   = HealthService::check();
-        $healthOk = $health['status'] === 'ok';
 
         $queueSizes = null;
         $sendSpeed = null;
@@ -158,7 +157,7 @@ final class HomeController
             'chartLabels' => $labels,
             'chartSuccess' => $successData,
             'chartFailed' => $failedData,
-            'healthOk' => $healthOk,
+            'health' => $health,
             'queueSizes' => $queueSizes,
             'sendSpeed' => $sendSpeed,
         ];
