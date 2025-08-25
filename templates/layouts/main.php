@@ -62,7 +62,7 @@ $messages = Flash::get();
                     <ul class="nav nav-pills flex-column mb-auto">
                         <?php foreach ($menu as $menuItem):?>
                         <li class="nav-item">
-                            <a href="<?= url($menuItem['url']) ?>" class="nav-link <?= $menuItem['class'] ?>"
+                            <a href="<?= url($menuItem['url']) ?>" class="nav-link <?= $menuItem['class'] ?> text-white"
                                aria-current="page">
                                 <i class="<?= $menuItem['icon'] ?>"></i>&nbsp;&nbsp;<?= $menuItem['title'] ?>
                             </a>
