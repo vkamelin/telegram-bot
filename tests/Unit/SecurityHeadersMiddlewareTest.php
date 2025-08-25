@@ -45,6 +45,7 @@ final class SecurityHeadersMiddlewareTest extends TestCase
         $this->assertSame('X-Test', $res->getHeaderLine('Access-Control-Allow-Headers'));
         $this->assertSame('DENY', $res->getHeaderLine('X-Frame-Options'));
         $this->assertSame('foo', $res->getHeaderLine('X-Test-Header'));
+        $this->assertCount(1, $res->getHeader('Content-Security-Policy'));
         $csp = $res->getHeaderLine('Content-Security-Policy');
         $this->assertStringContainsString("script-src 'self' https://scripts.example", $csp);
         $this->assertStringContainsString("style-src 'self' 'unsafe-inline' https://styles.example", $csp);
