@@ -41,12 +41,11 @@ final class SystemController
 
         $workerCommands = [
             'status' => [
-                'ps aux | grep workers/telegram.php',
+                'supervisorctl status gpt tg lp',
                 'tail -n 100 storage/logs/*.log',
             ],
             'restart' => [
-                'pkill -f workers/telegram.php',
-                'php workers/telegram.php &',
+                'supervisorctl restart gpt tg lp',
             ],
         ];
 
