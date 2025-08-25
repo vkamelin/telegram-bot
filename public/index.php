@@ -41,46 +41,46 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
     $g->post('/login', [\App\Controllers\Dashboard\AuthController::class, 'login']);
     $g->post('/logout', [\App\Controllers\Dashboard\AuthController::class, 'logout']);
 
-    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
-        $auth->get('', [\App\Controllers\Dashboard\HomeController::class, 'index']);
-        $auth->get('/messages', [\App\Controllers\Dashboard\MessagesController::class, 'index']);
-        $auth->post('/messages/data', [\App\Controllers\Dashboard\MessagesController::class, 'data']);
-        $auth->post('/messages/{id}/resend', [\App\Controllers\Dashboard\MessagesController::class, 'resend']);
-        $auth->get('/messages/{id}/response', [\App\Controllers\Dashboard\MessagesController::class, 'download']);
-        $auth->get('/pre-checkout', [\App\Controllers\Dashboard\PreCheckoutController::class, 'index']);
-        $auth->post('/pre-checkout/data', [\App\Controllers\Dashboard\PreCheckoutController::class, 'data']);
-        $auth->get('/shipping', [\App\Controllers\Dashboard\ShippingQueriesController::class, 'index']);
-        $auth->post('/shipping/data', [\App\Controllers\Dashboard\ShippingQueriesController::class, 'data']);
+    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($db) {
+        $auth->get('', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\HomeController($db))->index($req, $res));
+        $auth->get('/messages', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->index($req, $res));
+        $auth->post('/messages/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->data($req, $res));
+        $auth->post('/messages/{id}/resend', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->resend($req, $res));
+        $auth->get('/messages/{id}/response', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->download($req, $res));
+        $auth->get('/pre-checkout', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PreCheckoutController($db))->index($req, $res));
+        $auth->post('/pre-checkout/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PreCheckoutController($db))->data($req, $res));
+        $auth->get('/shipping', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ShippingQueriesController($db))->index($req, $res));
+        $auth->post('/shipping/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ShippingQueriesController($db))->data($req, $res));
         $auth->get('/invoices/create', [\App\Controllers\Dashboard\InvoicesController::class, 'create']);
         $auth->post('/invoices', [\App\Controllers\Dashboard\InvoicesController::class, 'store']);
-        $auth->get('/updates', [\App\Controllers\Dashboard\UpdatesController::class, 'index']);
-        $auth->post('/updates/data', [\App\Controllers\Dashboard\UpdatesController::class, 'data']);
-        $auth->get('/updates/{id}', [\App\Controllers\Dashboard\UpdatesController::class, 'show']);
-        $auth->get('/sessions', [\App\Controllers\Dashboard\SessionsController::class, 'index']);
-        $auth->post('/sessions/data', [\App\Controllers\Dashboard\SessionsController::class, 'data']);
-        $auth->get('/tokens', [\App\Controllers\Dashboard\TokensController::class, 'index']);
-        $auth->post('/tokens/data', [\App\Controllers\Dashboard\TokensController::class, 'data']);
-        $auth->post('/tokens/{id}/revoke', [\App\Controllers\Dashboard\TokensController::class, 'revoke']);
-        $auth->get('/tg-users', [\App\Controllers\Dashboard\TgUsersController::class, 'index']);
-        $auth->post('/tg-users/data', [\App\Controllers\Dashboard\TgUsersController::class, 'data']);
-        $auth->get('/tg-users/{id}', [\App\Controllers\Dashboard\TgUsersController::class, 'view']);
-        $auth->get('/join-requests', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'index']);
-        $auth->post('/join-requests/data', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'data']);
-        $auth->get('/join-requests/{chat_id}/{user_id}', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'view']);
-        $auth->post('/join-requests/{chat_id}/{user_id}/approve', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'approve']);
-        $auth->post('/join-requests/{chat_id}/{user_id}/decline', [\App\Controllers\Dashboard\ChatJoinRequestsController::class, 'decline']);
-        $auth->get('/chat-members', [\App\Controllers\Dashboard\ChatMembersController::class, 'index']);
-        $auth->post('/chat-members/data', [\App\Controllers\Dashboard\ChatMembersController::class, 'data']);
-        $auth->get('/users', [\App\Controllers\Dashboard\PanelUsersController::class, 'index']);
-        $auth->post('/users/data', [\App\Controllers\Dashboard\PanelUsersController::class, 'data']);
-        $auth->get('/users/create', [\App\Controllers\Dashboard\PanelUsersController::class, 'create']);
-        $auth->post('/users', [\App\Controllers\Dashboard\PanelUsersController::class, 'store']);
-        $auth->get('/users/{id}/edit', [\App\Controllers\Dashboard\PanelUsersController::class, 'edit']);
-        $auth->post('/users/{id}', [\App\Controllers\Dashboard\PanelUsersController::class, 'update']);
-        $auth->get('/scheduled', [\App\Controllers\Dashboard\ScheduledController::class, 'index']);
-        $auth->post('/scheduled/data', [\App\Controllers\Dashboard\ScheduledController::class, 'data']);
-        $auth->post('/scheduled/{id}/send-now', [\App\Controllers\Dashboard\ScheduledController::class, 'sendNow']);
-        $auth->post('/scheduled/{id}/delete', [\App\Controllers\Dashboard\ScheduledController::class, 'delete']);
+        $auth->get('/updates', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\UpdatesController($db))->index($req, $res));
+        $auth->post('/updates/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\UpdatesController($db))->data($req, $res));
+        $auth->get('/updates/{id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\UpdatesController($db))->show($req, $res));
+        $auth->get('/sessions', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\SessionsController($db))->index($req, $res));
+        $auth->post('/sessions/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\SessionsController($db))->data($req, $res));
+        $auth->get('/tokens', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->index($req, $res));
+        $auth->post('/tokens/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->data($req, $res));
+        $auth->post('/tokens/{id}/revoke', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->revoke($req, $res));
+        $auth->get('/tg-users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->index($req, $res));
+        $auth->post('/tg-users/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->data($req, $res));
+        $auth->get('/tg-users/{id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->view($req, $res));
+        $auth->get('/join-requests', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->index($req, $res));
+        $auth->post('/join-requests/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->data($req, $res));
+        $auth->get('/join-requests/{chat_id}/{user_id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->view($req, $res));
+        $auth->post('/join-requests/{chat_id}/{user_id}/approve', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->approve($req, $res));
+        $auth->post('/join-requests/{chat_id}/{user_id}/decline', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->decline($req, $res));
+        $auth->get('/chat-members', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatMembersController($db))->index($req, $res));
+        $auth->post('/chat-members/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatMembersController($db))->data($req, $res));
+        $auth->get('/users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->index($req, $res));
+        $auth->post('/users/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->data($req, $res));
+        $auth->get('/users/create', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->create($req, $res));
+        $auth->post('/users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->store($req, $res));
+        $auth->get('/users/{id}/edit', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->edit($req, $res));
+        $auth->post('/users/{id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->update($req, $res));
+        $auth->get('/scheduled', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->index($req, $res));
+        $auth->post('/scheduled/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->data($req, $res));
+        $auth->post('/scheduled/{id}/send-now', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->sendNow($req, $res));
+        $auth->post('/scheduled/{id}/delete', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->delete($req, $res));
         $auth->get('/system', [\App\Controllers\Dashboard\SystemController::class, 'index']);
         // добавляйте страницы админки здесь
     })->add(new \App\Middleware\AuthMiddleware());
@@ -90,15 +90,15 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
 // API (/api/*)
 $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db, $config) {
     $g->get('/health', new \App\Controllers\Api\HealthController($db));
-    $g->post('/auth/login', [\App\Controllers\Api\AuthController::class, 'login']);
+    $g->post('/auth/login', fn(Req $req, Res $res) => (new \App\Controllers\Api\AuthController($db, $config['jwt']))->login($req, $res));
 
-    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
+    $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($db) {
           $auth->get('/me', function (Req $req, Res $res): Res {
               return (new \App\Controllers\Api\MeController())->show($req, $res);
           });
 
-        $auth->get('/users', [\App\Controllers\Api\UsersController::class, 'list']);
-        $auth->post('/users', [\App\Controllers\Api\UsersController::class, 'create']);
+        $auth->get('/users', fn(Req $req, Res $res) => (new \App\Controllers\Api\UsersController($db))->list($req, $res));
+        $auth->post('/users', fn(Req $req, Res $res) => (new \App\Controllers\Api\UsersController($db))->create($req, $res));
     })->add(new \App\Middleware\RateLimitMiddleware($config['rate_limit']))
       ->add(new \App\Middleware\JwtMiddleware($config['jwt']));
 })->add(new \App\Middleware\TelegramInitDataMiddleware($config['bot_token'] ?: ''));
