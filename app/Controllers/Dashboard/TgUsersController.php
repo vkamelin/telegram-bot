@@ -103,6 +103,47 @@ final class TgUsersController
     }
 
     /**
+     * Ищет пользователей по переданным полям.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Res $res HTTP-ответ
+     * @return Res JSON с найденными пользователями
+     */
+    public function search(Req $req, Res $res): Res
+    {
+        $p = (array)$req->getParsedBody();
+        $conds = [];
+        $params = [];
+
+        foreach (['user_id', 'username', 'first_name', 'last_name'] as $field) {
+            if (($p[$field] ?? '') !== '') {
+                $conds[] = "$field LIKE :$field";
+                $params[$field] = '%' . $p[$field] . '%';
+            }
+        }
+        if (($p['is_premium'] ?? '') !== '') {
+            $conds[] = 'is_premium = :is_premium';
+            $params['is_premium'] = (int)$p['is_premium'];
+        }
+
+        $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
+
+        // Ограничиваем количество результатов для интерфейса добавления в группу
+        $limit = min(50, max(1, (int)($p['limit'] ?? 10)));
+
+        $sql = "SELECT id, user_id, username, first_name, last_name, is_premium FROM telegram_users {$whereSql} ORDER BY id DESC LIMIT :limit";
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $val) {
+            $stmt->bindValue(':' . $key, $val);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+
+        return Response::json($res, 200, $rows);
+    }
+
+    /**
      * Отображает карточку пользователя с последними сообщениями и обновлениями.
      */
     public function view(Req $req, Res $res, array $args): Res
