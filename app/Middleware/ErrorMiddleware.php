@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use App\Handlers\ApiErrorHandler;
+use App\Helpers\Logger;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Server\MiddlewareInterface;
@@ -47,6 +48,8 @@ final class ErrorMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($req);
         } catch (Throwable $e) {
+            Logger::error($e->getMessage(), ['exception' => $e]);
+
             $path = $req->getUri()->getPath();
             $accept = $req->getHeaderLine('Accept');
             $wantsJson = str_starts_with($path, '/api') || str_contains($accept, 'application/json');
