@@ -314,7 +314,30 @@ class Push
         
         return self::push($chatId, 'sendVideoNote', $data, $type, $priority, $sendAfter);
     }
-    
+
+    /**
+     * Добавляет в очередь инвойс в Телеграм.
+     *
+     * @param int         $chatId    Id чата
+     * @param array       $invoiceData Данные инвойса из API https://core.telegram.org/bots/api#sendinvoice
+     * @param string      $type      Тип сообщения. Возможные значения: 'push', 'message'
+     * @param int         $priority  Приоритет сообщения. 2 - самый низкий, 0 - самый высокий. По-умолчанию 2
+     * @param string|null $sendAfter Дата и время, после которой отправляется запрос
+     *
+     * @return bool Удалось ли добавить в очередь на отправку. True - удалось, False - не удалось
+     */
+    public static function invoice(
+        int $chatId,
+        array $invoiceData,
+        string $type = 'invoice',
+        int $priority = 2,
+        ?string $sendAfter = null
+    ): bool {
+        $data = array_merge(['chat_id' => $chatId], $invoiceData);
+
+        return self::push($chatId, 'sendInvoice', $data, $type, $priority, $sendAfter);
+    }
+
     /**
      * Метод добавляет в очередь произвольный запрос в Телеграм из документации
      * https://core.telegram.org/bots/api#available-methods
