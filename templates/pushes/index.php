@@ -67,7 +67,6 @@
         language: {
           url: 'https://cdn.datatables.net/plug-ins/2.2.2/i18n/ru.json',
         },
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Все"]]
       });
     });
-</script>
+  </script>
