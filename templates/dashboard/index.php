@@ -81,7 +81,10 @@
 
 <div class="row mt-3">
     <div class="col-md-12">
-        <canvas id="statusChart"></canvas>
+        <canvas id="statusChart"
+                data-labels='<?= htmlspecialchars(json_encode($chartLabels), ENT_QUOTES) ?>'
+                data-success='<?= htmlspecialchars(json_encode($chartSuccess), ENT_QUOTES) ?>'
+                data-failed='<?= htmlspecialchars(json_encode($chartFailed), ENT_QUOTES) ?>'></canvas>
     </div>
 </div>
 
@@ -114,32 +117,4 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const ctx = document.getElementById('statusChart').getContext('2d');
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: <?= json_encode($chartLabels) ?>,
-        datasets: [
-            {
-                label: 'success',
-                data: <?= json_encode($chartSuccess) ?>,
-                borderColor: 'rgb(25, 135, 84)',
-                tension: 0.1
-            },
-            {
-                label: 'failed',
-                data: <?= json_encode($chartFailed) ?>,
-                borderColor: 'rgb(220, 53, 69)',
-                tension: 0.1
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: { beginAtZero: true }
-        }
-    }
-});
-</script>
+<script src="<?= url('/assets/js/dashboard-chart.js') ?>"></script>
