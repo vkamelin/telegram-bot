@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
-use Vlsv\TelegramDataValidator\TelegramDataValidator;
+use Vlsv\TelegramInitDataValidator\Validator\InitData;
 
 /**
  * Middleware для проверки и извлечения Telegram init data.
@@ -54,15 +54,17 @@ final class TelegramInitDataMiddleware implements MiddlewareInterface
         }
 
         try {
-            (new TelegramDataValidator($this->botToken))->validate($init);
+            $initDataResult = InitData::isValid($init, env('TELEGRAM_TOKEN'), true);
         } catch (\Throwable $e) {
             return Response::problem(new \Slim\Psr7\Response(), 403, 'Invalid init data');
         }
 
-        parse_str($init, $data);
-        $user = json_decode($data['user'] ?? '{}', true);
-        if (!is_array($user)) {
-            $user = [];
+        if ($initDataResult) {
+            parse_str($init, $data);
+            $user = json_decode($data['user'] ?? '{}', true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($user)) {
+                $user = [];
+            }
         }
 
         $telegramUser = [
