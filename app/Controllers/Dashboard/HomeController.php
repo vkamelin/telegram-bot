@@ -10,7 +10,7 @@ namespace App\Controllers\Dashboard;
 use App\Helpers\RedisHelper;
 use App\Helpers\View;
 use App\Telemetry;
-use GuzzleHttp\Client;
+use App\Services\HealthService;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
@@ -117,16 +117,9 @@ final class HomeController
             $failedData[] = $indexed[$minute]['failed'] ?? 0;
         }
 
-        // Запрос к /api/health
-        $healthOk = false;
-        try {
-            $client = new Client(['timeout' => 2.0]);
-            $resp = $client->get('http://localhost/api/health');
-            $body = json_decode((string)$resp->getBody(), true);
-            $healthOk = isset($body['status']) && $body['status'] === 'ok';
-        } catch (\Throwable) {
-            $healthOk = false;
-        }
+        // Проверка компонентов приложения
+        $health   = HealthService::check();
+        $healthOk = $health['status'] === 'ok';
 
         $queueSizes = null;
         $sendSpeed = null;

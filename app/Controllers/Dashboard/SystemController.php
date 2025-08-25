@@ -10,7 +10,7 @@ namespace App\Controllers\Dashboard;
 use App\Helpers\Database;
 use App\Helpers\RedisHelper;
 use App\Helpers\View;
-use GuzzleHttp\Client;
+use App\Services\HealthService;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
 
@@ -24,14 +24,7 @@ final class SystemController
      */
     public function index(Req $req, Res $res): Res
     {
-        $health = null;
-        try {
-            $client = new Client(['timeout' => 2.0]);
-            $resp   = $client->get('http://localhost/api/health');
-            $health = json_decode((string)$resp->getBody(), true);
-        } catch (\Throwable) {
-            $health = null;
-        }
+        $health = HealthService::check();
 
         $envKeys = [
             'APP_ENV',
