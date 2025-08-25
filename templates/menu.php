@@ -22,6 +22,11 @@ $menu = [
         'icon'  => 'bi bi-truck',
     ],
     [
+        'url'   => '/dashboard/invoices/create',
+        'title' => 'Invoice',
+        'icon'  => 'bi bi-file-earmark-text',
+    ],
+    [
         'url'   => '/dashboard/scheduled',
         'title' => 'Scheduled',
         'icon'  => 'bi bi-clock',

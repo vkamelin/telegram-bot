@@ -50,6 +50,8 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/pre-checkout/data', [\App\Controllers\Dashboard\PreCheckoutController::class, 'data']);
         $auth->get('/shipping', [\App\Controllers\Dashboard\ShippingQueriesController::class, 'index']);
         $auth->post('/shipping/data', [\App\Controllers\Dashboard\ShippingQueriesController::class, 'data']);
+        $auth->get('/invoices/create', [\App\Controllers\Dashboard\InvoicesController::class, 'create']);
+        $auth->post('/invoices', [\App\Controllers\Dashboard\InvoicesController::class, 'store']);
         $auth->get('/updates', [\App\Controllers\Dashboard\UpdatesController::class, 'index']);
         $auth->post('/updates/data', [\App\Controllers\Dashboard\UpdatesController::class, 'data']);
         $auth->get('/updates/{id}', [\App\Controllers\Dashboard\UpdatesController::class, 'show']);
