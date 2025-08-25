@@ -2,7 +2,7 @@
 /**
  * System view
  *
- * @var array|null $health
+ * @var array{db: bool, redis: bool, worker: bool, status: string} $health
  * @var array $env
  * @var array $workerCommands
  * @var array|null $queueSizes
@@ -14,7 +14,11 @@
     <div class="col-md-3">
         <div class="h-100 p-3 text-bg-dark rounded-3">
             <h4>Health</h4>
-            <p class="lead"><?= isset($health['status']) && $health['status'] === 'ok' ? 'OK' : 'FAIL' ?></p>
+            <p class="lead">
+                <?= $health['db'] ? 'DB OK' : 'DB FAIL' ?>,
+                <?= $health['redis'] ? 'Redis OK' : 'Redis FAIL' ?>,
+                <?= $health['worker'] ? 'Worker OK' : 'Worker FAIL' ?>
+            </p>
         </div>
     </div>
 </div>

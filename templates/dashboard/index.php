@@ -15,7 +15,7 @@
  * @var array      $chartLabels
  * @var array      $chartSuccess
  * @var array      $chartFailed
- * @var bool       $healthOk
+ * @var array{db: bool, redis: bool, worker: bool, status: string} $health
  * @var array|null $queueSizes
  * @var int|null   $sendSpeed
  */
@@ -49,7 +49,11 @@
         <div class="card">
             <div class="card-body">
             <h4>Health</h4>
-            <p class="lead"><?= $healthOk ? 'OK' : 'FAIL' ?></p>
+            <p class="lead">
+                <?= $health['db'] ? 'DB OK' : 'DB FAIL' ?>,
+                <?= $health['redis'] ? 'Redis OK' : 'Redis FAIL' ?>,
+                <?= $health['worker'] ? 'Worker OK' : 'Worker FAIL' ?>
+            </p>
         </div></div>
     </div>
 </div>
