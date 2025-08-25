@@ -12,16 +12,16 @@ use Slim\Psr7\Response;
 
 final class PreCheckoutControllerTest extends TestCase
 {
-    private PDO $pdo;
+    private PDO $db;
     private PreCheckoutController $controller;
 
     protected function setUp(): void
     {
-        $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->exec('CREATE TABLE tg_pre_checkout (pre_checkout_query_id TEXT PRIMARY KEY, from_user_id INTEGER, currency TEXT, total_amount INTEGER, invoice_payload TEXT, shipping_option_id TEXT, order_info TEXT, received_at TEXT)');
-        $this->pdo->exec("INSERT INTO tg_pre_checkout (pre_checkout_query_id, from_user_id, currency, total_amount, invoice_payload, shipping_option_id, order_info, received_at) VALUES ('abc', 1, 'USD', 1000, 'payload', 'ship1', '{}', '2024-01-01 00:00:00')");
-        $this->controller = new PreCheckoutController($this->pdo);
+        $this->db = new PDO('sqlite::memory:');
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->db->exec('CREATE TABLE tg_pre_checkout (pre_checkout_query_id TEXT PRIMARY KEY, from_user_id INTEGER, currency TEXT, total_amount INTEGER, invoice_payload TEXT, shipping_option_id TEXT, order_info TEXT, received_at TEXT)');
+        $this->db->exec("INSERT INTO tg_pre_checkout (pre_checkout_query_id, from_user_id, currency, total_amount, invoice_payload, shipping_option_id, order_info, received_at) VALUES ('abc', 1, 'USD', 1000, 'payload', 'ship1', '{}', '2024-01-01 00:00:00')");
+        $this->controller = new PreCheckoutController($this->db);
     }
 
     public function testDataReturnsJson(): void

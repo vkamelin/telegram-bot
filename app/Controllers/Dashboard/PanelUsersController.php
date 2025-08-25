@@ -19,7 +19,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class PanelUsersController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает список пользователей панели.
@@ -52,7 +52,7 @@ final class PanelUsersController
         }
 
         $sql = "SELECT id, email, telegram_user_id, created_at, updated_at FROM users {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -61,14 +61,14 @@ final class PanelUsersController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM users {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM users {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM users')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
@@ -115,7 +115,7 @@ final class PanelUsersController
             return View::render($res, 'dashboard/users/form.php', $params, 'layouts/main.php');
         }
 
-        $stmt = $this->pdo->prepare('INSERT INTO users (email, telegram_user_id) VALUES (:email, :telegram_user_id)');
+        $stmt = $this->db->prepare('INSERT INTO users (email, telegram_user_id) VALUES (:email, :telegram_user_id)');
         $stmt->execute([
             'email' => $email,
             'telegram_user_id' => $telegramId !== '' ? $telegramId : null,
@@ -131,7 +131,7 @@ final class PanelUsersController
     public function edit(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare('SELECT id, email, telegram_user_id, created_at, updated_at FROM users WHERE id = :id');
+        $stmt = $this->db->prepare('SELECT id, email, telegram_user_id, created_at, updated_at FROM users WHERE id = :id');
         $stmt->execute(['id' => $id]);
         $user = $stmt->fetch();
         if (!$user) {
@@ -153,7 +153,7 @@ final class PanelUsersController
     public function update(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare('SELECT id FROM users WHERE id = :id');
+        $stmt = $this->db->prepare('SELECT id FROM users WHERE id = :id');
         $stmt->execute(['id' => $id]);
         if (!$stmt->fetch()) {
             return $res->withStatus(404);
@@ -177,7 +177,7 @@ final class PanelUsersController
             return View::render($res, 'dashboard/users/form.php', $params, 'layouts/main.php');
         }
 
-        $stmt = $this->pdo->prepare('UPDATE users SET email = :email, telegram_user_id = :telegram_user_id WHERE id = :id');
+        $stmt = $this->db->prepare('UPDATE users SET email = :email, telegram_user_id = :telegram_user_id WHERE id = :id');
         $stmt->execute([
             'email' => $email,
             'telegram_user_id' => $telegramId !== '' ? $telegramId : null,

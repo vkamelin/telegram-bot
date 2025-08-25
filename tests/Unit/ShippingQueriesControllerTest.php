@@ -12,16 +12,16 @@ use Slim\Psr7\Response;
 
 final class ShippingQueriesControllerTest extends TestCase
 {
-    private PDO $pdo;
+    private PDO $db;
     private ShippingQueriesController $controller;
 
     protected function setUp(): void
     {
-        $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->exec('CREATE TABLE tg_shipping_queries (shipping_query_id TEXT PRIMARY KEY, from_user_id INTEGER, invoice_payload TEXT, shipping_address TEXT, received_at TEXT)');
-        $this->pdo->exec("INSERT INTO tg_shipping_queries (shipping_query_id, from_user_id, invoice_payload, shipping_address, received_at) VALUES ('sq1', 1, 'payload', '{}', '2024-01-01 00:00:00')");
-        $this->controller = new ShippingQueriesController($this->pdo);
+        $this->db = new PDO('sqlite::memory:');
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->db->exec('CREATE TABLE tg_shipping_queries (shipping_query_id TEXT PRIMARY KEY, from_user_id INTEGER, invoice_payload TEXT, shipping_address TEXT, received_at TEXT)');
+        $this->db->exec("INSERT INTO tg_shipping_queries (shipping_query_id, from_user_id, invoice_payload, shipping_address, received_at) VALUES ('sq1', 1, 'payload', '{}', '2024-01-01 00:00:00')");
+        $this->controller = new ShippingQueriesController($this->db);
     }
 
     public function testDataReturnsJson(): void

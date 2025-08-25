@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class TokensController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу токенов.
@@ -69,7 +69,7 @@ final class TokensController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, user_id, jti, FROM_UNIXTIME(expires_at) AS expires_at, revoked, created_at, updated_at FROM refresh_tokens {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -78,14 +78,14 @@ final class TokensController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM refresh_tokens {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM refresh_tokens {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM refresh_tokens')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM refresh_tokens')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
@@ -101,7 +101,7 @@ final class TokensController
     public function revoke(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare('UPDATE refresh_tokens SET revoked = 1 WHERE id = :id');
+        $stmt = $this->db->prepare('UPDATE refresh_tokens SET revoked = 1 WHERE id = :id');
         $stmt->execute(['id' => $id]);
 
         return $res->withHeader('Location', '/dashboard/tokens')->withStatus(302);

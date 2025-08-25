@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class ChatMembersController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     public function index(Req $req, Res $res): Res
     {
@@ -59,7 +59,7 @@ final class ChatMembersController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT cm.chat_id, cm.user_id, tu.username, cm.role, cm.state FROM chat_members cm LEFT JOIN telegram_users tu ON tu.user_id = cm.user_id {$whereSql} ORDER BY cm.chat_id, cm.user_id LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -68,14 +68,14 @@ final class ChatMembersController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM chat_members cm LEFT JOIN telegram_users tu ON tu.user_id = cm.user_id {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM chat_members cm LEFT JOIN telegram_users tu ON tu.user_id = cm.user_id {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM chat_members')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM chat_members')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,

@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class SessionsController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу сессий.
@@ -65,7 +65,7 @@ final class SessionsController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT user_id, state, created_at, updated_at FROM telegram_sessions {$whereSql} ORDER BY updated_at DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -74,14 +74,14 @@ final class SessionsController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM telegram_sessions {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_sessions {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM telegram_sessions')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM telegram_sessions')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,

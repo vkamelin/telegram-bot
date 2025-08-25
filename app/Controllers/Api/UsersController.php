@@ -20,9 +20,9 @@ use App\Helpers\Response;
 final class UsersController
 {
     /**
-     * @param PDO $pdo Подключение к базе данных
+     * @param PDO $db Подключение к базе данных
      */
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Возвращает список пользователей.
@@ -33,7 +33,7 @@ final class UsersController
      */
     public function list(Req $req, Res $res): Res
     {
-        $q = $this->pdo->query('SELECT id, email, created_at FROM users ORDER BY id DESC LIMIT 100');
+        $q = $this->db->query('SELECT id, email, created_at FROM users ORDER BY id DESC LIMIT 100');
         $rows = $q->fetchAll();
         return Response::json($res, 200, ['items' => $rows]);
     }
@@ -52,8 +52,8 @@ final class UsersController
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return Response::problem($res, 400, 'Validation error', ['errors' => ['email' => 'invalid']]);
         }
-        $stmt = $this->pdo->prepare('INSERT INTO users(email, created_at) VALUES(?, NOW())');
+        $stmt = $this->db->prepare('INSERT INTO users(email, created_at) VALUES(?, NOW())');
         $stmt->execute([$email]);
-        return Response::json($res, 201, ['id' => (int)$this->pdo->lastInsertId()]);
+        return Response::json($res, 201, ['id' => (int)$this->db->lastInsertId()]);
     }
 }

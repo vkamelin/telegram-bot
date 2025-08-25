@@ -42,9 +42,9 @@ final class ApiTest extends TestCase
         $app = AppFactory::create();
         $app->addBodyParsingMiddleware();
         $app->add(new ErrorMiddleware(true));
-        $pdo = new PDO('sqlite::memory:');
-        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($pdo) {
-            $g->get('/health', new HealthController($pdo));
+        $db = new PDO('sqlite::memory:');
+        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db) {
+            $g->get('/health', new HealthController($db));
             $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
                 $auth->get('/me', function ($req, $res) {
                     return (new MeController())->show($req, $res);

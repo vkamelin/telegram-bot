@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class UpdatesController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу обновлений.
@@ -73,7 +73,7 @@ final class UpdatesController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, update_id, user_id, message_id, `type`, sent_at, created_at FROM telegram_updates {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -82,14 +82,14 @@ final class UpdatesController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM telegram_updates {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_updates {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM telegram_updates')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM telegram_updates')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
@@ -105,7 +105,7 @@ final class UpdatesController
     public function show(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->pdo->prepare('SELECT data FROM telegram_updates WHERE id = :id');
+        $stmt = $this->db->prepare('SELECT data FROM telegram_updates WHERE id = :id');
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
         if (!$row) {
