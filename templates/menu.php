@@ -17,6 +17,11 @@ $menu = [
         'icon'  => 'bi bi-receipt',
     ],
     [
+        'url'   => '/dashboard/shipping',
+        'title' => 'Shipping',
+        'icon'  => 'bi bi-truck',
+    ],
+    [
         'url'   => '/dashboard/scheduled',
         'title' => 'Scheduled',
         'icon'  => 'bi bi-clock',
