@@ -1,6 +1,8 @@
 // Initialize Bootstrap popovers
-const popoverTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="popover"]'));
-popoverTriggerList.forEach((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl, { html: true }));
+if (window.bootstrap) {
+    const popoverTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    popoverTriggerList.forEach((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl, { html: true }));
+}
 
 // Theme toggle
 const themeToggle = document.getElementById('theme-toggle');
