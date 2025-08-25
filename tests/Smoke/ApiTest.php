@@ -42,9 +42,8 @@ final class ApiTest extends TestCase
         $app = AppFactory::create();
         $app->addBodyParsingMiddleware();
         $app->add(new ErrorMiddleware(true));
-        $db = new PDO('sqlite::memory:');
-        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db) {
-            $g->get('/health', new HealthController($db));
+        $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) {
+            $g->get('/health', new HealthController());
             $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) {
                 $auth->get('/me', function ($req, $res) {
                     return (new MeController())->show($req, $res);
@@ -62,7 +61,12 @@ final class ApiTest extends TestCase
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/api/health')
             ->withHeader('X-Telegram-Init-Data', $init);
         $res = $app->handle($req);
-        $this->assertSame(200, $res->getStatusCode());
+        $body = json_decode((string)$res->getBody(), true);
+        foreach (['db', 'redis', 'worker'] as $key) {
+            $this->assertArrayHasKey($key, $body);
+        }
+        $expectedStatus = ($body['status'] ?? '') === 'ok' ? 200 : 503;
+        $this->assertSame($expectedStatus, $res->getStatusCode());
     }
 
     public function testMeWithValidInitData(): void

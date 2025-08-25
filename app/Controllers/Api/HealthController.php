@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api;
 
-use PDO;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
+use App\Services\HealthService;
 
 /**
  * Контроллер проверки состояния сервиса.
@@ -19,10 +19,9 @@ use App\Helpers\Response;
  */
 final class HealthController
 {
-    public function __construct(private PDO $db) {}
 
     /**
-     * Проверяет работоспособность базы данных и возвращает статус.
+     * Проверяет работоспособность сервисов и возвращает статус.
      *
      * @param Req $req HTTP-запрос
      * @param Res $res HTTP-ответ
@@ -30,7 +29,9 @@ final class HealthController
      */
     public function __invoke(Req $req, Res $res): Res
     {
-        $this->db->query('SELECT 1');
-        return Response::json($res, 200, ['status' => 'ok']);
+        $details = HealthService::check();
+        $overall = $details['status'] === 'ok';
+
+        return Response::json($res, $overall ? 200 : 503, $details);
     }
 }
