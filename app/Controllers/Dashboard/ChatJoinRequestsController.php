@@ -40,8 +40,11 @@ final class ChatJoinRequestsController
     {
         $p = (array)$req->getParsedBody();
         $start  = max(0, (int)($p['start'] ?? 0));
-        $length = max(10, (int)($p['length'] ?? 10));
+        $length = (int)($p['length'] ?? 10);
         $draw   = (int)($p['draw'] ?? 0);
+        if ($length === -1) {
+            $start = 0;
+        }
 
         $conds = [];
         $params = [];
@@ -65,13 +68,15 @@ final class ChatJoinRequestsController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT c.chat_id, c.user_id, tu.username, c.bio, c.invite_link, c.requested_at, c.status, c.decided_at, c.decided_by FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id {$whereSql} ORDER BY c.requested_at DESC LIMIT :limit OFFSET :offset";
+        $sql = "SELECT c.chat_id, c.user_id, tu.username, c.bio, c.invite_link, c.requested_at, c.status, c.decided_at, c.decided_by FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id {$whereSql} ORDER BY c.requested_at DESC";
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
-        $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        if ($length > 0) {
+            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        }
         $stmt->execute();
         $rows = $stmt->fetchAll();
 

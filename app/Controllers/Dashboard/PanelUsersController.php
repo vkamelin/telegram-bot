@@ -40,8 +40,11 @@ final class PanelUsersController
     {
         $p = (array)$req->getParsedBody();
         $start  = max(0, (int)($p['start'] ?? 0));
-        $length = max(10, (int)($p['length'] ?? 10));
+        $length = (int)($p['length'] ?? 10);
         $draw   = (int)($p['draw'] ?? 0);
+        if ($length === -1) {
+            $start = 0;
+        }
 
         $params = [];
         $searchValue = $p['search']['value'] ?? '';
@@ -51,13 +54,15 @@ final class PanelUsersController
             $params['search'] = '%' . $searchValue . '%';
         }
 
-        $sql = "SELECT id, email, telegram_user_id, created_at, updated_at FROM users {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        $sql = "SELECT id, email, telegram_user_id, created_at, updated_at FROM users {$whereSql} ORDER BY id DESC";
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
-        $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        if ($length > 0) {
+            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        }
         $stmt->execute();
         $rows = $stmt->fetchAll();
 

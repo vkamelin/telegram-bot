@@ -39,8 +39,11 @@ final class UpdatesController
     {
         $p = (array)$req->getParsedBody();
         $start  = max(0, (int)($p['start'] ?? 0));
-        $length = max(10, (int)($p['length'] ?? 10));
+        $length = (int)($p['length'] ?? 10);
         $draw   = (int)($p['draw'] ?? 0);
+        if ($length === -1) {
+            $start = 0;
+        }
 
         $conds = [];
         $params = [];
@@ -72,13 +75,15 @@ final class UpdatesController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT id, update_id, user_id, message_id, `type`, sent_at, created_at FROM telegram_updates {$whereSql} ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        $sql = "SELECT id, update_id, user_id, message_id, `type`, sent_at, created_at FROM telegram_updates {$whereSql} ORDER BY id DESC";
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
-        $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        if ($length > 0) {
+            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        }
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
