@@ -69,6 +69,11 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/tg-users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->index($req, $res));
         $auth->post('/tg-users/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->data($req, $res));
         $auth->get('/tg-users/{id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->view($req, $res));
+        $auth->get('/tg-groups', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgGroupsController($db))->index($req, $res));
+        $auth->post('/tg-groups', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgGroupsController($db))->store($req, $res));
+        $auth->map(['GET','POST'], '/tg-groups/{id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TgGroupsController($db))->view($req, $res, $args));
+        $auth->post('/tg-groups/{id}/add-user', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TgGroupsController($db))->addUser($req, $res, $args));
+        $auth->post('/tg-groups/{id}/remove-user', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TgGroupsController($db))->removeUser($req, $res, $args));
         $auth->get('/join-requests', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->index($req, $res));
         $auth->post('/join-requests/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->data($req, $res));
         $auth->get('/join-requests/{chat_id}/{user_id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->view($req, $res));
