@@ -19,7 +19,8 @@
       },
       columns: columns,
       lengthMenu: [[10,25,50,100,1000,-1],[10,25,50,100,1000,"Все"]],
-      dom: 'Bfrtip',
+      lengthChange: true,
+      dom: 'Blfrtip',
       buttons: ['excel'],
       language: {
         url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Russian.json"
