@@ -93,7 +93,12 @@ code, pre {
 .sidebar {
     width: 100%;
     min-height: 100vh;
-    background-color: #f8f9fa;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+.sidebar .nav-link {
+    color: var(--bs-body-color);
 }
 
 .main-content {
