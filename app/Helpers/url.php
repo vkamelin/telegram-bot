@@ -7,7 +7,7 @@ if (!function_exists('url')) {
      */
     function url(string $path): string
     {
-        $base = rtrim(env('BASE_PATH', ''), '/');
+        $base = rtrim($_ENV['BASE_PATH'] ?? '', '/');
         return $base . '/' . ltrim($path, '/');
     }
 }
