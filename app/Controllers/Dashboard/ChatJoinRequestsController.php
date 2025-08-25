@@ -19,7 +19,7 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class ChatJoinRequestsController
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $db) {}
 
     /**
      * Отображает таблицу заявок.
@@ -66,7 +66,7 @@ final class ChatJoinRequestsController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT c.chat_id, c.user_id, tu.username, c.bio, c.invite_link, c.requested_at, c.status, c.decided_at, c.decided_by FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id {$whereSql} ORDER BY c.requested_at DESC LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
@@ -75,14 +75,14 @@ final class ChatJoinRequestsController
         $stmt->execute();
         $rows = $stmt->fetchAll();
 
-        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id {$whereSql}");
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id {$whereSql}");
         foreach ($params as $key => $val) {
             $countStmt->bindValue(':' . $key, $val);
         }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotal = (int)$this->pdo->query('SELECT COUNT(*) FROM chat_join_requests')->fetchColumn();
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM chat_join_requests')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,
@@ -99,7 +99,7 @@ final class ChatJoinRequestsController
     {
         $chatId = (int)($args['chat_id'] ?? 0);
         $userId = (int)($args['user_id'] ?? 0);
-        $stmt = $this->pdo->prepare('SELECT c.*, tu.username, tu.first_name, tu.last_name FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id WHERE c.chat_id = :chat_id AND c.user_id = :user_id');
+        $stmt = $this->db->prepare('SELECT c.*, tu.username, tu.first_name, tu.last_name FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id WHERE c.chat_id = :chat_id AND c.user_id = :user_id');
         $stmt->execute(['chat_id' => $chatId, 'user_id' => $userId]);
         $row = $stmt->fetch();
         if (!$row) {
@@ -122,7 +122,7 @@ final class ChatJoinRequestsController
         $chatId = (int)($args['chat_id'] ?? 0);
         $userId = (int)($args['user_id'] ?? 0);
         Request::approveChatJoinRequest(['chat_id' => $chatId, 'user_id' => $userId]);
-        $stmt = $this->pdo->prepare('UPDATE chat_join_requests SET status = :status, decided_at = CURRENT_TIMESTAMP, decided_by = :decided_by WHERE chat_id = :chat_id AND user_id = :user_id');
+        $stmt = $this->db->prepare('UPDATE chat_join_requests SET status = :status, decided_at = CURRENT_TIMESTAMP, decided_by = :decided_by WHERE chat_id = :chat_id AND user_id = :user_id');
         $stmt->execute([
             'status' => 'approved',
             'decided_by' => $_SESSION['user_id'] ?? null,
@@ -130,7 +130,7 @@ final class ChatJoinRequestsController
             'user_id' => $userId,
         ]);
 
-        $stmt2 = $this->pdo->prepare('INSERT INTO chat_members (chat_id, user_id, role, state) VALUES (:chat_id, :user_id, :role, :state) ON DUPLICATE KEY UPDATE role = VALUES(role), state = VALUES(state)');
+        $stmt2 = $this->db->prepare('INSERT INTO chat_members (chat_id, user_id, role, state) VALUES (:chat_id, :user_id, :role, :state) ON DUPLICATE KEY UPDATE role = VALUES(role), state = VALUES(state)');
         $stmt2->execute([
             'chat_id' => $chatId,
             'user_id' => $userId,
@@ -149,7 +149,7 @@ final class ChatJoinRequestsController
         $chatId = (int)($args['chat_id'] ?? 0);
         $userId = (int)($args['user_id'] ?? 0);
         Request::declineChatJoinRequest(['chat_id' => $chatId, 'user_id' => $userId]);
-        $stmt = $this->pdo->prepare('UPDATE chat_join_requests SET status = :status, decided_at = CURRENT_TIMESTAMP, decided_by = :decided_by WHERE chat_id = :chat_id AND user_id = :user_id');
+        $stmt = $this->db->prepare('UPDATE chat_join_requests SET status = :status, decided_at = CURRENT_TIMESTAMP, decided_by = :decided_by WHERE chat_id = :chat_id AND user_id = :user_id');
         $stmt->execute([
             'status' => 'declined',
             'decided_by' => $_SESSION['user_id'] ?? null,
@@ -157,7 +157,7 @@ final class ChatJoinRequestsController
             'user_id' => $userId,
         ]);
 
-        $stmt2 = $this->pdo->prepare('INSERT INTO chat_members (chat_id, user_id, role, state) VALUES (:chat_id, :user_id, NULL, :state) ON DUPLICATE KEY UPDATE role = VALUES(role), state = VALUES(state)');
+        $stmt2 = $this->db->prepare('INSERT INTO chat_members (chat_id, user_id, role, state) VALUES (:chat_id, :user_id, NULL, :state) ON DUPLICATE KEY UPDATE role = VALUES(role), state = VALUES(state)');
         $stmt2->execute([
             'chat_id' => $chatId,
             'user_id' => $userId,

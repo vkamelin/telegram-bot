@@ -27,6 +27,7 @@
     "ext-curl": "*",
     "ext-redis": "*",
     "ext-fileinfo": "*",
+    "ext-readline": "*",,
     "slim/slim": "^4.12",
     "slim/psr7": "^1.7",
     "guzzlehttp/guzzle": "^7.9",

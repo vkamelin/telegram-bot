@@ -27,8 +27,8 @@ class CreateAdminCommand extends Command
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         $pdo = Database::getInstance();
-        $stmt = $pdo->prepare('INSERT INTO users (email, password_hash) VALUES (:email, :password_hash)');
-        $stmt->execute(['email' => $email, 'password_hash' => $hash]);
+        $stmt = $pdo->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
+        $stmt->execute(['email' => $email, 'password' => $hash]);
 
         echo "Administrator created." . PHP_EOL;
         return 0;

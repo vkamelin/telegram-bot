@@ -20,10 +20,10 @@ use App\Helpers\Response;
 final class AuthController
 {
     /**
-     * @param PDO   $pdo    Подключение к базе данных
+     * @param PDO   $db
      * @param array $jwtCfg Настройки JWT (secret, alg, ttl)
      */
-    public function __construct(private PDO $pdo, private array $jwtCfg) {}
+    public function __construct(private PDO $db, private array $jwtCfg) {}
 
     /**
      * Выполняет вход пользователя и возвращает JWT.
@@ -38,10 +38,10 @@ final class AuthController
         $email = (string)($data['email'] ?? '');
         $pass  = (string)($data['password'] ?? '');
         
-        $stmt = $this->pdo->prepare('SELECT id, password_hash FROM users WHERE email=? LIMIT 1');
+        $stmt = $this->db->prepare('SELECT id, password FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);
         $u = $stmt->fetch();
-        if (!$u || !password_verify($pass, $u['password_hash'])) {
+        if (!$u || !password_verify($pass, $u['password'])) {
             return Response::problem($res, 401, 'Invalid credentials');
         }
         

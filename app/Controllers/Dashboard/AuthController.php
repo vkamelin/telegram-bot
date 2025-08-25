@@ -42,16 +42,16 @@ final class AuthController
      */
     public function login(Req $req, Res $res): Res
     {
-        global $pdo;
+        global $db;
 
         $data = (array)$req->getParsedBody();
         $email = (string)($data['email'] ?? '');
         $pass  = (string)($data['password'] ?? '');
 
-        $stmt = $pdo->prepare('SELECT id, password_hash FROM users WHERE email=? LIMIT 1');
+        $stmt = $db->prepare('SELECT id, password FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);
         $u = $stmt->fetch();
-        if (!$u || !password_verify($pass, $u['password_hash'])) {
+        if (!$u || !password_verify($pass, $u['password'])) {
             $params = [
                 'title' => 'Login',
                 'error' => 'Invalid credentials',
