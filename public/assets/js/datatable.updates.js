@@ -21,8 +21,12 @@ $(document).ready(function() {
     { data: 'created_at' },
     {
       data: null,
+      className: 'text-end',
       render: function(data, type, row) {
-        return '<a href="/dashboard/updates/' + row.id + '" class="btn btn-sm btn-outline-secondary">JSON</a>';
+        return '<a href="/dashboard/updates/' + row.id + '"' +
+            'class="btn btn-sm btn-outline-secondary" title="JSON">' +
+            '<i class="bi bi-filetype-json"></i>' +
+            '</a>';
       },
       orderable: false,
       searchable: false

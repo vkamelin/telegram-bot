@@ -4,10 +4,10 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Users</h1>
+<h1>Администраторы</h1>
 
 <div class="mb-3">
-    <a href="<?= url('/dashboard/users/create') ?>" class="btn btn-success">Create user</a>
+    <a href="<?= url('/dashboard/users/create') ?>" class="btn btn-outline-success">Создать нового</a>
 </div>
 
 <table id="panelUsersTable" class="table table-center table-striped table-hover">
@@ -16,9 +16,9 @@
         <th>ID</th>
         <th>Email</th>
         <th>Telegram ID</th>
-        <th>Created at</th>
-        <th>Updated at</th>
-        <th>Actions</th>
+        <th>Создан</th>
+        <th>Обновлен</th>
+        <th class="text-end">Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -27,9 +27,9 @@
         <th>ID</th>
         <th>Email</th>
         <th>Telegram ID</th>
-        <th>Created at</th>
-        <th>Updated at</th>
-        <th>Actions</th>
+        <th>Создан</th>
+        <th>Обновлен</th>
+        <th class="text-end">Действия</th>
     </tr>
     </tfoot>
 </table>

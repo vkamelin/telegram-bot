@@ -14,12 +14,13 @@ $(document).ready(function() {
     { data: 'decided_by' },
     {
       data: null,
+      className: 'text-end',
       render: function(data, type, row) {
         return '<a href="/dashboard/join-requests/' + row.chat_id + '/' + row.user_id + '" class="btn btn-sm btn-outline-secondary me-1">View</a>'
           + '<form method="post" action="/dashboard/join-requests/' + row.chat_id + '/' + row.user_id + '/approve" class="d-inline">'
-          + '<input type="hidden" name="_csrf_token" value="' + csrfToken + '">' + '<button type="submit" class="btn btn-sm btn-outline-success">Approve</button>' + '</form>'
+          + '<input type="hidden" name="_csrf_token" value="' + csrfToken + '">' + '<button type="submit" class="btn btn-sm btn-outline-success"><i class="bi bi-check-lg" title="Одобрить"></i></button>' + '</form>'
           + '<form method="post" action="/dashboard/join-requests/' + row.chat_id + '/' + row.user_id + '/decline" class="d-inline ms-1">'
-          + '<input type="hidden" name="_csrf_token" value="' + csrfToken + '">' + '<button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>' + '</form>';
+          + '<input type="hidden" name="_csrf_token" value="' + csrfToken + '">' + '<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg" title="Отклонить"></i></button>' + '</form>';
       },
       orderable: false,
       searchable: false

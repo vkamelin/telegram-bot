@@ -41,7 +41,7 @@
         <th>Статус</th>
         <th>Дата решения</th>
         <th>Решен</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -56,7 +56,7 @@
         <th>Статус</th>
         <th>Дата решения</th>
         <th>Решен</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </tfoot>
 </table>

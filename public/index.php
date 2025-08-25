@@ -27,7 +27,7 @@ $app->addBodyParsingMiddleware();
 $app->add(new SecurityHeadersMiddleware([
     'cors' => $config['cors'],
     'csp' => [
-        'script' => 'https://code.jquery.com, https://cdn.jsdelivr.net, https://cdn.datatables.net, https://cdn.tailwindcss.com',
+        'script' => 'https://code.jquery.com, https://cdn.jsdelivr.net, https://cdn.datatables.net, https://cdn.tailwindcss.com, https://cdnjs.cloudflare.com',
         'style' => 'https://fonts.googleapis.com, https://cdn.jsdelivr.net, https://cdn.datatables.net, https://cdn.tailwindcss.com',
         'font' => 'https://fonts.gstatic.com',
     ],

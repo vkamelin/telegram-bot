@@ -16,7 +16,7 @@
         <th>Type</th>
         <th>Sent At</th>
         <th>Created At</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -29,7 +29,7 @@
         <th>Type</th>
         <th>Sent At</th>
         <th>Created At</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </tfoot>
 </table>

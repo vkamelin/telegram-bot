@@ -13,13 +13,13 @@ $menu = [
     ],
     [
         'url'   => '/dashboard/updates',
-        'title' => 'Обновления',
-        'icon'  => 'bi bi-arrow-repeat',
+        'title' => 'Входяшие',
+        'icon'  => 'bi bi-telegram',
     ],
     [
         'url'   => '/dashboard/messages',
-        'title' => 'Telegram Сообщения',
-        'icon'  => 'bi bi-chat-right-text',
+        'title' => 'Исходящие',
+        'icon'  => 'bi bi-telegram',
     ],
     [
         'url'   => '/dashboard/scheduled',

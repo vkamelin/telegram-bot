@@ -26,7 +26,7 @@ final class UpdatesController
     public function index(Req $req, Res $res): Res
     {
         $data = [
-            'title' => 'Updates',
+            'title' => 'Обновления',
         ];
 
         return View::render($res, 'dashboard/updates/index.php', $data, 'layouts/main.php');

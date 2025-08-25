@@ -18,7 +18,7 @@
         <th>Ошибка</th>
         <th>Код ошибки</th>
         <th>Обработано</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -33,7 +33,7 @@
         <th>Ошибка</th>
         <th>Код ошибки</th>
         <th>Обработано</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </tfoot>
 </table>

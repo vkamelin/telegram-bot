@@ -4,17 +4,17 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Sessions</h1>
+<h1>Сессии</h1>
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
-        <input type="text" name="state" value="<?= htmlspecialchars($_GET['state'] ?? '') ?>" class="form-control" placeholder="state">
+        <input type="text" name="state" value="<?= htmlspecialchars($_GET['state'] ?? '') ?>" class="form-control" placeholder="состояние">
     </div>
     <div class="col-auto">
         <input type="text" name="period" value="<?= htmlspecialchars($_GET['period'] ?? '') ?>" class="form-control" placeholder="YYYY-MM-DD,YYYY-MM-DD">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">Фильтр</button>
     </div>
 </form>
 
@@ -22,18 +22,18 @@
     <thead>
     <tr>
         <th>User ID</th>
-        <th>State</th>
-        <th>Created At</th>
-        <th>Updated At</th>
+        <th>Состояние</th>
+        <th>Создана</th>
+        <th>Обновлена</th>
     </tr>
     </thead>
     <tbody></tbody>
     <tfoot>
     <tr>
         <th>User ID</th>
-        <th>State</th>
-        <th>Created At</th>
-        <th>Updated At</th>
+        <th>Состояние</th>
+        <th>Создана</th>
+        <th>Обновлена</th>
     </tr>
     </tfoot>
 </table>

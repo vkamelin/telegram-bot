@@ -4,26 +4,26 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Shipping</h1>
+<h1>Доставка</h1>
 
 <table id="shippingTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
         <th>ID</th>
-        <th>From User ID</th>
-        <th>Invoice Payload</th>
-        <th>Shipping Address</th>
-        <th>Received At</th>
+        <th>От User ID</th>
+        <th>Доп. инфо. счета</th>
+        <th>Адрес доставки</th>
+        <th>Принят</th>
     </tr>
     </thead>
     <tbody></tbody>
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>From User ID</th>
-        <th>Invoice Payload</th>
-        <th>Shipping Address</th>
-        <th>Received At</th>
+        <th>От User ID</th>
+        <th>Доп. инфо. счета</th>
+        <th>Адрес доставки</th>
+        <th>Принят</th>
     </tr>
     </tfoot>
 </table>

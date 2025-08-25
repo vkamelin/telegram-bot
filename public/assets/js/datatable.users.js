@@ -7,8 +7,9 @@ $(document).ready(function() {
     {data: 'alias'},
     {
       data: null,
+      className: 'text-end',
       render: function(data, type, row) {
-        return `<a href="/dashboard/users/${row.id}">View</a>`;
+        return `<a href="/dashboard/users/${row.id}"><i class="bi bi-eye" title="Просмотр"></i></a>`;
       },
       sortable: false,
     },

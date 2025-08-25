@@ -95,10 +95,16 @@ code, pre {
     min-height: 100vh;
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
+    padding: 0.5rem;
+    border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .sidebar .nav-link {
     color: var(--bs-body-color);
+}
+
+[data-bs-theme="light"] .sidebar {
+    background-color: #dddddd !important;
 }
 
 .main-content {
