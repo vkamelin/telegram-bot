@@ -20,7 +20,7 @@
       columns: columns,
       lengthMenu: [[10,25,50,100,1000,-1],[10,25,50,100,1000,"Все"]],
       lengthChange: true,
-      dom: "<'d-flex align-items-center'lfB>rtip",
+      dom: "<'d-flex justify-content-between align-items-center'lfB>rtip",
       buttons: ['excel'],
       language: {
         url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Russian.json"

@@ -12,13 +12,13 @@ if (canvas) {
             labels: labels,
             datasets: [
                 {
-                    label: 'success',
+                    label: 'успешные',
                     data: success,
                     borderColor: 'rgb(25, 135, 84)',
                     tension: 0.1,
                 },
                 {
-                    label: 'failed',
+                    label: 'неудачные',
                     data: failed,
                     borderColor: 'rgb(220, 53, 69)',
                     tension: 0.1,

@@ -101,6 +101,8 @@
     </div>
 </div>
 
+<div class="d-flex justify-content-between"></div>
+
 <div class="row mt-3">
     <div class="col-md-12">
         <h4>Последние ошибки</h4>
