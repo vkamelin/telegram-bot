@@ -58,13 +58,18 @@ final class ChatMembersController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT cm.chat_id, cm.user_id, tu.username, cm.role, cm.state FROM chat_members cm LEFT JOIN telegram_users tu ON tu.user_id = cm.user_id {$whereSql} ORDER BY cm.chat_id, cm.user_id LIMIT :limit OFFSET :offset";
+        $sql = "SELECT cm.chat_id, cm.user_id, tu.username, cm.role, cm.state FROM chat_members cm LEFT JOIN telegram_users tu ON tu.user_id = cm.user_id {$whereSql} ORDER BY cm.chat_id, cm.user_id";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
         }
-        $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        if ($length > 0) {
+            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        }
         $stmt->execute();
         $rows = $stmt->fetchAll();
 

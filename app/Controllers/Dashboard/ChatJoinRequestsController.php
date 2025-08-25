@@ -69,6 +69,9 @@ final class ChatJoinRequestsController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT c.chat_id, c.user_id, tu.username, c.bio, c.invite_link, c.requested_at, c.status, c.decided_at, c.decided_by FROM chat_join_requests c LEFT JOIN telegram_users tu ON tu.user_id = c.user_id {$whereSql} ORDER BY c.requested_at DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);

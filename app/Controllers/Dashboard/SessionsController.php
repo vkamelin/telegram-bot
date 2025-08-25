@@ -68,6 +68,9 @@ final class SessionsController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT user_id, state, created_at, updated_at FROM telegram_sessions {$whereSql} ORDER BY updated_at DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);

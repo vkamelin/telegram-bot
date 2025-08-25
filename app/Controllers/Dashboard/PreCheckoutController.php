@@ -80,6 +80,9 @@ final class PreCheckoutController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT pre_checkout_query_id, from_user_id, currency, total_amount, shipping_option_id, received_at FROM tg_pre_checkout {$whereSql} ORDER BY received_at DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);

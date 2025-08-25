@@ -83,6 +83,9 @@ final class ScheduledController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, user_id, method, `type`, priority, send_after, created_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
