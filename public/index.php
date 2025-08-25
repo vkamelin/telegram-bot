@@ -68,6 +68,7 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/tokens/{id}/revoke', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->revoke($req, $res));
         $auth->get('/tg-users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->index($req, $res));
         $auth->post('/tg-users/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->data($req, $res));
+        $auth->post('/tg-users/search', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->search($req, $res));
         $auth->get('/tg-users/{id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->view($req, $res));
         $auth->get('/tg-groups', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgGroupsController($db))->index($req, $res));
         $auth->post('/tg-groups', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgGroupsController($db))->store($req, $res));
