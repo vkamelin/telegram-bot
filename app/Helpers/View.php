@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Helpers;
 
 use Psr\Http\Message\ResponseInterface as Res;
+use Random\RandomException;
 
 /**
  * Minimalistic view renderer for templates.
@@ -13,16 +14,18 @@ final class View
     /**
      * Renders template with optional layout.
      *
-     * @param Res    $res      HTTP response to write into
-     * @param string $template Template path relative to templates/
-     * @param array  $params   Variables for template
-     * @param string|null $layout Layout path relative to templates/
+     * @param Res         $res      HTTP response to write into
+     * @param string      $template Template path relative to templates/
+     * @param array       $params   Variables for template
+     * @param string|null $layout   Layout path relative to templates/
+     *
+     * @throws RandomException
      */
     public static function render(Res $res, string $template, array $params = [], ?string $layout = null): Res
     {
         $basePath    = dirname(__DIR__, 2) . '/templates/';
 
-        $csrfName  = env('CSRF_TOKEN_NAME', '_csrf_token');
+        $csrfName  = $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token';
         $csrfToken = $_COOKIE[$csrfName] ?? bin2hex(random_bytes(16));
         if (!isset($_COOKIE[$csrfName])) {
             setcookie($csrfName, $csrfToken, ['path' => '/']);
