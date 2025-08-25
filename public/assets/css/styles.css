@@ -89,3 +89,13 @@ code, pre {
     outline: 0;
     box-shadow: var(--bs-btn-close-focus-shadow);
 }
+
+.sidebar {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.main-content {
+    padding: 1rem;
+}
