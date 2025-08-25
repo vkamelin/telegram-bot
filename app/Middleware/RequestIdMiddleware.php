@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use App\Logger;
-use App\Services\Uuid;
+use App\Helpers\Logger;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -36,7 +35,8 @@ class RequestIdMiddleware
     {
         $requestId = $request->getHeaderLine($this->header);
         if ($requestId === '') {
-            $requestId = Uuid::generate();
+            // создаем uuid
+            $requestId = uniqid('', true);
         }
 
         $request = $request->withAttribute('request_id', $requestId);
