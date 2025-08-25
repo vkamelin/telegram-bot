@@ -72,6 +72,9 @@ final class TokensController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, user_id, jti, FROM_UNIXTIME(expires_at) AS expires_at, revoked, created_at, updated_at FROM refresh_tokens {$whereSql} ORDER BY id DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);

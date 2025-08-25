@@ -76,6 +76,9 @@ final class UpdatesController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, update_id, user_id, message_id, `type`, sent_at, created_at FROM telegram_updates {$whereSql} ORDER BY id DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);

@@ -55,6 +55,9 @@ final class PanelUsersController
         }
 
         $sql = "SELECT id, email, telegram_user_id, created_at, updated_at FROM users {$whereSql} ORDER BY id DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);

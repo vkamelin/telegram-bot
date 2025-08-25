@@ -73,6 +73,9 @@ final class ShippingQueriesController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT shipping_query_id, from_user_id, invoice_payload, shipping_address, received_at FROM tg_shipping_queries {$whereSql} ORDER BY received_at DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);

@@ -71,6 +71,9 @@ final class TgUsersController
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, user_id, username, first_name, last_name, language_code, is_premium, is_user_banned, is_bot_banned, is_subscribed, utm, referral_code FROM telegram_users {$whereSql} ORDER BY id DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
             $stmt->bindValue(':' . $key, $val);
