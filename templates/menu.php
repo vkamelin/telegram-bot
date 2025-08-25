@@ -12,6 +12,11 @@ $menu = [
         'icon'  => 'bi bi-chat-right-text',
     ],
     [
+        'url'   => '/dashboard/pre-checkout',
+        'title' => 'Pre-checkout',
+        'icon'  => 'bi bi-receipt',
+    ],
+    [
         'url'   => '/dashboard/scheduled',
         'title' => 'Scheduled',
         'icon'  => 'bi bi-clock',
