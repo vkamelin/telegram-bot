@@ -61,27 +61,37 @@ final class HealthService
     }
 
     /**
-     * Check whether worker process is running or lock file exists.
+     * Check whether required worker processes are running under Supervisor.
      */
     private static function checkWorker(): bool
     {
+        $workers = ['gpt', 'lp', 'tg'];
+
         try {
-            $output = @shell_exec('ps aux | grep workers/telegram.php | grep -v grep');
-            if (is_string($output) && trim($output) !== '') {
-                return true;
+            $command   = 'supervisorctl status ' . implode(' ', $workers);
+            $output    = [];
+            $returnVar = 0;
+            @exec($command, $output, $returnVar);
+            if ($returnVar !== 0) {
+                return false;
             }
+
+            foreach ($workers as $worker) {
+                $found = false;
+                foreach ($output as $line) {
+                    if (preg_match('/^' . preg_quote($worker, '/') . '\s+RUNNING\b/', $line)) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (! $found) {
+                    return false;
+                }
+            }
+
+            return true;
         } catch (\Throwable) {
-            // ignore
+            return false;
         }
-
-        $lockFile = __DIR__ . '/../../storage/worker.lock';
-        if (is_file($lockFile)) {
-            $mtime = filemtime($lockFile);
-            if ($mtime !== false && (time() - $mtime) < 60) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
