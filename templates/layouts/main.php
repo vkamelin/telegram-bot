@@ -38,13 +38,18 @@ $messages = Flash::get();
     <nav class="navbar navbar-dark bg-dark" aria-label="Dark offcanvas navbar">
         <div class="container-fluid">
             <div class="d-flex align-items-center">
+                <!-- Левая половина шапки -->
                 <button class="btn btn-dark d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
                     <i class="bi bi-list"></i>
                 </button>
                 <a class="navbar-brand mx-1" href="<?= url('/dashboard') ?>">Панель</a>
             </div>
             <div class="d-flex align-items-center">
-                <!-- Правая панель -->
+                <!-- Правая половина шапки -->
+                <a href="#" class="btn btn-outline-light">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span class="d-none d-lg-inline">Выйти</span>
+                </a>
             </div>
             <div class="offcanvas offcanvas-start text-bg-dark d-lg-none" tabindex="-1" id="offcanvasNavbarDark"
                  aria-labelledby="offcanvasNavbarDarkLabel">

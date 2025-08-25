@@ -14,7 +14,7 @@
 <?php endif; ?>
 
 <form method="post" action="<?= url('/dashboard/invoices') ?>">
-    <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
+    <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
     <div class="mb-3">
         <label for="chat_id" class="form-label">Chat ID</label>
         <input type="text" class="form-control" id="chat_id" name="chat_id" value="<?= htmlspecialchars($invoice['chat_id'] ?? '') ?>">
