@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Dashboard;
 
+use App\Helpers\Response;
 use App\Helpers\View;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Res;
@@ -103,16 +104,20 @@ final class TgGroupsController
         $id = (int)($args['id'] ?? 0);
         $p = (array)$req->getParsedBody();
         $userTelegramId = (int)($p['user_id'] ?? 0);
+        $user = null;
         if ($userTelegramId > 0) {
-            $select = $this->db->prepare('SELECT id FROM telegram_users WHERE user_id = :uid');
+            $select = $this->db->prepare('SELECT id, user_id, username FROM telegram_users WHERE user_id = :uid');
             $select->execute(['uid' => $userTelegramId]);
-            $userId = (int)$select->fetchColumn();
-            if ($userId > 0) {
+            $user = $select->fetch();
+            if ($user) {
                 $stmt = $this->db->prepare(
                     'INSERT IGNORE INTO telegram_user_group_user (group_id, user_id) VALUES (:gid, :uid)'
                 );
-                $stmt->execute(['gid' => $id, 'uid' => $userId]);
+                $stmt->execute(['gid' => $id, 'uid' => $user['id']]);
             }
+        }
+        if ($req->getHeaderLine('X-Requested-With') === 'XMLHttpRequest') {
+            return Response::json($res, 200, ['user' => $user]);
         }
         return $res->withHeader('Location', '/dashboard/tg-groups/' . $id)->withStatus(302);
     }
@@ -130,6 +135,9 @@ final class TgGroupsController
                 'DELETE FROM telegram_user_group_user WHERE group_id = :gid AND user_id = :uid'
             );
             $stmt->execute(['gid' => $id, 'uid' => $userId]);
+        }
+        if ($req->getHeaderLine('X-Requested-With') === 'XMLHttpRequest') {
+            return Response::json($res, 200, ['status' => 'ok']);
         }
         return $res->withHeader('Location', '/dashboard/tg-groups/' . $id)->withStatus(302);
     }

@@ -15,19 +15,14 @@
 </form>
 
 <h2 class="h5">Add user</h2>
-<form method="post" class="mb-4" action="<?= url('/dashboard/tg-groups/' . $group['id'] . '/add-user') ?>">
-    <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
-    <div class="input-group">
-        <input type="number" class="form-control" name="user_id" placeholder="Telegram user ID">
-        <button type="submit" class="btn btn-secondary">Add</button>
-    </div>
-</form>
+<div class="mb-4">
+    <input type="text" class="form-control mb-2" id="userSearchInput" placeholder="Search by username or ID">
+    <ul class="list-group" id="userSearchResults"></ul>
+</div>
 
 <h2 class="h5">Members</h2>
-<?php if (empty($members)): ?>
-    <p>No members</p>
-<?php else: ?>
-<table class="table table-striped">
+<p id="noMembers" class="<?= empty($members) ? '' : 'd-none' ?>">No members</p>
+<table class="table table-striped <?= empty($members) ? 'd-none' : '' ?>" id="membersTable">
     <thead>
     <tr>
         <th>ID</th>
@@ -38,19 +33,19 @@
     </thead>
     <tbody>
     <?php foreach ($members as $m): ?>
-        <tr>
+        <tr data-member-id="<?= $m['id'] ?>">
             <td><?= $m['id'] ?></td>
             <td><?= $m['user_id'] ?></td>
             <td><?= htmlspecialchars($m['username'] ?? '') ?></td>
-            <td>
-                <form method="post" class="d-inline" action="<?= url('/dashboard/tg-groups/' . $group['id'] . '/remove-user') ?>">
-                    <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
-                    <input type="hidden" name="user_id" value="<?= $m['id'] ?>">
-                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove user?')">Remove</button>
-                </form>
-            </td>
+            <td><button type="button" class="btn btn-sm btn-danger remove-member-btn" data-user-id="<?= $m['id'] ?>">Remove</button></td>
         </tr>
     <?php endforeach; ?>
     </tbody>
 </table>
-<?php endif; ?>
+
+<script>
+    window.tgUserSearchUrl = '<?= url('/dashboard/tg-users/search') ?>';
+    window.tgGroupAddUrl = '<?= url('/dashboard/tg-groups/' . $group['id'] . '/add-user') ?>';
+    window.tgGroupRemoveUrl = '<?= url('/dashboard/tg-groups/' . $group['id'] . '/remove-user') ?>';
+</script>
+<script src="<?= url('/assets/js/tg-groups-edit.js') ?>"></script>
