@@ -189,6 +189,31 @@ Push::mediaGroup(123456789, $media);
 
 Полученный массив можно передавать и в одиночные методы `Push::photo()`, `Push::video()`, `Push::audio()` и `Push::document()`.
 
+Каждый элемент медиагруппы может иметь собственные настройки:
+
+```php
+$media = [
+    MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', [
+        'caption' => '<b>Фото</b>',
+        'parse_mode' => 'html',
+    ]),
+    MediaBuilder::buildInputMedia('video', 'https://example.com/b.mp4', [
+        'caption' => 'Клип',
+        'width' => 640,
+        'height' => 360,
+        'duration' => 5,
+    ]),
+    MediaBuilder::buildInputMedia('audio', 'https://example.com/c.mp3', [
+        'caption' => '*Аудио*',
+        'parse_mode' => 'MarkdownV2',
+        'duration' => 15,
+        'performer' => 'Tester',
+    ]),
+];
+
+Push::mediaGroup(123456789, $media);
+```
+
 ---
 
 ## 📖 Документация

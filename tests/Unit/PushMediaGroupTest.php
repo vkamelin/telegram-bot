@@ -44,8 +44,22 @@ final class PushMediaGroupTest extends TestCase
     public function testMediaGroupQueued(): void
     {
         $media = [
-            MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'One']),
-            MediaBuilder::buildInputMedia('photo', 'https://example.com/b.jpg'),
+            MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', [
+                'caption' => '<b>Photo</b>',
+                'parse_mode' => 'html',
+            ]),
+            MediaBuilder::buildInputMedia('video', 'https://example.com/b.mp4', [
+                'caption' => 'Video',
+                'width' => 640,
+                'height' => 360,
+                'duration' => 5,
+            ]),
+            MediaBuilder::buildInputMedia('audio', 'https://example.com/c.mp3', [
+                'caption' => '*Audio*',
+                'parse_mode' => 'MarkdownV2',
+                'duration' => 15,
+                'performer' => 'Tester',
+            ]),
         ];
 
         $result = Push::mediaGroup(321, $media);
@@ -55,8 +69,15 @@ final class PushMediaGroupTest extends TestCase
         $this->assertSame(321, (int)$row['user_id']);
         $this->assertSame('sendMediaGroup', $row['method']);
         $data = json_decode($row['data'], true);
+
         $this->assertSame('https://example.com/a.jpg', $data['media'][0]['media']);
         $this->assertSame('html', $data['media'][0]['parse_mode']);
-        $this->assertArrayNotHasKey('parse_mode', $data['media'][1]);
+
+        $this->assertSame('https://example.com/b.mp4', $data['media'][1]['media']);
+        $this->assertSame(5, $data['media'][1]['duration']);
+
+        $this->assertSame('https://example.com/c.mp3', $data['media'][2]['media']);
+        $this->assertSame('MarkdownV2', $data['media'][2]['parse_mode']);
+        $this->assertSame('Tester', $data['media'][2]['performer']);
     }
 }
