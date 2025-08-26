@@ -43,6 +43,46 @@ class Push
 
         return array_merge($data, $options);
     }
+
+    /**
+     * Подготавливает данные для медиа-запросов Telegram API.
+     *
+     * @param int         $chatId   Id чата
+     * @param string      $mediaType Тип медиа (photo, audio, document, video и т.д.)
+     * @param array|string $media    URL, fileId или структура InputMedia
+     * @param string      $caption  Текст подписи
+     * @param array       $options  Дополнительные параметры метода
+     *
+     * @return array
+     */
+    private static function prepareMediaData(
+        int $chatId,
+        string $mediaType,
+        array|string $media,
+        string $caption = '',
+        array $options = []
+    ): array {
+        $payload = is_array($media)
+            ? $media
+            : self::buildInputMedia($mediaType, $media, ['caption' => $caption]);
+
+        $data = [
+            'chat_id' => $chatId,
+            $mediaType => $payload['media'],
+        ];
+
+        unset($payload['type'], $payload['media']);
+
+        if ($caption !== '' && !isset($payload['caption'])) {
+            $payload['caption'] = $caption;
+        }
+
+        if (isset($payload['caption']) && !isset($payload['parse_mode'])) {
+            $payload['parse_mode'] = 'html';
+        }
+
+        return array_merge($data, $payload, $options);
+    }
     
     /**
      * Метод добавляет в очередь текстовое сообщение в Телеграм
@@ -96,17 +136,7 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
-        $payload = is_array($photo)
-            ? $photo
-            : self::buildInputMedia('photo', $photo, ['caption' => $caption]);
-
-        $data = [
-            'chat_id' => $chatId,
-            'photo' => $payload['media'],
-        ];
-
-        unset($payload['type'], $payload['media']);
-        $data = array_merge($data, $payload, $options);
+        $data = self::prepareMediaData($chatId, 'photo', $photo, $caption, $options);
 
         return self::push($chatId, 'sendPhoto', $data, $type, $priority, $sendAfter);
     }
@@ -132,17 +162,7 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
-        $payload = is_array($audio)
-            ? $audio
-            : self::buildInputMedia('audio', $audio, ['caption' => $caption]);
-
-        $data = [
-            'chat_id' => $chatId,
-            'audio' => $payload['media'],
-        ];
-
-        unset($payload['type'], $payload['media']);
-        $data = array_merge($data, $payload, $options);
+        $data = self::prepareMediaData($chatId, 'audio', $audio, $caption, $options);
 
         return self::push($chatId, 'sendAudio', $data, $type, $priority, $sendAfter);
     }
@@ -168,18 +188,9 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
-        $payload = is_array($document)
-            ? $document
-            : self::buildInputMedia('document', $document, ['caption' => $caption]);
+        $options = array_merge(['disable_content_type_detection' => true], $options);
 
-        $data = [
-            'chat_id' => $chatId,
-            'document' => $payload['media'],
-            'disable_content_type_detection' => true,
-        ];
-
-        unset($payload['type'], $payload['media']);
-        $data = array_merge($data, $payload, $options);
+        $data = self::prepareMediaData($chatId, 'document', $document, $caption, $options);
 
         return self::push($chatId, 'sendDocument', $data, $type, $priority, $sendAfter);
     }
@@ -205,17 +216,7 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
-        $payload = is_array($video)
-            ? $video
-            : self::buildInputMedia('video', $video, ['caption' => $caption]);
-
-        $data = [
-            'chat_id' => $chatId,
-            'video' => $payload['media'],
-        ];
-
-        unset($payload['type'], $payload['media']);
-        $data = array_merge($data, $payload, $options);
+        $data = self::prepareMediaData($chatId, 'video', $video, $caption, $options);
 
         return self::push($chatId, 'sendVideo', $data, $type, $priority, $sendAfter);
     }
