@@ -96,26 +96,26 @@ class MediaBuilder
             $payload = $media;
         } else {
             $method = 'inputMedia' . ucfirst($mediaType);
-
+            
             if (method_exists(self::class, $method)) {
                 $ref = new \ReflectionMethod(self::class, $method);
                 $args = [];
-
+                
                 foreach ($ref->getParameters() as $param) {
                     $name = $param->getName();
-
+                    
                     if ($name === 'media') {
                         $args[] = $media;
                         continue;
                     }
-
+                    
                     if ($name === 'caption') {
                         $args[] = $caption !== '' ? $caption : null;
                         continue;
                     }
-
+                    
                     $optionName = self::camelToSnake($name);
-
+                    
                     if (array_key_exists($optionName, $options)) {
                         $args[] = $options[$optionName];
                         unset($options[$optionName]);
@@ -125,7 +125,7 @@ class MediaBuilder
                         $args[] = null;
                     }
                 }
-
+                
                 $payload = $ref->invokeArgs(null, $args);
             } else {
                 $payload = self::buildInputMedia($mediaType, $media, ['caption' => $caption]);
@@ -155,14 +155,16 @@ class MediaBuilder
     }
     
     /**
-     * @param string      $media   Файл для отправки. Передайте file_id для отправки файла, который существует на
-     *                             серверах Telegram (рекомендуется), передайте URL-адрес HTTP для Telegram, чтобы
-     *                             получить файл из Интернета, или передайте “attach://<имя_файла>”, чтобы загрузить
-     *                             новый файл, используя multipart/form-data под именем <имя_файла>.
-     * @param string|null $caption Подпись к отправляемой фотографии, 0-1024 символа после разбора сущностей
-     * @param string|null $parseMode
-     * @param bool        $showCaptionAboveMedia
-     * @param bool        $has_spoiler
+     * @param string      $media                 Файл для отправки. Передайте file_id для отправки файла, который
+     *                                           существует на серверах Telegram (рекомендуется), передайте URL-адрес
+     *                                           HTTP для Telegram, чтобы получить файл из Интернета, или передайте
+     *                                           “attach://<имя_файла>”, чтобы загрузить новый файл, используя
+     *                                           multipart/form-data под именем <имя_файла>.
+     * @param string|null $caption               Подпись к отправляемой фотографии, 0-1024 символа после разбора
+     *                                           сущностей
+     * @param string|null $parseMode             Режим парсинга подписи. Поддерживаемые режимы: html, markdown
+     * @param bool        $showCaptionAboveMedia Показывать подпись выше медиа
+     * @param bool        $has_spoiler           Спрятать подпись в спойлере
      *
      * @return array
      */
@@ -176,22 +178,22 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-
+        
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
         ];
-
+        
         if ($showCaptionAboveMedia) {
             $options['show_caption_above_media'] = true;
         }
-
+        
         if ($has_spoiler) {
             $options['has_spoiler'] = true;
         }
-
+        
         $data = self::buildInputMedia('photo', $media, $options);
-
+        
         return array_filter(
             $data,
             static fn($value) => $value !== null && $value !== ''
@@ -199,30 +201,35 @@ class MediaBuilder
     }
     
     /**
-     * @param string      $media     Файл для отправки. Передайте file_id для отправки файла, который существует на
-     *                               серверах Telegram (рекомендуется), передайте URL-адрес HTTP для Telegram, чтобы
-     *                               получить файл из Интернета, или передайте “attach://<имя_файла>”, чтобы загрузить
-     *                               новый файл, используя multipart/form-data под именем <имя_файла>.
+     * @param string      $media                 Файл для отправки. Передайте file_id для отправки файла, который
+     *                                           существует на серверах Telegram (рекомендуется), передайте URL-адрес
+     *                                           HTTP для Telegram, чтобы получить файл из Интернета, или передайте
+     *                                           “attach://<имя_файла>”, чтобы загрузить новый файл, используя
+     *                                           multipart/form-data под именем <имя_файла>.
      * @param string|null $caption
-     * @param string|null $thumbnail Миниатюра отправленного файла; может быть проигнорирована, если создание миниатюр
-     *                               для файла поддерживается на стороне сервера. Миниатюра должна быть в формате JPEG
-     *                               и иметь размер менее 200 Кб. Ширина и высота миниатюры не должны превышать 320.
-     *                               Игнорируется, если файл не загружен с использованием multipart/form-data.
-     *                               Миниатюры нельзя использовать повторно, их можно загрузить только в виде нового
-     *                               файла, поэтому вы можете передать “прикрепить://<имя_файла>”, если миниатюра была
-     *                               загружена с использованием multipart/form-data в <имя_файла>.
-     * @param string|null $cover     Обложка для видео в сообщении. Передайте file_id для отправки файла, который
-     *                               существует на серверах Telegram (рекомендуется), передайте URL-адрес HTTP для
-     *                               Telegram, чтобы получить файл из Интернета, или передайте “attach://<имя_файла>”,
-     *                               чтобы загрузить новый файл, используя multipart/form-data под именем <имя_файла>.
-     * @param int|null    $startTimestamp
-     * @param string|null $parseMode
-     * @param bool        $showCaptionAboveMedia
-     * @param int|null    $width
-     * @param int|null    $height
-     * @param int|null    $duration
-     * @param bool        $supportsStreaming
-     * @param bool        $has_spoiler
+     * @param string|null $thumbnail             Миниатюра отправленного файла; может быть проигнорирована, если
+     *                                           создание миниатюр для файла поддерживается на стороне сервера.
+     *                                           Миниатюра должна быть в формате JPEG и иметь размер менее 200 Кб.
+     *                                           Ширина и высота миниатюры не должны превышать 320. Игнорируется, если
+     *                                           файл не загружен с использованием multipart/form-data. Миниатюры
+     *                                           нельзя использовать повторно, их можно загрузить только в виде нового
+     *                                           файла, поэтому вы можете передать “прикрепить://<имя_файла>”, если
+     *                                           миниатюра была загружена с использованием multipart/form-data в
+     *                                           <имя_файла>.
+     * @param string|null $cover                 Обложка для видео в сообщении. Передайте file_id для отправки файла,
+     *                                           который существует на серверах Telegram (рекомендуется), передайте
+     *                                           URL-адрес HTTP для Telegram, чтобы получить файл из Интернета, или
+     *                                           передайте “attach://<имя_файла>”, чтобы загрузить новый файл,
+     *                                           используя multipart/form-data под именем <имя_файла>.
+     * @param int|null    $startTimestamp        Стартовая метка времени в секундах, от 0 до 59
+     * @param string|null $parseMode             Определяет режим парсинга подписи. Поддерживаемые режимы: html,
+     *                                           markdown
+     * @param bool        $showCaptionAboveMedia Показывать подпись выше медиа
+     * @param int|null    $width                 Ширина видео
+     * @param int|null    $height                Высота видео
+     * @param int|null    $duration              Длительность видео в секундах, от 0 до 59
+     * @param bool        $supportsStreaming     Поддержка стриминга
+     * @param bool        $has_spoiler           Спрятать видео в спойлере
      *
      * @return array
      */
@@ -243,18 +250,20 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-
-        foreach ([
-            'width' => $width,
-            'height' => $height,
-            'duration' => $duration,
-            'startTimestamp' => $startTimestamp,
-        ] as $name => $value) {
+        
+        foreach (
+            [
+                'width' => $width,
+                'height' => $height,
+                'duration' => $duration,
+                'startTimestamp' => $startTimestamp,
+            ] as $name => $value
+        ) {
             if ($value !== null && $value < 0) {
                 throw new RuntimeException(sprintf('%s не может быть отрицательным', $name));
             }
         }
-
+        
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
@@ -265,21 +274,21 @@ class MediaBuilder
             'height' => $height,
             'duration' => $duration,
         ];
-
+        
         if ($showCaptionAboveMedia) {
             $options['show_caption_above_media'] = true;
         }
-
+        
         if ($supportsStreaming) {
             $options['supports_streaming'] = true;
         }
-
+        
         if ($has_spoiler) {
             $options['has_spoiler'] = true;
         }
-
+        
         $data = self::buildInputMedia('video', $media, $options);
-
+        
         return array_filter(
             $data,
             static fn($value) => $value !== null && $value !== ''
@@ -287,23 +296,23 @@ class MediaBuilder
     }
     
     /**
-     * @param string      $media      Файл для отправки. Передайте file_id для отправки файла, который существует на
-     *                                серверах Telegram (рекомендуется), передайте URL-адрес HTTP для Telegram, чтобы
-     *                                получить файл из Интернета, или передайте “attach://<имя_файла>”, чтобы загрузить
-     *                                новый файл, используя multipart/form-data под именем <имя_файла>.
+     * @param string      $media       Файл для отправки. Передайте file_id для отправки файла, который существует на
+     *                                 серверах Telegram (рекомендуется), передайте URL-адрес HTTP для Telegram, чтобы
+     *                                 получить файл из Интернета, или передайте “attach://<имя_файла>”, чтобы загрузить
+     *                                 новый файл, используя multipart/form-data под именем <имя_файла>.
      * @param string|null $caption
-     * @param string|null $thumbnail  Миниатюра отправленного файла; может быть проигнорирована, если создание миниатюр
-     *                                для файла поддерживается на стороне сервера. Миниатюра должна быть в формате JPEG
-     *                                и иметь размер менее 200 Кб. Ширина и высота миниатюры не должны превышать 320.
-     *                                Игнорируется, если файл не загружен с использованием multipart/form-data.
-     *                                Миниатюры нельзя использовать повторно, их можно загрузить только в виде нового
-     *                                файла, поэтому вы можете передать “прикрепить://<имя_файла>”, если миниатюра была
-     *                                загружена с использованием multipart/form-data под <имя_файла>.
-     * @param string|null $parseMode
-     * @param int|null    $width
-     * @param int|null    $height
-     * @param int|null    $duration
-     * @param bool        $has_spoiler
+     * @param string|null $thumbnail   Миниатюра отправленного файла; может быть проигнорирована, если создание миниатюр
+     *                                 для файла поддерживается на стороне сервера. Миниатюра должна быть в формате JPEG
+     *                                 и иметь размер менее 200 Кб. Ширина и высота миниатюры не должны превышать 320.
+     *                                 Игнорируется, если файл не загружен с использованием multipart/form-data.
+     *                                 Миниатюры нельзя использовать повторно, их можно загрузить только в виде нового
+     *                                 файла, поэтому вы можете передать “прикрепить://<имя_файла>”, если миниатюра была
+     *                                 загружена с использованием multipart/form-data под <имя_файла>.
+     * @param string|null $parseMode   Определяет режим парсинга подписи. Поддерживаемые режимы: html, markdown
+     * @param int|null    $width       Ширина видео
+     * @param int|null    $height      Высота видео
+     * @param int|null    $duration    Длительность видео в секундах, от 0 до 59
+     * @param bool        $has_spoiler Спрятать видео в спойлере
      *
      * @return array
      */
@@ -320,17 +329,19 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-
-        foreach ([
-            'width' => $width,
-            'height' => $height,
-            'duration' => $duration,
-        ] as $name => $value) {
+        
+        foreach (
+            [
+                'width' => $width,
+                'height' => $height,
+                'duration' => $duration,
+            ] as $name => $value
+        ) {
             if ($value !== null && $value < 0) {
                 throw new RuntimeException(sprintf('%s не может быть отрицательным', $name));
             }
         }
-
+        
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
@@ -339,13 +350,13 @@ class MediaBuilder
             'height' => $height,
             'duration' => $duration,
         ];
-
+        
         if ($has_spoiler) {
             $options['has_spoiler'] = true;
         }
-
+        
         $data = self::buildInputMedia('animation', $media, $options);
-
+        
         return array_filter(
             $data,
             static fn($value) => $value !== null && $value !== ''
@@ -353,23 +364,29 @@ class MediaBuilder
     }
     
     /**
-     * @param string      $media       Файл для отправки. Передайте file_id для отправки файла, который существует на
-     *                                 серверах Telegram (рекомендуется), передайте URL-адрес HTTP для Telegram, чтобы
-     *                                 получить файл из Интернета, или передайте “attach://<имя_файла>”, чтобы
-     *                                 загрузить новый файл, используя multipart/form-data под именем <имя_файла>.
-     * @param string|null $caption
-     * @param string|null $thumbnail   Миниатюра отправленного файла; может быть проигнорирована, если создание
-     *                                 миниатюр для файла поддерживается на стороне сервера. Миниатюра должна быть в
-     *                                 формате JPEG и иметь размер менее 200 Кб. Ширина и высота миниатюры не должны
-     *                                 превышать 320. Игнорируется, если файл не загружен с использованием
-     *                                 multipart/form-data. Миниатюры нельзя использовать повторно, их можно загрузить
-     *                                 только в виде нового файла, поэтому вы можете передать
-     *                                 “прикрепить://<имя_файла>”, если миниатюра была загружена с использованием
-     *                                 multipart/form-data под <имя_файла>.
-     * @param string|null $parseMode
-     * @param int|null    $duration
-     * @param string|null $performer
-     * @param string|null $title
+     * @param string      $media                        Файл для отправки. Передайте file_id для отправки файла,
+     *                                                  который существует на серверах Telegram (рекомендуется),
+     *                                                  передайте URL-адрес HTTP для Telegram, чтобы получить файл из
+     *                                                  Интернета, или передайте “attach://<имя_файла>”, чтобы
+     *                                                  загрузить новый файл, используя multipart/form-data под именем
+     *                                                  <имя_файла>.
+     * @param string|null $caption                      Подпись к отправляемой фотографии, 0-1024 символа после разбора
+     *                                                  сущностей
+     * @param string|null $thumbnail                    Миниатюра отправленного файла; может быть проигнорирована, если
+     *                                                  создание миниатюр для файла поддерживается на стороне сервера.
+     *                                                  Миниатюра должна быть в формате JPEG и иметь размер менее 200
+     *                                                  Кб. Ширина и высота миниатюры не должны превышать 320.
+     *                                                  Игнорируется, если файл не загружен с использованием
+     *                                                  multipart/form-data. Миниатюры нельзя использовать повторно, их
+     *                                                  можно загрузить только в виде нового файла, поэтому вы можете
+     *                                                  передать
+     *                                                  “прикрепить://<имя_файла>”, если миниатюра была загружена с
+     *                                                  использованием multipart/form-data под <имя_файла>.
+     * @param string|null $parseMode                    Определяет режим парсинга подписи. Поддерживаемые режимы: html,
+     *                                                  markdown
+     * @param int|null    $duration                     Длительность аудио в секундах, от 0 до 59
+     * @param string|null $performer                    Исполнитель аудио
+     * @param string|null $title                        Название аудио
      *
      * @return array
      */
@@ -385,20 +402,22 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-
-        foreach ([
-            'performer' => $performer,
-            'title' => $title,
-        ] as $name => $value) {
+        
+        foreach (
+            [
+                'performer' => $performer,
+                'title' => $title,
+            ] as $name => $value
+        ) {
             if ($value !== null && $value !== '' && mb_strlen($value) > 64) {
                 throw new RuntimeException(sprintf('Длина %s должна быть не более 64 символов', $name));
             }
         }
-
+        
         if ($duration !== null && $duration < 0) {
             throw new RuntimeException('duration не может быть отрицательным');
         }
-
+        
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
@@ -407,9 +426,9 @@ class MediaBuilder
             'performer' => $performer !== '' ? $performer : null,
             'title' => $title !== '' ? $title : null,
         ];
-
+        
         $data = self::buildInputMedia('audio', $media, $options);
-
+        
         return array_filter(
             $data,
             static fn($value) => $value !== null && $value !== ''
@@ -422,7 +441,7 @@ class MediaBuilder
      *                                                 URL-адрес HTTP для Telegram, чтобы получить файл из Интернета,
      *                                                 или передайте “attach://<имя_файла>”, чтобы загрузить новый
      *                                                 файл, используя multipart/form-data под именем <имя_файла>.
-     * @param string|null $caption
+     * @param string|null $caption                     Подпись к отправляемой фотографии, 0-1024 символа после разбора
      * @param string|null $thumbnail                   Миниатюра отправленного файла; может быть проигнорирована, если
      *                                                 создание миниатюр для файла поддерживается на стороне сервера.
      *                                                 Миниатюра должна быть в формате JPEG и иметь размер менее 200
@@ -432,7 +451,8 @@ class MediaBuilder
      *                                                 можно загрузить только в виде нового файла, поэтому вы можете
      *                                                 передать “прикрепить://<имя_файла>”, если миниатюра была
      *                                                 загружена с использованием multipart/form-data под <имя_файла>.
-     * @param string|null $parseMode
+     * @param string|null $parseMode                   Определяет режим парсинга подписи. Поддерживаемые режимы: html,
+     *                                                 markdown
      * @param bool        $disableContentTypeDetection Отключает автоматическое определение типа содержимого на стороне
      *                                                 сервера для файлов, загруженных с использованием
      *                                                 multipart/form-data. Всегда выполняется, если документ
@@ -450,25 +470,25 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-
+        
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
             'thumbnail' => $thumbnail,
         ];
-
+        
         if ($disableContentTypeDetection) {
             $options['disable_content_type_detection'] = true;
         }
-
+        
         $data = self::buildInputMedia('document', $media, $options);
-
+        
         return array_filter(
             $data,
             static fn($value) => $value !== null && $value !== ''
         );
     }
-
+    
     private static function camelToSnake(string $input): string
     {
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $input));
