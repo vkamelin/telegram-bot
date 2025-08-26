@@ -92,9 +92,45 @@ class MediaBuilder
         string $caption = '',
         array $options = []
     ): array {
-        $payload = is_array($media)
-            ? $media
-            : self::buildInputMedia($mediaType, $media, ['caption' => $caption]);
+        if (is_array($media)) {
+            $payload = $media;
+        } else {
+            $method = 'inputMedia' . ucfirst($mediaType);
+
+            if (method_exists(self::class, $method)) {
+                $ref = new \ReflectionMethod(self::class, $method);
+                $args = [];
+
+                foreach ($ref->getParameters() as $param) {
+                    $name = $param->getName();
+
+                    if ($name === 'media') {
+                        $args[] = $media;
+                        continue;
+                    }
+
+                    if ($name === 'caption') {
+                        $args[] = $caption !== '' ? $caption : null;
+                        continue;
+                    }
+
+                    $optionName = self::camelToSnake($name);
+
+                    if (array_key_exists($optionName, $options)) {
+                        $args[] = $options[$optionName];
+                        unset($options[$optionName]);
+                    } elseif ($param->isDefaultValueAvailable()) {
+                        $args[] = $param->getDefaultValue();
+                    } else {
+                        $args[] = null;
+                    }
+                }
+
+                $payload = $ref->invokeArgs(null, $args);
+            } else {
+                $payload = self::buildInputMedia($mediaType, $media, ['caption' => $caption]);
+            }
+        }
         
         $data = [
             'chat_id' => $chatId,
@@ -431,5 +467,10 @@ class MediaBuilder
             $data,
             static fn($value) => $value !== null && $value !== ''
         );
+    }
+
+    private static function camelToSnake(string $input): string
+    {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $input));
     }
 }
