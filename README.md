@@ -170,17 +170,18 @@ curl "http://localhost:8080/api/health?initData=<initData>"
 
 ## 🖼️ Работа с медиа-группами
 
-`Push::buildInputMedia()` помогает собрать массив [`InputMedia`](https://core.telegram.org/bots/api#inputmedia) для разных типов файлов.
+`MediaBuilder::buildInputMedia()` помогает собрать массив [`InputMedia`](https://core.telegram.org/bots/api#inputmedia) для разных типов файлов.
 Укажите тип (`photo`, `video`, `audio` или `document`), ссылку, `fileId` или путь к файлу и при необходимости подпись.
 
 ```php
 use App\Helpers\Push;
+use App\Helpers\MediaBuilder;
 
 $media = [
-    Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Фото']),
-    Push::buildInputMedia('video', 'https://example.com/b.mp4', ['caption' => 'Видео']),
-    Push::buildInputMedia('audio', 'https://example.com/c.mp3'),
-    Push::buildInputMedia('document', 'https://example.com/d.pdf', ['caption' => 'Документ']),
+    MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Фото']),
+    MediaBuilder::buildInputMedia('video', 'https://example.com/b.mp4', ['caption' => 'Видео']),
+    MediaBuilder::buildInputMedia('audio', 'https://example.com/c.mp3'),
+    MediaBuilder::buildInputMedia('document', 'https://example.com/d.pdf', ['caption' => 'Документ']),
 ];
 
 Push::mediaGroup(123456789, $media);

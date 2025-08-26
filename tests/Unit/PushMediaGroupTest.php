@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Helpers\Database;
 use App\Helpers\Push;
+use App\Helpers\MediaBuilder;
 use App\Helpers\RedisHelper;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -43,8 +44,8 @@ final class PushMediaGroupTest extends TestCase
     public function testMediaGroupQueued(): void
     {
         $media = [
-            Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'One']),
-            Push::buildInputMedia('photo', 'https://example.com/b.jpg'),
+            MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'One']),
+            MediaBuilder::buildInputMedia('photo', 'https://example.com/b.jpg'),
         ];
 
         $result = Push::mediaGroup(321, $media);

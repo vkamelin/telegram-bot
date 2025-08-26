@@ -26,15 +26,16 @@
 
 ```php
 use App\Helpers\Push;
+use App\Helpers\MediaBuilder;
 
 // одиночное изображение
-$photo = Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Привет']);
+$photo = MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Привет']);
 Push::photo(123, $photo);
 
 // медиагруппа
 $media = [
-    Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Первая']),
-    Push::buildInputMedia('photo', 'https://example.com/b.jpg'),
+    MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Первая']),
+    MediaBuilder::buildInputMedia('photo', 'https://example.com/b.jpg'),
 ];
 Push::mediaGroup(123, $media);
 ```

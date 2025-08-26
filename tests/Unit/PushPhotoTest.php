@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Helpers\Database;
 use App\Helpers\Push;
+use App\Helpers\MediaBuilder;
 use App\Helpers\RedisHelper;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +43,7 @@ final class PushPhotoTest extends TestCase
 
     public function testPhotoQueuedFromInputMedia(): void
     {
-        $media = Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'One']);
+        $media = MediaBuilder::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'One']);
 
         $result = Push::photo(321, $media);
         $this->assertTrue($result);
