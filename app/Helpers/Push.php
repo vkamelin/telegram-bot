@@ -183,10 +183,47 @@ class Push
             'parse_mode' => 'html',
             'caption' => $caption,
         ];
-        
+
         $data = array_merge($data, $options);
-        
+
         return self::push($chatId, 'sendVideo', $data, $type, $priority, $sendAfter);
+    }
+
+    /**
+     * Метод добавляет в очередь группу медиафайлов в Телеграм
+     *
+     * @param int         $chatId    Id чата
+     * @param array       $media     Массив медиафайлов согласно API https://core.telegram.org/bots/api#inputmedia
+     * @param string      $type      Тип сообщения. Возможные значения: 'push', 'message'
+     * @param int         $priority  Приоритет сообщения. 2 - самый низкий, 0 - самый высокий. По-умолчанию 2
+     * @param array       $options   Дополнительные параметры из API https://core.telegram.org/bots/api#sendmediagroup
+     * @param string|null $sendAfter Время после которого отправлять сообщение в Телеграм
+     *
+     * @return bool Удалось ли добавить в очередь на отправку. True - удалось, False - не удалось
+     */
+    public static function mediaGroup(
+        int $chatId,
+        array $media,
+        string $type = 'media-group',
+        int $priority = 2,
+        array $options = [],
+        ?string $sendAfter = null
+    ): bool {
+        foreach ($media as &$item) {
+            if (isset($item['caption']) && !isset($item['parse_mode'])) {
+                $item['parse_mode'] = 'html';
+            }
+        }
+        unset($item);
+
+        $data = [
+            'chat_id' => $chatId,
+            'media' => $media,
+        ];
+
+        $data = array_merge($data, $options);
+
+        return self::push($chatId, 'sendMediaGroup', $data, $type, $priority, $sendAfter);
     }
     
     /**
