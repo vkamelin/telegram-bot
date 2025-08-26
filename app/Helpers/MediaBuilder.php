@@ -204,11 +204,50 @@ class MediaBuilder
         bool $supportsStreaming = false,
         bool $has_spoiler = false
     ): array {
-        // TODO: Implement inputMediaVideo() method.
-        
-        $data = [];
-        
-        return $data;
+        if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
+            throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
+        }
+
+        foreach ([
+            'width' => $width,
+            'height' => $height,
+            'duration' => $duration,
+            'startTimestamp' => $startTimestamp,
+        ] as $name => $value) {
+            if ($value !== null && $value < 0) {
+                throw new RuntimeException(sprintf('%s не может быть отрицательным', $name));
+            }
+        }
+
+        $options = [
+            'caption' => $caption !== '' ? $caption : null,
+            'parse_mode' => $parseMode,
+            'thumbnail' => $thumbnail,
+            'cover' => $cover,
+            'start_timestamp' => $startTimestamp,
+            'width' => $width,
+            'height' => $height,
+            'duration' => $duration,
+        ];
+
+        if ($showCaptionAboveMedia) {
+            $options['show_caption_above_media'] = true;
+        }
+
+        if ($supportsStreaming) {
+            $options['supports_streaming'] = true;
+        }
+
+        if ($has_spoiler) {
+            $options['has_spoiler'] = true;
+        }
+
+        $data = self::buildInputMedia('video', $media, $options);
+
+        return array_filter(
+            $data,
+            static fn($value) => $value !== null && $value !== ''
+        );
     }
     
     /**
