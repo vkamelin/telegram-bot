@@ -3,6 +3,21 @@ $(function () {
   window.csrfToken = csrfToken;
   const searchUrl = window.tgUserSearchUrl;
 
+  const $typeSelect = $('#messageType');
+  const $messageFields = $('.message-fields');
+
+  function toggleMessageFields() {
+    const type = $typeSelect.val();
+    $messageFields.each(function () {
+      const $section = $(this);
+      const active = $section.data('type') === type;
+      $section.toggleClass('d-none', !active);
+      $section.find('input,textarea,select').prop('disabled', !active);
+    });
+  }
+  $typeSelect.on('change', toggleMessageFields);
+  toggleMessageFields();
+
   const $modeRadios = $('input[name="mode"]');
   const $singleSection = $('#singleUserSection');
   const $selectedSection = $('#selectedUsersSection');

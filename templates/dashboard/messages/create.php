@@ -12,10 +12,114 @@
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
-<form method="post" action="<?= url('/dashboard/messages/send') ?>">
+<form method="post" action="<?= url('/dashboard/messages/send') ?>" enctype="multipart/form-data">
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
+
     <div class="mb-3">
+        <label for="messageType" class="form-label">Type</label>
+        <select class="form-select" name="type" id="messageType">
+            <?php
+            $types = [
+                'text' => 'Text',
+                'photo' => 'Photo',
+                'audio' => 'Audio',
+                'video' => 'Video',
+                'document' => 'Document',
+                'sticker' => 'Sticker',
+                'animation' => 'Animation',
+                'voice' => 'Voice',
+                'video_note' => 'Video Note',
+                'media_group' => 'Media Group'
+            ];
+            $curType = $data['type'] ?? 'text';
+            foreach ($types as $val => $label): ?>
+                <option value="<?= $val ?>" <?= $curType === $val ? 'selected' : '' ?>><?= $label ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'text' ? '' : 'd-none' ?>" data-type="text">
         <textarea class="form-control" name="text" rows="3" placeholder="Text message"><?= htmlspecialchars($data['text'] ?? '') ?></textarea>
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'photo' ? '' : 'd-none' ?>" data-type="photo">
+        <input class="form-control mb-2" type="file" name="photo">
+        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="has_spoiler" id="photoSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
+            <label class="form-check-label" for="photoSpoiler">Has spoiler</label>
+        </div>
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'audio' ? '' : 'd-none' ?>" data-type="audio">
+        <input class="form-control mb-2" type="file" name="audio">
+        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
+        <input class="form-control mb-2" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+        <input class="form-control mb-2" type="text" name="performer" placeholder="Performer" value="<?= htmlspecialchars($data['performer'] ?? '') ?>">
+        <input class="form-control" type="text" name="title" placeholder="Title" value="<?= htmlspecialchars($data['title'] ?? '') ?>">
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'video' ? '' : 'd-none' ?>" data-type="video">
+        <input class="form-control mb-2" type="file" name="video">
+        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
+        <div class="row g-2 mb-2">
+            <div class="col"><input class="form-control" type="number" name="width" placeholder="Width" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
+            <div class="col"><input class="form-control" type="number" name="height" placeholder="Height" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
+        </div>
+        <input class="form-control mb-2" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="has_spoiler" id="videoSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
+            <label class="form-check-label" for="videoSpoiler">Has spoiler</label>
+        </div>
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'document' ? '' : 'd-none' ?>" data-type="document">
+        <input class="form-control mb-2" type="file" name="document">
+        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+        <input class="form-control" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'sticker' ? '' : 'd-none' ?>" data-type="sticker">
+        <input class="form-control" type="file" name="sticker">
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'animation' ? '' : 'd-none' ?>" data-type="animation">
+        <input class="form-control mb-2" type="file" name="animation">
+        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
+        <div class="row g-2 mb-2">
+            <div class="col"><input class="form-control" type="number" name="width" placeholder="Width" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
+            <div class="col"><input class="form-control" type="number" name="height" placeholder="Height" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
+        </div>
+        <input class="form-control mb-2" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="has_spoiler" id="animationSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
+            <label class="form-check-label" for="animationSpoiler">Has spoiler</label>
+        </div>
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'voice' ? '' : 'd-none' ?>" data-type="voice">
+        <input class="form-control mb-2" type="file" name="voice">
+        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
+        <input class="form-control" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'video_note' ? '' : 'd-none' ?>" data-type="video_note">
+        <input class="form-control" type="file" name="video_note">
+        <div class="row g-2 mt-2">
+            <div class="col"><input class="form-control" type="number" name="length" placeholder="Length" value="<?= htmlspecialchars($data['length'] ?? '') ?>"></div>
+            <div class="col"><input class="form-control" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>"></div>
+        </div>
+    </div>
+
+    <div class="mb-3 message-fields <?= $curType === 'media_group' ? '' : 'd-none' ?>" data-type="media_group">
+        <input class="form-control mb-2" type="file" name="media[]" multiple>
+        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+        <input class="form-control" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
     </div>
     <div class="mb-3">
         <div class="form-check">
