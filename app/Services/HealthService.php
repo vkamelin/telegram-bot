@@ -65,32 +65,41 @@ final class HealthService
      */
     private static function checkWorker(): bool
     {
-        $patterns = [
-            'gpt' => '/^gpt:gpt-\d+\s+RUNNING\b/',
-            'tg'  => '/^tg:tg-\d+\s+RUNNING\b/',
-            'lp'  => '/^lp\s+RUNNING\b/',
-        ];
-
         try {
-            $command   = 'supervisorctl status ' . implode(' ', array_keys($patterns));
             $output    = [];
             $returnVar = 0;
-            @exec($command, $output, $returnVar);
+            @exec('supervisorctl status', $output, $returnVar);
             if ($returnVar !== 0) {
                 return false;
             }
 
-            foreach ($patterns as $pattern) {
-                $found = false;
+            $groups = [
+                'gpt' => '/^gpt:gpt-\d+\s+RUNNING\b/',
+                'tg'  => '/^tg:tg-\d+\s+RUNNING\b/',
+            ];
+
+            foreach ($groups as $group => $pattern) {
+                $matched = false;
                 foreach ($output as $line) {
-                    if (preg_match($pattern, $line)) {
-                        $found = true;
-                        break;
+                    if (str_starts_with($line, $group . ':' . $group . '-')) {
+                        $matched = true;
+                        if (! preg_match($pattern, $line)) {
+                            return false;
+                        }
                     }
                 }
-                if (! $found) {
+                if (! $matched) {
                     return false;
                 }
+            }
+
+            $lpLines = array_values(array_filter(
+                $output,
+                static fn(string $line): bool => str_starts_with($line, 'lp')
+            ));
+
+            if (count($lpLines) !== 1 || ! preg_match('/^lp\s+RUNNING\b/', $lpLines[0])) {
+                return false;
             }
 
             return true;
