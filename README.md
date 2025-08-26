@@ -133,9 +133,17 @@ php bin/console migrate:rollback
 
 ```bash
 php bin/console admin:create
+php bin/console push:send "Hello" --all
 ```
 
-Создаёт администратора панели управления, запрашивая email и пароль и добавляя запись в таблицу `users`.
+`admin:create` — создаёт администратора панели управления, запрашивая email и пароль и добавляя запись в таблицу `users`.
+
+`push:send` — отправляет push-сообщение пользователям Telegram. Получатели задаются параметрами:
+
+* `--all` — всем пользователям;
+* `--user=1,2,3` — по идентификаторам;
+* `--username=alice,bob` — по username;
+* `--group=support` — по группам.
 
 ---
 

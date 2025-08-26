@@ -18,6 +18,7 @@ class Kernel
         Commands\CreateAdminCommand::class,
         Commands\UpdateFilterCommand::class,
         Commands\WorkerHandlerCommand::class,
+        Commands\PushSendCommand::class,
     ];
 
     /**
