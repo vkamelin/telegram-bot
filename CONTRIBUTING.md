@@ -32,4 +32,4 @@
 - Изменилась архитектура? Обнови `ARCHITECTURE.md`.
 - Добавил сущность? Опиши её в `CHANGELOG.md`.
 - Изменения группируй по `Added`, `Changed`, `Removed` и при релизе обновляй версию и дату.
-- Все PR должны проходить `composer cs` и `composer test`.
+- Все PR должны проходить `composer cs` и `composer tests`.
