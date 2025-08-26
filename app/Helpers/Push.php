@@ -18,6 +18,31 @@ use Throwable;
  */
 class Push
 {
+
+    /**
+     * Фабричный метод формирования структуры InputMedia.
+     *
+     * @param string $type    Тип медиа (photo, audio, document, video и т.д.)
+     * @param string $media   URL, fileId или путь к файлу
+     * @param array  $options Дополнительные параметры InputMedia
+     *
+     * @return array
+     */
+    public static function buildInputMedia(string $type, string $media, array $options = []): array
+    {
+        $data = [
+            'type' => $type,
+            'media' => $media,
+        ];
+
+        if (isset($options['caption']) && $options['caption'] !== '') {
+            $data['caption'] = $options['caption'];
+            $data['parse_mode'] = $options['parse_mode'] ?? 'html';
+            unset($options['caption'], $options['parse_mode']);
+        }
+
+        return array_merge($data, $options);
+    }
     
     /**
      * Метод добавляет в очередь текстовое сообщение в Телеграм
@@ -53,7 +78,7 @@ class Push
      * Метод добавляет в очередь изображение по ссылке в Телеграм
      *
      * @param int         $chatId    Id чата
-     * @param string      $photo     URL изображения, или fileId изображения, или относительный путь к локальному файлу
+     * @param array|string $photo    URL изображения, fileId или результат buildInputMedia
      * @param string      $caption   Текст подписи
      * @param string      $type      Тип сообщения. Возможные значения: 'push', 'message'
      * @param int         $priority  Приоритет сообщения. 2 - самый низкий, 0 - самый высокий. По-умолчанию 2
@@ -64,34 +89,34 @@ class Push
      */
     public static function photo(
         int $chatId,
-        string $photo,
+        array|string $photo,
         string $caption = '',
         string $type = 'photo',
         int $priority = 2,
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        $payload = is_array($photo)
+            ? $photo
+            : self::buildInputMedia('photo', $photo, ['caption' => $caption]);
+
         $data = [
             'chat_id' => $chatId,
-            'photo' => $photo,
-            'parse_mode' => 'html'
+            'photo' => $payload['media'],
         ];
-        
-        if (!empty($caption)) {
-            $data['caption'] = $caption;
-        }
-        
-        $data = array_merge($data, $options);
-        
+
+        unset($payload['type'], $payload['media']);
+        $data = array_merge($data, $payload, $options);
+
         return self::push($chatId, 'sendPhoto', $data, $type, $priority, $sendAfter);
     }
     
     /**
      * Метод добавляет в очередь аудио в Телеграм
      *
-     * @param int    $chatId   Id чата
-     * @param string $audio    URL аудио, или fileId аудио, или относительный путь к локальному файлу.
-     * @param string $caption  Текст подписи
+     * @param int          $chatId   Id чата
+     * @param array|string $audio    URL аудио, fileId или результат buildInputMedia.
+     * @param string       $caption  Текст подписи
      * @param string $type     Тип сообщения. Возможные значения: 'push', 'message'
      * @param int    $priority Приоритет сообщения. 2 - самый низкий, 0 - самый высокий. По-умолчанию 2
      * @param array  $options  Дополнительные параметры из API https://core.telegram.org/bots/api#sendaudio
@@ -100,34 +125,34 @@ class Push
      */
     public static function audio(
         int $chatId,
-        string $audio,
+        array|string $audio,
         string $caption = '',
         string $type = 'audio',
         int $priority = 2,
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        $payload = is_array($audio)
+            ? $audio
+            : self::buildInputMedia('audio', $audio, ['caption' => $caption]);
+
         $data = [
             'chat_id' => $chatId,
-            'audio' => $audio,
-            'parse_mode' => 'html'
+            'audio' => $payload['media'],
         ];
-        
-        if (!empty($caption)) {
-            $data['caption'] = $caption;
-        }
-        
-        $data = array_merge($data, $options);
-        
+
+        unset($payload['type'], $payload['media']);
+        $data = array_merge($data, $payload, $options);
+
         return self::push($chatId, 'sendAudio', $data, $type, $priority, $sendAfter);
     }
     
     /**
      * Метод добавляет в очередь документа в Телеграм
      *
-     * @param int    $chatId   Id чата
-     * @param string $document URL документа, или fileId документа, или относительный путь к локальному файлу
-     * @param string $caption  Текст подписи
+     * @param int          $chatId   Id чата
+     * @param array|string $document URL документа, fileId или результат buildInputMedia
+     * @param string       $caption  Текст подписи
      * @param string $type     Тип сообщения. Возможные значения: 'push', 'message'
      * @param int    $priority Приоритет сообщения. 2 - самый низкий, 0 - самый высокий. По-умолчанию 2
      * @param array  $options  Дополнительные параметры из API https://core.telegram.org/bots/api#senddocument
@@ -136,32 +161,35 @@ class Push
      */
     public static function document(
         int $chatId,
-        string $document,
+        array|string $document,
         string $caption = '',
         string $type = 'document',
         int $priority = 2,
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        $payload = is_array($document)
+            ? $document
+            : self::buildInputMedia('document', $document, ['caption' => $caption]);
+
         $data = [
             'chat_id' => $chatId,
-            'document' => $document,
-            'parse_mode' => 'html',
-            'caption' => $caption,
+            'document' => $payload['media'],
             'disable_content_type_detection' => true,
         ];
-        
-        $data = array_merge($data, $options);
-        
+
+        unset($payload['type'], $payload['media']);
+        $data = array_merge($data, $payload, $options);
+
         return self::push($chatId, 'sendDocument', $data, $type, $priority, $sendAfter);
     }
     
     /**
      * Метод добавляет в очередь видео в Телеграм
      *
-     * @param int    $chatId   Id чата
-     * @param string $video    URL видео, или fileId видео, или относительный путь к локальному файлу
-     * @param string $caption  Текст подписи
+     * @param int          $chatId   Id чата
+     * @param array|string $video    URL видео, fileId или результат buildInputMedia
+     * @param string       $caption  Текст подписи
      * @param string $type     Тип сообщения. Возможные значения: 'push', 'message'
      * @param int    $priority Приоритет сообщения. 2 - самый низкий, 0 - самый высокий. По-умолчанию 2
      * @param array  $options  Дополнительные параметры из API https://core.telegram.org/bots/api#sendvideo
@@ -170,21 +198,24 @@ class Push
      */
     public static function video(
         int $chatId,
-        string $video,
+        array|string $video,
         string $caption = '',
         string $type = 'video',
         int $priority = 2,
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        $payload = is_array($video)
+            ? $video
+            : self::buildInputMedia('video', $video, ['caption' => $caption]);
+
         $data = [
             'chat_id' => $chatId,
-            'video' => $video,
-            'parse_mode' => 'html',
-            'caption' => $caption,
+            'video' => $payload['media'],
         ];
 
-        $data = array_merge($data, $options);
+        unset($payload['type'], $payload['media']);
+        $data = array_merge($data, $payload, $options);
 
         return self::push($chatId, 'sendVideo', $data, $type, $priority, $sendAfter);
     }
@@ -193,7 +224,7 @@ class Push
      * Метод добавляет в очередь группу медиафайлов в Телеграм
      *
      * @param int         $chatId    Id чата
-     * @param array       $media     Массив медиафайлов согласно API https://core.telegram.org/bots/api#inputmedia
+     * @param array       $media     Массив, сформированный через buildInputMedia()
      * @param string      $type      Тип сообщения. Возможные значения: 'push', 'message'
      * @param int         $priority  Приоритет сообщения. 2 - самый низкий, 0 - самый высокий. По-умолчанию 2
      * @param array       $options   Дополнительные параметры из API https://core.telegram.org/bots/api#sendmediagroup
@@ -209,13 +240,6 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
-        foreach ($media as &$item) {
-            if (isset($item['caption']) && !isset($item['parse_mode'])) {
-                $item['parse_mode'] = 'html';
-            }
-        }
-        unset($item);
-
         $data = [
             'chat_id' => $chatId,
             'media' => $media,

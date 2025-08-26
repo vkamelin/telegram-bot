@@ -11,7 +11,7 @@ use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-final class PushMediaGroupTest extends TestCase
+final class PushPhotoTest extends TestCase
 {
     private PDO $db;
 
@@ -40,22 +40,19 @@ final class PushMediaGroupTest extends TestCase
         $propRedis->setValue(null, $redisStub);
     }
 
-    public function testMediaGroupQueued(): void
+    public function testPhotoQueuedFromInputMedia(): void
     {
-        $media = [
-            Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'One']),
-            Push::buildInputMedia('photo', 'https://example.com/b.jpg'),
-        ];
+        $media = Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'One']);
 
-        $result = Push::mediaGroup(321, $media);
+        $result = Push::photo(321, $media);
         $this->assertTrue($result);
 
         $row = $this->db->query('SELECT user_id, method, data FROM telegram_messages')->fetch();
         $this->assertSame(321, (int)$row['user_id']);
-        $this->assertSame('sendMediaGroup', $row['method']);
+        $this->assertSame('sendPhoto', $row['method']);
         $data = json_decode($row['data'], true);
-        $this->assertSame('https://example.com/a.jpg', $data['media'][0]['media']);
-        $this->assertSame('html', $data['media'][0]['parse_mode']);
-        $this->assertArrayNotHasKey('parse_mode', $data['media'][1]);
+        $this->assertSame('https://example.com/a.jpg', $data['photo']);
+        $this->assertSame('One', $data['caption']);
+        $this->assertSame('html', $data['parse_mode']);
     }
 }
