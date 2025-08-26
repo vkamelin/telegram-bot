@@ -10,10 +10,9 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Type</th>
         <th>Name</th>
-        <th>MIME</th>
-        <th>Size</th>
+        <th>Type</th>
+        <th>File ID</th>
         <th>Created</th>
         <th class="text-end">Actions</th>
     </tr>
@@ -22,10 +21,9 @@
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>Type</th>
         <th>Name</th>
-        <th>MIME</th>
-        <th>Size</th>
+        <th>Type</th>
+        <th>File ID</th>
         <th>Created</th>
         <th class="text-end">Actions</th>
     </tr>
