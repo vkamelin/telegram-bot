@@ -9,6 +9,7 @@ namespace App\Controllers\Dashboard;
 
 use App\Helpers\Flash;
 use App\Helpers\Push;
+use App\Helpers\MediaBuilder;
 use App\Helpers\Response;
 use App\Helpers\View;
 use PDO;
@@ -167,22 +168,214 @@ final class MessagesController
     public function send(Req $req, Res $res): Res
     {
         $p = (array)$req->getParsedBody();
-        $text = trim((string)($p['text'] ?? ''));
+        $type = (string)($p['type'] ?? 'text');
         $mode = (string)($p['mode'] ?? '');
+
         $data = [
-            'text' => $text,
+            'type' => $type,
+            'text' => trim((string)($p['text'] ?? '')),
+            'caption' => trim((string)($p['caption'] ?? '')),
+            'parse_mode' => trim((string)($p['parse_mode'] ?? '')),
+            'has_spoiler' => !empty($p['has_spoiler']),
+            'duration' => trim((string)($p['duration'] ?? '')),
+            'performer' => trim((string)($p['performer'] ?? '')),
+            'title' => trim((string)($p['title'] ?? '')),
+            'width' => trim((string)($p['width'] ?? '')),
+            'height' => trim((string)($p['height'] ?? '')),
+            'length' => trim((string)($p['length'] ?? '')),
             'mode' => $mode,
             'user' => trim((string)($p['user'] ?? '')),
             'users' => $p['users'] ?? [],
             'group_id' => $p['group_id'] ?? '',
         ];
+
         $errors = [];
-        if ($text === '') {
-            $errors[] = 'text is required';
+        $sender = null;
+
+        switch ($type) {
+            case 'text':
+                $text = $data['text'];
+                if ($text === '') {
+                    $errors[] = 'text is required';
+                }
+                $sender = static fn(int $cid) => Push::text($cid, $text);
+                break;
+            case 'photo':
+                $file = $_FILES['photo']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'photo is required';
+                    break;
+                }
+                $options = [];
+                if ($data['parse_mode'] !== '') {
+                    $options['parse_mode'] = $data['parse_mode'];
+                }
+                if ($data['has_spoiler']) {
+                    $options['has_spoiler'] = true;
+                }
+                $caption = $data['caption'];
+                $sender = static fn(int $cid) => Push::photo($cid, $file, $caption, 'photo', 2, $options);
+                break;
+            case 'audio':
+                $file = $_FILES['audio']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'audio is required';
+                    break;
+                }
+                $options = [];
+                if ($data['parse_mode'] !== '') {
+                    $options['parse_mode'] = $data['parse_mode'];
+                }
+                if ($data['duration'] !== '') {
+                    $options['duration'] = (int)$data['duration'];
+                }
+                if ($data['performer'] !== '') {
+                    $options['performer'] = $data['performer'];
+                }
+                if ($data['title'] !== '') {
+                    $options['title'] = $data['title'];
+                }
+                $caption = $data['caption'];
+                $sender = static fn(int $cid) => Push::audio($cid, $file, $caption, 'audio', 2, $options);
+                break;
+            case 'video':
+                $file = $_FILES['video']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'video is required';
+                    break;
+                }
+                $options = [];
+                if ($data['parse_mode'] !== '') {
+                    $options['parse_mode'] = $data['parse_mode'];
+                }
+                if ($data['width'] !== '') {
+                    $options['width'] = (int)$data['width'];
+                }
+                if ($data['height'] !== '') {
+                    $options['height'] = (int)$data['height'];
+                }
+                if ($data['duration'] !== '') {
+                    $options['duration'] = (int)$data['duration'];
+                }
+                if ($data['has_spoiler']) {
+                    $options['has_spoiler'] = true;
+                }
+                $caption = $data['caption'];
+                $sender = static fn(int $cid) => Push::video($cid, $file, $caption, 'video', 2, $options);
+                break;
+            case 'document':
+                $file = $_FILES['document']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'document is required';
+                    break;
+                }
+                $options = [];
+                if ($data['parse_mode'] !== '') {
+                    $options['parse_mode'] = $data['parse_mode'];
+                }
+                $caption = $data['caption'];
+                $sender = static fn(int $cid) => Push::document($cid, $file, $caption, 'document', 2, $options);
+                break;
+            case 'sticker':
+                $file = $_FILES['sticker']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'sticker is required';
+                    break;
+                }
+                $sender = static fn(int $cid) => Push::sticker($cid, $file);
+                break;
+            case 'animation':
+                $file = $_FILES['animation']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'animation is required';
+                    break;
+                }
+                $options = [];
+                if ($data['parse_mode'] !== '') {
+                    $options['parse_mode'] = $data['parse_mode'];
+                }
+                if ($data['width'] !== '') {
+                    $options['width'] = (int)$data['width'];
+                }
+                if ($data['height'] !== '') {
+                    $options['height'] = (int)$data['height'];
+                }
+                if ($data['duration'] !== '') {
+                    $options['duration'] = (int)$data['duration'];
+                }
+                if ($data['has_spoiler']) {
+                    $options['has_spoiler'] = true;
+                }
+                $caption = $data['caption'];
+                $sender = static fn(int $cid) => Push::animation($cid, $file, $caption, 'animation', 2, $options);
+                break;
+            case 'voice':
+                $file = $_FILES['voice']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'voice is required';
+                    break;
+                }
+                $options = [];
+                if ($data['caption'] !== '') {
+                    $options['caption'] = $data['caption'];
+                }
+                if ($data['parse_mode'] !== '') {
+                    $options['parse_mode'] = $data['parse_mode'];
+                }
+                if ($data['duration'] !== '') {
+                    $options['duration'] = (int)$data['duration'];
+                }
+                $sender = static fn(int $cid) => Push::voice($cid, $file, 'voice', 2, $options);
+                break;
+            case 'video_note':
+                $file = $_FILES['video_note']['tmp_name'] ?? '';
+                if ($file === '') {
+                    $errors[] = 'video_note is required';
+                    break;
+                }
+                $options = [];
+                if ($data['length'] !== '') {
+                    $options['length'] = (int)$data['length'];
+                }
+                if ($data['duration'] !== '') {
+                    $options['duration'] = (int)$data['duration'];
+                }
+                $sender = static fn(int $cid) => Push::videoNote($cid, $file, 'video-note', 2, $options);
+                break;
+            case 'media_group':
+                $uploads = $_FILES['media'] ?? null;
+                $media = [];
+                if (is_array($uploads) && isset($uploads['tmp_name']) && is_array($uploads['tmp_name'])) {
+                    $caption = $data['caption'];
+                    $parseMode = $data['parse_mode'];
+                    foreach ($uploads['tmp_name'] as $idx => $tmp) {
+                        if (($uploads['error'][$idx] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK || $tmp === '') {
+                            continue;
+                        }
+                        $opts = [];
+                        if ($idx === 0 && $caption !== '') {
+                            $opts['caption'] = $caption;
+                            if ($parseMode !== '') {
+                                $opts['parse_mode'] = $parseMode;
+                            }
+                        }
+                        $media[] = MediaBuilder::buildInputMedia('photo', $tmp, $opts);
+                    }
+                }
+                if (!$media) {
+                    $errors[] = 'media is required';
+                    break;
+                }
+                $sender = static fn(int $cid) => Push::mediaGroup($cid, $media);
+                break;
+            default:
+                $errors[] = 'unknown message type';
         }
+
         if (!in_array($mode, ['all', 'single', 'selected', 'group'], true)) {
             $errors[] = 'mode is invalid';
         }
+
         $chatIds = [];
         if (!$errors) {
             switch ($mode) {
@@ -253,10 +446,11 @@ final class MessagesController
                     break;
             }
         }
-        if (!$errors && $chatIds) {
+
+        if (!$errors && $chatIds && $sender !== null) {
             $ok = true;
             foreach ($chatIds as $cid) {
-                $ok = Push::text($cid, $text) && $ok;
+                $ok = $sender($cid) && $ok;
             }
             if ($ok) {
                 Flash::add('success', 'Message queued');
@@ -264,6 +458,7 @@ final class MessagesController
             }
             $errors[] = 'Failed to queue message';
         }
+
         $groups = $this->db->query('SELECT id,name FROM telegram_user_groups ORDER BY name')->fetchAll();
         $params = [
             'title' => 'Send message',
