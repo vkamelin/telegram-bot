@@ -1,3 +1,4 @@
+
 # Minimal Telegram Bot Backend (API + Dashboard)
 
 ## 🚀 Описание
@@ -166,6 +167,26 @@ curl http://localhost:8080/api/health -H "Authorization: tma <initData>"
 curl http://localhost:8080/api/health -H "X-Telegram-Init-Data: <initData>"
 curl "http://localhost:8080/api/health?initData=<initData>"
 ```
+
+## 🖼️ Работа с медиа-группами
+
+`Push::buildInputMedia()` помогает собрать массив [`InputMedia`](https://core.telegram.org/bots/api#inputmedia) для разных типов файлов.
+Укажите тип (`photo`, `video`, `audio` или `document`), ссылку, `fileId` или путь к файлу и при необходимости подпись.
+
+```php
+use App\Helpers\Push;
+
+$media = [
+    Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Фото']),
+    Push::buildInputMedia('video', 'https://example.com/b.mp4', ['caption' => 'Видео']),
+    Push::buildInputMedia('audio', 'https://example.com/c.mp3'),
+    Push::buildInputMedia('document', 'https://example.com/d.pdf', ['caption' => 'Документ']),
+];
+
+Push::mediaGroup(123456789, $media);
+```
+
+Полученный массив можно передавать и в одиночные методы `Push::photo()`, `Push::video()`, `Push::audio()` и `Push::document()`.
 
 ---
 
