@@ -41,11 +41,11 @@ final class SystemController
 
         $workerCommands = [
             'status' => [
-                'supervisorctl status gpt tg lp',
+                'supervisorctl status gpt:* tg:* lp',
                 'tail -n 100 storage/logs/*.log',
             ],
             'restart' => [
-                'supervisorctl restart gpt tg lp',
+                'supervisorctl restart gpt:* tg:* lp',
             ],
         ];
 
