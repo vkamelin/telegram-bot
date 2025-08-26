@@ -281,11 +281,39 @@ class MediaBuilder
         int $duration = null,
         bool $has_spoiler = false
     ): array {
-        // TODO: Implement inputMediaAnimation() method.
-        
-        $data = [];
-        
-        return $data;
+        if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
+            throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
+        }
+
+        foreach ([
+            'width' => $width,
+            'height' => $height,
+            'duration' => $duration,
+        ] as $name => $value) {
+            if ($value !== null && $value < 0) {
+                throw new RuntimeException(sprintf('%s не может быть отрицательным', $name));
+            }
+        }
+
+        $options = [
+            'caption' => $caption !== '' ? $caption : null,
+            'parse_mode' => $parseMode,
+            'thumbnail' => $thumbnail,
+            'width' => $width,
+            'height' => $height,
+            'duration' => $duration,
+        ];
+
+        if ($has_spoiler) {
+            $options['has_spoiler'] = true;
+        }
+
+        $data = self::buildInputMedia('animation', $media, $options);
+
+        return array_filter(
+            $data,
+            static fn($value) => $value !== null && $value !== ''
+        );
     }
     
     /**
