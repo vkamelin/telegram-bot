@@ -7,10 +7,14 @@
 ### Обязательные заголовки
 - `X-Request-Id` — уникальный идентификатор запроса. Если не указан, сервер сгенерирует его автоматически.
 - `Authorization: Bearer <token>` — обязателен для всех защищённых эндпоинтов.
+- `initData` — данные авторизации из Telegram. Передаются одним из следующих заголовков:
+  - `X-Telegram-Init-Data: <initData>`
+  - `Authorization: tma <initData>`
 
 ## POST /api/auth/login
 ### Заголовки
 - `X-Request-Id: <uuid>`
+- `Authorization: tma <initData>`
 ### Запрос
 ```json
 {
@@ -28,6 +32,7 @@
 ## GET /api/me
 ### Заголовки
 - `Authorization: Bearer <token>`
+- `X-Telegram-Init-Data: <initData>`
 - `X-Request-Id: <uuid>`
 ### Ответ
 ```json
@@ -43,6 +48,7 @@
 ## GET /api/users
 ### Заголовки
 - `Authorization: Bearer <token>`
+- `X-Telegram-Init-Data: <initData>`
 - `X-Request-Id: <uuid>`
 ### Ответ
 ```json
@@ -60,6 +66,7 @@
 ## POST /api/users
 ### Заголовки
 - `Authorization: Bearer <token>`
+- `X-Telegram-Init-Data: <initData>`
 - `X-Request-Id: <uuid>`
 ### Запрос
 ```json
