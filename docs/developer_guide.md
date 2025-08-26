@@ -21,3 +21,20 @@
 - `rm -f var/log/*.log` — очистка логов
 - `php workers/<worker>.php` — запуск конкретного воркера
 - `composer dump-autoload`
+
+## Отправка медиа
+
+```php
+use App\Helpers\Push;
+
+// одиночное изображение
+$photo = Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Привет']);
+Push::photo(123, $photo);
+
+// медиагруппа
+$media = [
+    Push::buildInputMedia('photo', 'https://example.com/a.jpg', ['caption' => 'Первая']),
+    Push::buildInputMedia('photo', 'https://example.com/b.jpg'),
+];
+Push::mediaGroup(123, $media);
+```
