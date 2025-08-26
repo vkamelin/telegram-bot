@@ -44,6 +44,7 @@ class Push
         ];
         
         $data = array_merge($data, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
         
         return self::push($chatId, 'sendMessage', $data, $type, $priority, $sendAfter);
     }
@@ -71,6 +72,7 @@ class Push
         ?string $sendAfter = null
     ): bool {
         $data = MediaBuilder::prepareMediaData($chatId, 'photo', $photo, $caption, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
 
         return self::push($chatId, 'sendPhoto', $data, $type, $priority, $sendAfter);
     }
@@ -97,6 +99,7 @@ class Push
         ?string $sendAfter = null
     ): bool {
         $data = MediaBuilder::prepareMediaData($chatId, 'audio', $audio, $caption, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
 
         return self::push($chatId, 'sendAudio', $data, $type, $priority, $sendAfter);
     }
@@ -125,6 +128,7 @@ class Push
         $options = array_merge(['disable_content_type_detection' => true], $options);
 
         $data = MediaBuilder::prepareMediaData($chatId, 'document', $document, $caption, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
 
         return self::push($chatId, 'sendDocument', $data, $type, $priority, $sendAfter);
     }
@@ -151,6 +155,7 @@ class Push
         ?string $sendAfter = null
     ): bool {
         $data = MediaBuilder::prepareMediaData($chatId, 'video', $video, $caption, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
 
         return self::push($chatId, 'sendVideo', $data, $type, $priority, $sendAfter);
     }
@@ -175,12 +180,15 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        $media = array_map(static fn ($item) => array_filter($item, static fn ($value) => $value !== null), $media);
+
         $data = [
             'chat_id' => $chatId,
             'media' => $media,
         ];
 
         $data = array_merge($data, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
 
         return self::push($chatId, 'sendMediaGroup', $data, $type, $priority, $sendAfter);
     }
@@ -211,6 +219,7 @@ class Push
         ];
         
         $data = array_merge($data, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
         
         return self::push($chatId, 'sendSticker', $data, $type, $priority, $sendAfter);
     }
@@ -247,6 +256,7 @@ class Push
         }
         
         $data = array_merge($data, $options);
+        $data = array_filter($data, static fn ($value) => $value !== null);
         
         return self::push($chatId, 'sendAnimation', $data, $type, $priority, $sendAfter);
     }

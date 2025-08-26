@@ -25,11 +25,49 @@ class MediaBuilder
             'media' => $media,
         ];
 
-        if (isset($options['caption']) && $options['caption'] !== '') {
-            $data['caption'] = $options['caption'];
-            $data['parse_mode'] = $options['parse_mode'] ?? 'html';
-            unset($options['caption'], $options['parse_mode']);
+        // Обработка подписи и режима парсинга. Нужно учитывать случаи,
+        // когда параметр передан со значением null - такой параметр не
+        // должен попадать в итоговый массив, однако его наличие не должно
+        // активировать значение по-умолчанию.
+        if (array_key_exists('caption', $options)) {
+            $caption = $options['caption'];
+            unset($options['caption']);
+
+            if ($caption !== null && $caption !== '') {
+                $data['caption'] = $caption;
+
+                if (array_key_exists('parse_mode', $options)) {
+                    $parseMode = $options['parse_mode'];
+                    unset($options['parse_mode']);
+
+                    if ($parseMode !== null && $parseMode !== '') {
+                        $data['parse_mode'] = $parseMode;
+                    }
+                } else {
+                    // parse_mode не передан явно - используем значение по-умолчанию
+                    $data['parse_mode'] = 'html';
+                }
+            } elseif (array_key_exists('parse_mode', $options)) {
+                // Подпись пустая, но parse_mode передан - нужно корректно
+                // обработать значение parse_mode и исключить null.
+                $parseMode = $options['parse_mode'];
+                unset($options['parse_mode']);
+
+                if ($parseMode !== null && $parseMode !== '') {
+                    $data['parse_mode'] = $parseMode;
+                }
+            }
+        } elseif (array_key_exists('parse_mode', $options)) {
+            $parseMode = $options['parse_mode'];
+            unset($options['parse_mode']);
+
+            if ($parseMode !== null && $parseMode !== '') {
+                $data['parse_mode'] = $parseMode;
+            }
         }
+
+        // Удаляем из options параметры со значением null
+        $options = array_filter($options, static fn ($value) => $value !== null);
 
         return array_merge($data, $options);
     }
@@ -63,13 +101,17 @@ class MediaBuilder
 
         unset($payload['type'], $payload['media']);
 
-        if ($caption !== '' && !isset($payload['caption'])) {
+        if ($caption !== '' && !array_key_exists('caption', $payload)) {
             $payload['caption'] = $caption;
+
+            if (!array_key_exists('parse_mode', $payload)) {
+                $payload['parse_mode'] = 'html';
+            }
         }
 
-        if (isset($payload['caption']) && !isset($payload['parse_mode'])) {
-            $payload['parse_mode'] = 'html';
-        }
+        // Удаляем параметры со значением null как из payload, так и из options
+        $payload = array_filter($payload, static fn ($value) => $value !== null);
+        $options = array_filter($options, static fn ($value) => $value !== null);
 
         return array_merge($data, $payload, $options);
     }
