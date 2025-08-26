@@ -4,42 +4,59 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Telegram Users</h1>
+<h1>Пользователи</h1>
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
         <select name="is_premium" class="form-select">
-            <option value="">is_premium</option>
-            <option value="1" <?= isset($_GET['is_premium']) && $_GET['is_premium'] === '1' ? 'selected' : '' ?>>1</option>
-            <option value="0" <?= isset($_GET['is_premium']) && $_GET['is_premium'] === '0' ? 'selected' : '' ?>>0</option>
+            <option value="">премиум</option>
+            <option value="1" <?= isset($_GET['is_premium']) && $_GET['is_premium'] === '1' ? 'selected' : '' ?>>
+                ДА
+            </option>
+            <option value="0" <?= isset($_GET['is_premium']) && $_GET['is_premium'] === '0' ? 'selected' : '' ?>>
+                НЕТ
+            </option>
         </select>
     </div>
     <div class="col-auto">
         <select name="is_user_banned" class="form-select">
-            <option value="">is_user_banned</option>
-            <option value="1" <?= isset($_GET['is_user_banned']) && $_GET['is_user_banned'] === '1' ? 'selected' : '' ?>>1</option>
-            <option value="0" <?= isset($_GET['is_user_banned']) && $_GET['is_user_banned'] === '0' ? 'selected' : '' ?>>0</option>
+            <option value="">забанен</option>
+            <option value="1" <?= isset($_GET['is_user_banned']) && $_GET['is_user_banned'] === '1' ? 'selected' : '' ?>>
+                ДА
+            </option>
+            <option value="0" <?= isset($_GET['is_user_banned']) && $_GET['is_user_banned'] === '0' ? 'selected' : '' ?>>
+                НЕТ
+            </option>
         </select>
     </div>
     <div class="col-auto">
         <select name="is_bot_banned" class="form-select">
-            <option value="">is_bot_banned</option>
-            <option value="1" <?= isset($_GET['is_bot_banned']) && $_GET['is_bot_banned'] === '1' ? 'selected' : '' ?>>1</option>
-            <option value="0" <?= isset($_GET['is_bot_banned']) && $_GET['is_bot_banned'] === '0' ? 'selected' : '' ?>>0</option>
+            <option value="">бот забанен</option>
+            <option value="1" <?= isset($_GET['is_bot_banned']) && $_GET['is_bot_banned'] === '1' ? 'selected' : '' ?>>
+                ДА
+            </option>
+            <option value="0" <?= isset($_GET['is_bot_banned']) && $_GET['is_bot_banned'] === '0' ? 'selected' : '' ?>>
+                НЕТ
+            </option>
         </select>
     </div>
     <div class="col-auto">
         <select name="is_subscribed" class="form-select">
-            <option value="">is_subscribed</option>
-            <option value="1" <?= isset($_GET['is_subscribed']) && $_GET['is_subscribed'] === '1' ? 'selected' : '' ?>>1</option>
-            <option value="0" <?= isset($_GET['is_subscribed']) && $_GET['is_subscribed'] === '0' ? 'selected' : '' ?>>0</option>
+            <option value="">подписан</option>
+            <option value="1" <?= isset($_GET['is_subscribed']) && $_GET['is_subscribed'] === '1' ? 'selected' : '' ?>>
+                ДА
+            </option>
+            <option value="0" <?= isset($_GET['is_subscribed']) && $_GET['is_subscribed'] === '0' ? 'selected' : '' ?>>
+                НЕТ
+            </option>
         </select>
     </div>
     <div class="col-auto">
-        <input type="text" name="language_code" value="<?= htmlspecialchars($_GET['language_code'] ?? '') ?>" class="form-control" placeholder="language">
+        <input type="text" name="language_code" value="<?= htmlspecialchars($_GET['language_code'] ?? '') ?>"
+               class="form-control" placeholder="язык">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-outline-success">Фильтр</button>
     </div>
 </form>
 
@@ -48,12 +65,12 @@
     <tr>
         <th>User ID</th>
         <th>Username</th>
-        <th>Language</th>
-        <th>Premium</th>
-        <th>Subscribed</th>
-        <th>User banned</th>
-        <th>Bot banned</th>
-        <th>Actions</th>
+        <th>Язык</th>
+        <th>Премиум</th>
+        <th>Подписан</th>
+        <th>Забанен</th>
+        <th>Бот забанен</th>
+        <th>Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -61,12 +78,12 @@
     <tr>
         <th>User ID</th>
         <th>Username</th>
-        <th>Language</th>
-        <th>Premium</th>
-        <th>Subscribed</th>
-        <th>User banned</th>
-        <th>Bot banned</th>
-        <th>Actions</th>
+        <th>Язык</th>
+        <th>Премиум</th>
+        <th>Подписан</th>
+        <th>Забанен</th>
+        <th>Бот забанен</th>
+        <th>Действия</th>
     </tr>
     </tfoot>
 </table>

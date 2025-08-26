@@ -1,10 +1,15 @@
-<h1>Telegram Groups</h1>
+<?php
+/** @var string $csrfToken CSRF-токен */
+/** @var array $groups Группы */
+?>
+
+<h1>Группы пользователей Telegram</h1>
 
 <form method="post" class="mb-3" action="<?= url('/dashboard/tg-groups') ?>">
-    <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
+    <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
     <div class="input-group">
-        <input type="text" name="name" class="form-control" placeholder="Group name" required>
-        <button type="submit" class="btn btn-primary">Create</button>
+        <input type="text" name="name" class="form-control" placeholder="Имя группы" required>
+        <button type="submit" class="btn btn-outline-success">Создать</button>
     </div>
 </form>
 
@@ -12,8 +17,8 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Name</th>
-        <th>Members</th>
+        <th>Название</th>
+        <th>Пользователи</th>
         <th></th>
     </tr>
     </thead>
@@ -23,7 +28,11 @@
             <td><?= $g['id'] ?></td>
             <td><?= htmlspecialchars($g['name']) ?></td>
             <td><?= $g['members'] ?></td>
-            <td><a class="btn btn-sm btn-secondary" href="<?= url('/dashboard/tg-groups/' . $g['id']) ?>">View</a></td>
+            <td>
+                <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dashboard/tg-groups/' . $g['id']) ?>">
+                    View
+                </a>
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>

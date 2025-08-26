@@ -110,3 +110,7 @@ code, pre {
 .main-content {
     padding: 1rem;
 }
+
+.dataTables_empty {
+    color: #cccccc !important;
+}
