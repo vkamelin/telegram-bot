@@ -27,6 +27,11 @@ $menu = [
         'icon'  => 'bi bi-telegram',
     ],
     [
+        'url'   => '/dashboard/messages/create',
+        'title' => 'Отправить сообщение',
+        'icon'  => 'bi bi-envelope',
+    ],
+    [
         'url'   => '/dashboard/scheduled',
         'title' => 'Расписание сообщений',
         'icon'  => 'bi bi-clock',

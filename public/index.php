@@ -50,6 +50,8 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\HomeController($db))->index($req, $res));
         $auth->get('/messages', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->index($req, $res));
         $auth->post('/messages/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->data($req, $res));
+        $auth->get('/messages/create', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->create($req, $res));
+        $auth->post('/messages/send', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->send($req, $res));
         $auth->post('/messages/{id}/resend', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->resend($req, $res));
         $auth->get('/messages/{id}/response', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->download($req, $res));
         $auth->get('/pre-checkout', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PreCheckoutController($db))->index($req, $res));

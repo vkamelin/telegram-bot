@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace App\Controllers\Dashboard;
 
+use App\Helpers\Flash;
+use App\Helpers\Push;
 use App\Helpers\Response;
 use App\Helpers\View;
 use PDO;
@@ -142,5 +144,133 @@ final class MessagesController
         $res->getBody()->write((string)$row['response']);
         return $res->withHeader('Content-Type', 'application/json')
             ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
+    /**
+     * Shows form for sending new message.
+     */
+    public function create(Req $req, Res $res): Res
+    {
+        $groups = $this->db->query('SELECT id,name FROM telegram_user_groups ORDER BY name')->fetchAll();
+        $params = [
+            'title' => 'Send message',
+            'groups' => $groups,
+            'errors' => [],
+            'data' => [],
+        ];
+        return View::render($res, 'dashboard/messages/create.php', $params, 'layouts/main.php');
+    }
+
+    /**
+     * Sends text message to selected users.
+     */
+    public function send(Req $req, Res $res): Res
+    {
+        $p = (array)$req->getParsedBody();
+        $text = trim((string)($p['text'] ?? ''));
+        $mode = (string)($p['mode'] ?? '');
+        $data = [
+            'text' => $text,
+            'mode' => $mode,
+            'user' => trim((string)($p['user'] ?? '')),
+            'users' => $p['users'] ?? [],
+            'group_id' => $p['group_id'] ?? '',
+        ];
+        $errors = [];
+        if ($text === '') {
+            $errors[] = 'text is required';
+        }
+        if (!in_array($mode, ['all', 'single', 'selected', 'group'], true)) {
+            $errors[] = 'mode is invalid';
+        }
+        $chatIds = [];
+        if (!$errors) {
+            switch ($mode) {
+                case 'all':
+                    $chatIds = $this->db->query('SELECT user_id FROM telegram_users')->fetchAll(PDO::FETCH_COLUMN) ?: [];
+                    $chatIds = array_map('intval', $chatIds);
+                    break;
+                case 'single':
+                    $q = $data['user'];
+                    if ($q === '') {
+                        $errors[] = 'user is required';
+                        break;
+                    }
+                    if (ctype_digit($q)) {
+                        $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE user_id = :uid');
+                        $stmt->execute(['uid' => (int)$q]);
+                    } else {
+                        $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE username = :uname');
+                        $stmt->execute(['uname' => $q]);
+                    }
+                    $id = $stmt->fetchColumn();
+                    if ($id !== false) {
+                        $chatIds[] = (int)$id;
+                    } else {
+                        $errors[] = 'User not found';
+                    }
+                    break;
+                case 'selected':
+                    $users = is_array($p['users'] ?? null) ? $p['users'] : [];
+                    if (!$users) {
+                        $errors[] = 'No users selected';
+                        break;
+                    }
+                    foreach ($users as $u) {
+                        $u = trim((string)$u);
+                        if ($u === '') {
+                            continue;
+                        }
+                        if (ctype_digit($u)) {
+                            $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE user_id = :uid');
+                            $stmt->execute(['uid' => (int)$u]);
+                        } else {
+                            $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE username = :uname');
+                            $stmt->execute(['uname' => $u]);
+                        }
+                        $id = $stmt->fetchColumn();
+                        if ($id !== false) {
+                            $chatIds[] = (int)$id;
+                        }
+                    }
+                    if (!$chatIds) {
+                        $errors[] = 'No users found';
+                    }
+                    break;
+                case 'group':
+                    $gid = (int)($p['group_id'] ?? 0);
+                    if ($gid <= 0) {
+                        $errors[] = 'group_id is required';
+                        break;
+                    }
+                    $stmt = $this->db->prepare('SELECT tu.user_id FROM telegram_user_group_user ugu JOIN telegram_users tu ON tu.id = ugu.user_id WHERE ugu.group_id = :gid');
+                    $stmt->execute(['gid' => $gid]);
+                    $chatIds = $stmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
+                    $chatIds = array_map('intval', $chatIds);
+                    if (!$chatIds) {
+                        $errors[] = 'Group is empty';
+                    }
+                    break;
+            }
+        }
+        if (!$errors && $chatIds) {
+            $ok = true;
+            foreach ($chatIds as $cid) {
+                $ok = Push::text($cid, $text) && $ok;
+            }
+            if ($ok) {
+                Flash::add('success', 'Message queued');
+                return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
+            }
+            $errors[] = 'Failed to queue message';
+        }
+        $groups = $this->db->query('SELECT id,name FROM telegram_user_groups ORDER BY name')->fetchAll();
+        $params = [
+            'title' => 'Send message',
+            'groups' => $groups,
+            'errors' => $errors,
+            'data' => $data,
+        ];
+        return View::render($res, 'dashboard/messages/create.php', $params, 'layouts/main.php');
     }
 }
