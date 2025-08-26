@@ -214,6 +214,41 @@ $media = [
 Push::mediaGroup(123456789, $media);
 ```
 
+## 🖥️ Отправка медиа через Dashboard
+
+На странице Dashboard → Messages → Send можно отправлять сообщения с любыми типами медиа без написания кода:
+
+1. Откройте раздел **Messages** и нажмите **Send**.
+2. Выберите тип сообщения в списке **Type** — появятся доступные параметры.
+3. Заполните параметры и выберите получателей (all, single, selected или group).
+4. Нажмите **Send**.
+
+| Тип | Параметры |
+| --- | --- |
+| `text` | `text` |
+| `photo` | `caption`, `parse_mode`, `has_spoiler` |
+| `audio` | `caption`, `parse_mode`, `duration`, `performer`, `title` |
+| `video` | `caption`, `parse_mode`, `width`, `height`, `duration`, `has_spoiler` |
+| `document` | `caption`, `parse_mode` |
+| `sticker` | — |
+| `animation` | `caption`, `parse_mode`, `width`, `height`, `duration`, `has_spoiler` |
+| `voice` | `caption`, `parse_mode`, `duration` |
+| `video_note` | `length`, `duration` |
+| `media_group` | `caption`, `parse_mode` (только для первого элемента) |
+
+Файлы загружаются на сервер и сохраняются в `storage/messages`. Размер запроса ограничен переменной `.env` `REQUEST_SIZE_LIMIT` (по умолчанию 1 МБ); также действуют лимиты Telegram Bot API (например, фото/видео до 20 МБ).
+
+Пример использования опций `MediaBuilder`:
+
+```php
+$video = MediaBuilder::buildInputMedia('video', '/path/clip.mp4', [
+    'caption' => '<b>Демо</b>',
+    'parse_mode' => 'HTML',
+    'width' => 640,
+    'height' => 360,
+]);
+```
+
 ---
 
 ## 📖 Документация
