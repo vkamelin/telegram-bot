@@ -46,6 +46,14 @@ final class MessagesControllerSendTest extends TestCase
         $propRedis->setValue(null, $redisStub);
         $this->controller = new MessagesController($this->db);
         $_SESSION = [];
+        $_FILES = [];
+
+        $dir = __DIR__ . '/../../storage/messages';
+        if (is_dir($dir)) {
+            foreach (glob($dir . '/*') as $f) {
+                @unlink($f);
+            }
+        }
     }
 
     private function send(array $body): void
@@ -83,5 +91,46 @@ final class MessagesControllerSendTest extends TestCase
         $this->send(['text' => 'hi', 'mode' => 'group', 'group_id' => 1]);
         $rows = $this->db->query('SELECT user_id FROM telegram_messages ORDER BY user_id')->fetchAll(PDO::FETCH_COLUMN);
         $this->assertSame([100, 101], array_map('intval', $rows));
+    }
+
+    public function testVideoWidthValidationFails(): void
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'vid');
+        file_put_contents($tmp, 'video');
+        $_FILES = [
+            'video' => [
+                'tmp_name' => $tmp,
+                'name' => 'test.mp4',
+                'error' => UPLOAD_ERR_OK,
+            ],
+        ];
+        $this->send(['type' => 'video', 'mode' => 'single', 'user' => '100', 'width' => 'abc']);
+        $cnt = (int)$this->db->query('SELECT COUNT(*) FROM telegram_messages')->fetchColumn();
+        $this->assertSame(0, $cnt);
+        $dir = __DIR__ . '/../../storage/messages';
+        $this->assertSame([], array_values(array_filter(glob($dir . '/*') ?: [])));
+    }
+
+    public function testMediaGroupStoresFiles(): void
+    {
+        $t1 = tempnam(sys_get_temp_dir(), 'm1');
+        $t2 = tempnam(sys_get_temp_dir(), 'm2');
+        file_put_contents($t1, 'a');
+        file_put_contents($t2, 'b');
+        $_FILES = [
+            'media' => [
+                'tmp_name' => [$t1, $t2],
+                'name' => ['a.jpg', 'b.jpg'],
+                'error' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK],
+            ],
+        ];
+        $this->send(['type' => 'media_group', 'mode' => 'single', 'user' => '100']);
+        $row = $this->db->query('SELECT data FROM telegram_messages')->fetchColumn();
+        $data = json_decode((string)$row, true);
+        $this->assertCount(2, $data['media']);
+        foreach ($data['media'] as $m) {
+            $this->assertArrayHasKey('media', $m);
+            $this->assertFileExists($m['media']);
+        }
     }
 }
