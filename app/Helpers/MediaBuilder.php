@@ -137,19 +137,29 @@ class MediaBuilder
         bool $showCaptionAboveMedia = false,
         bool $has_spoiler = false
     ): array {
-        // TODO: Implement full inputMediaPhoto() method.
-        
-        $data = [];
-        
-        if (!empty($caption)) {
-            if (mb_strlen($caption) > 1024) {
-                throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
-            }
-            
-            $data['caption'] = $caption;
+        if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
+            throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-        
-        return $data;
+
+        $options = [
+            'caption' => $caption !== '' ? $caption : null,
+            'parse_mode' => $parseMode,
+        ];
+
+        if ($showCaptionAboveMedia) {
+            $options['show_caption_above_media'] = true;
+        }
+
+        if ($has_spoiler) {
+            $options['has_spoiler'] = true;
+        }
+
+        $data = self::buildInputMedia('photo', $media, $options);
+
+        return array_filter(
+            $data,
+            static fn($value) => $value !== null && $value !== ''
+        );
     }
     
     /**
