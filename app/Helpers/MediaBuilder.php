@@ -346,11 +346,38 @@ class MediaBuilder
         string $performer = null,
         string $title = null
     ): array {
-        // TODO: Implement inputMediaAudio() method.
-        
-        $data = [];
-        
-        return $data;
+        if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
+            throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
+        }
+
+        foreach ([
+            'performer' => $performer,
+            'title' => $title,
+        ] as $name => $value) {
+            if ($value !== null && $value !== '' && mb_strlen($value) > 64) {
+                throw new RuntimeException(sprintf('Длина %s должна быть не более 64 символов', $name));
+            }
+        }
+
+        if ($duration !== null && $duration < 0) {
+            throw new RuntimeException('duration не может быть отрицательным');
+        }
+
+        $options = [
+            'caption' => $caption !== '' ? $caption : null,
+            'parse_mode' => $parseMode,
+            'thumbnail' => $thumbnail,
+            'duration' => $duration,
+            'performer' => $performer !== '' ? $performer : null,
+            'title' => $title !== '' ? $title : null,
+        ];
+
+        $data = self::buildInputMedia('audio', $media, $options);
+
+        return array_filter(
+            $data,
+            static fn($value) => $value !== null && $value !== ''
+        );
     }
     
     /**
