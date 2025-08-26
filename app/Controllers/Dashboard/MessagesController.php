@@ -10,6 +10,7 @@ namespace App\Controllers\Dashboard;
 use App\Helpers\Flash;
 use App\Helpers\Push;
 use App\Helpers\MediaBuilder;
+use App\Helpers\Path;
 use App\Helpers\Response;
 use App\Helpers\View;
 use PDO;
@@ -22,6 +23,59 @@ use Psr\Http\Message\ServerRequestInterface as Req;
 final class MessagesController
 {
     public function __construct(private PDO $db) {}
+
+    /**
+     * Saves uploaded file to persistent storage.
+     */
+    private function storeUploadedFile(array $file): ?string
+    {
+        $tmp = $file['tmp_name'] ?? '';
+        $err = $file['error'] ?? UPLOAD_ERR_NO_FILE;
+        if ($tmp === '' || $err !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        $ext = pathinfo($file['name'] ?? '', PATHINFO_EXTENSION);
+        $dir = Path::base('storage/messages');
+        if (!is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
+            return null;
+        }
+
+        $name = bin2hex(random_bytes(16));
+        if ($ext !== '') {
+            $name .= '.' . $ext;
+        }
+        $dest = $dir . '/' . $name;
+
+        // move_uploaded_file works only for HTTP uploads; fall back to rename for tests
+        if (!@move_uploaded_file($tmp, $dest)) {
+            if (!@rename($tmp, $dest)) {
+                return null;
+            }
+        }
+
+        return $dest;
+    }
+
+    /**
+     * Validates an integer field with optional range.
+     */
+    private function filterInt(string $value, string $field, array &$errors, int $min = 0, int $max = PHP_INT_MAX): ?int
+    {
+        if ($value === '') {
+            return null;
+        }
+        if (!ctype_digit($value)) {
+            $errors[] = $field . ' must be an integer';
+            return null;
+        }
+        $int = (int)$value;
+        if ($int < $min || $int > $max) {
+            $errors[] = $field . ' must be between ' . $min . ' and ' . $max;
+            return null;
+        }
+        return $int;
+    }
 
     /**
      * Отображает таблицу сообщений.
@@ -191,6 +245,7 @@ final class MessagesController
 
         $errors = [];
         $sender = null;
+        $storedFiles = [];
 
         switch ($type) {
             case 'text':
@@ -200,12 +255,14 @@ final class MessagesController
                 }
                 $sender = static fn(int $cid) => Push::text($cid, $text);
                 break;
+
             case 'photo':
-                $file = $_FILES['photo']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['photo'] ?? []);
+                if ($path === null) {
                     $errors[] = 'photo is required';
                     break;
                 }
+                $storedFiles[] = $path;
                 $options = [];
                 if ($data['parse_mode'] !== '') {
                     $options['parse_mode'] = $data['parse_mode'];
@@ -214,20 +271,23 @@ final class MessagesController
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::photo($cid, $file, $caption, 'photo', 2, $options);
+                $sender = static fn(int $cid) => Push::photo($cid, $path, $caption, 'photo', 2, $options);
                 break;
+
             case 'audio':
-                $file = $_FILES['audio']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['audio'] ?? []);
+                if ($path === null) {
                     $errors[] = 'audio is required';
                     break;
                 }
+                $storedFiles[] = $path;
                 $options = [];
                 if ($data['parse_mode'] !== '') {
                     $options['parse_mode'] = $data['parse_mode'];
                 }
-                if ($data['duration'] !== '') {
-                    $options['duration'] = (int)$data['duration'];
+                $d = $this->filterInt($data['duration'], 'duration', $errors);
+                if ($d !== null) {
+                    $options['duration'] = $d;
                 }
                 if ($data['performer'] !== '') {
                     $options['performer'] = $data['performer'];
@@ -236,85 +296,101 @@ final class MessagesController
                     $options['title'] = $data['title'];
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::audio($cid, $file, $caption, 'audio', 2, $options);
+                $sender = static fn(int $cid) => Push::audio($cid, $path, $caption, 'audio', 2, $options);
                 break;
+
             case 'video':
-                $file = $_FILES['video']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['video'] ?? []);
+                if ($path === null) {
                     $errors[] = 'video is required';
                     break;
                 }
+                $storedFiles[] = $path;
                 $options = [];
                 if ($data['parse_mode'] !== '') {
                     $options['parse_mode'] = $data['parse_mode'];
                 }
-                if ($data['width'] !== '') {
-                    $options['width'] = (int)$data['width'];
+                $w = $this->filterInt($data['width'], 'width', $errors);
+                if ($w !== null) {
+                    $options['width'] = $w;
                 }
-                if ($data['height'] !== '') {
-                    $options['height'] = (int)$data['height'];
+                $h = $this->filterInt($data['height'], 'height', $errors);
+                if ($h !== null) {
+                    $options['height'] = $h;
                 }
-                if ($data['duration'] !== '') {
-                    $options['duration'] = (int)$data['duration'];
+                $d = $this->filterInt($data['duration'], 'duration', $errors);
+                if ($d !== null) {
+                    $options['duration'] = $d;
                 }
                 if ($data['has_spoiler']) {
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::video($cid, $file, $caption, 'video', 2, $options);
+                $sender = static fn(int $cid) => Push::video($cid, $path, $caption, 'video', 2, $options);
                 break;
+
             case 'document':
-                $file = $_FILES['document']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['document'] ?? []);
+                if ($path === null) {
                     $errors[] = 'document is required';
                     break;
                 }
+                $storedFiles[] = $path;
                 $options = [];
                 if ($data['parse_mode'] !== '') {
                     $options['parse_mode'] = $data['parse_mode'];
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::document($cid, $file, $caption, 'document', 2, $options);
+                $sender = static fn(int $cid) => Push::document($cid, $path, $caption, 'document', 2, $options);
                 break;
+
             case 'sticker':
-                $file = $_FILES['sticker']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['sticker'] ?? []);
+                if ($path === null) {
                     $errors[] = 'sticker is required';
                     break;
                 }
-                $sender = static fn(int $cid) => Push::sticker($cid, $file);
+                $storedFiles[] = $path;
+                $sender = static fn(int $cid) => Push::sticker($cid, $path);
                 break;
+
             case 'animation':
-                $file = $_FILES['animation']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['animation'] ?? []);
+                if ($path === null) {
                     $errors[] = 'animation is required';
                     break;
                 }
+                $storedFiles[] = $path;
                 $options = [];
                 if ($data['parse_mode'] !== '') {
                     $options['parse_mode'] = $data['parse_mode'];
                 }
-                if ($data['width'] !== '') {
-                    $options['width'] = (int)$data['width'];
+                $w = $this->filterInt($data['width'], 'width', $errors);
+                if ($w !== null) {
+                    $options['width'] = $w;
                 }
-                if ($data['height'] !== '') {
-                    $options['height'] = (int)$data['height'];
+                $h = $this->filterInt($data['height'], 'height', $errors);
+                if ($h !== null) {
+                    $options['height'] = $h;
                 }
-                if ($data['duration'] !== '') {
-                    $options['duration'] = (int)$data['duration'];
+                $d = $this->filterInt($data['duration'], 'duration', $errors);
+                if ($d !== null) {
+                    $options['duration'] = $d;
                 }
                 if ($data['has_spoiler']) {
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::animation($cid, $file, $caption, 'animation', 2, $options);
+                $sender = static fn(int $cid) => Push::animation($cid, $path, $caption, 'animation', 2, $options);
                 break;
+
             case 'voice':
-                $file = $_FILES['voice']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['voice'] ?? []);
+                if ($path === null) {
                     $errors[] = 'voice is required';
                     break;
                 }
+                $storedFiles[] = $path;
                 $options = [];
                 if ($data['caption'] !== '') {
                     $options['caption'] = $data['caption'];
@@ -322,26 +398,32 @@ final class MessagesController
                 if ($data['parse_mode'] !== '') {
                     $options['parse_mode'] = $data['parse_mode'];
                 }
-                if ($data['duration'] !== '') {
-                    $options['duration'] = (int)$data['duration'];
+                $d = $this->filterInt($data['duration'], 'duration', $errors);
+                if ($d !== null) {
+                    $options['duration'] = $d;
                 }
-                $sender = static fn(int $cid) => Push::voice($cid, $file, 'voice', 2, $options);
+                $sender = static fn(int $cid) => Push::voice($cid, $path, 'voice', 2, $options);
                 break;
+
             case 'video_note':
-                $file = $_FILES['video_note']['tmp_name'] ?? '';
-                if ($file === '') {
+                $path = $this->storeUploadedFile($_FILES['video_note'] ?? []);
+                if ($path === null) {
                     $errors[] = 'video_note is required';
                     break;
                 }
+                $storedFiles[] = $path;
                 $options = [];
-                if ($data['length'] !== '') {
-                    $options['length'] = (int)$data['length'];
+                $len = $this->filterInt($data['length'], 'length', $errors);
+                if ($len !== null) {
+                    $options['length'] = $len;
                 }
-                if ($data['duration'] !== '') {
-                    $options['duration'] = (int)$data['duration'];
+                $d = $this->filterInt($data['duration'], 'duration', $errors);
+                if ($d !== null) {
+                    $options['duration'] = $d;
                 }
-                $sender = static fn(int $cid) => Push::videoNote($cid, $file, 'video-note', 2, $options);
+                $sender = static fn(int $cid) => Push::videoNote($cid, $path, 'video-note', 2, $options);
                 break;
+
             case 'media_group':
                 $uploads = $_FILES['media'] ?? null;
                 $media = [];
@@ -352,6 +434,15 @@ final class MessagesController
                         if (($uploads['error'][$idx] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK || $tmp === '') {
                             continue;
                         }
+                        $storedPath = $this->storeUploadedFile([
+                            'tmp_name' => $tmp,
+                            'error' => $uploads['error'][$idx] ?? UPLOAD_ERR_OK,
+                            'name' => $uploads['name'][$idx] ?? ''
+                        ]);
+                        if ($storedPath === null) {
+                            continue;
+                        }
+                        $storedFiles[] = $storedPath;
                         $opts = [];
                         if ($idx === 0 && $caption !== '') {
                             $opts['caption'] = $caption;
@@ -359,7 +450,7 @@ final class MessagesController
                                 $opts['parse_mode'] = $parseMode;
                             }
                         }
-                        $media[] = MediaBuilder::buildInputMedia('photo', $tmp, $opts);
+                        $media[] = MediaBuilder::buildInputMedia('photo', $storedPath, $opts);
                     }
                 }
                 if (!$media) {
@@ -368,6 +459,7 @@ final class MessagesController
                 }
                 $sender = static fn(int $cid) => Push::mediaGroup($cid, $media);
                 break;
+
             default:
                 $errors[] = 'unknown message type';
         }
@@ -457,6 +549,12 @@ final class MessagesController
                 return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
             }
             $errors[] = 'Failed to queue message';
+        }
+
+        if ($errors) {
+            foreach ($storedFiles as $f) {
+                @unlink($f);
+            }
         }
 
         $groups = $this->db->query('SELECT id,name FROM telegram_user_groups ORDER BY name')->fetchAll();
