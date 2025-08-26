@@ -40,17 +40,6 @@
 }
 ```
 
-## GET /api/items
-### Заголовки
-- `Authorization: Bearer <token>`
-- `X-Request-Id: <uuid>`
-### Ответ
-```json
-{
-  "items": []
-}
-```
-
 ## GET /api/users
 ### Заголовки
 - `Authorization: Bearer <token>`

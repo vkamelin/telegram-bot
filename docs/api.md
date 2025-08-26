@@ -7,7 +7,6 @@
 - `GET /api/health` — проверка состояния сервиса
 - `POST /api/auth/login` — выдача JWT-токена по email и паролю
 - `GET /api/me` — данные текущего пользователя
-- `GET /api/items` — список товаров
 - `GET /api/users` — список пользователей
 - `POST /api/users` — создание пользователя
 
@@ -49,17 +48,6 @@ curl http://localhost:8080/api/me \
 **Ответ:**
 ```json
 {"user":{"id":1,"email":"a@b.c","created_at":"2025-01-01"}}
-```
-
-### `GET /api/items`
-```bash
-curl http://localhost:8080/api/items \
-  -H "Authorization: Bearer <jwt>" \
-  -H "X-Telegram-Init-Data: <initData>"
-```
-**Ответ:**
-```json
-{"items":[]}
 ```
 
 ### `GET /api/users`
