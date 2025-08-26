@@ -118,6 +118,7 @@ composer serve
 
 * API: [http://localhost:8080/api/](http://localhost:8080/api/)\*
 * Dashboard: [http://localhost:8080/dashboard/](http://localhost:8080/dashboard/)\*
+  * System: [http://localhost:8080/dashboard/system](http://localhost:8080/dashboard/system) — просмотр env-переменных и команд воркеров
 * Health: [http://localhost:8080/api/health](http://localhost:8080/api/health)
 
 ## 🗄️ Миграции
