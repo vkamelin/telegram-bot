@@ -10,7 +10,7 @@
 ## Запуск
 - `composer serve`
 - Запуск воркеров из каталога `workers/` (`php workers/<worker>.php`)
-- `vendor/bin/phpunit`
+- `composer tests`
 
 ## Структура каталогов
 Смотрите [project_structure.md](project_structure.md) и [README.md](../README.md) для дополнительных деталей.
