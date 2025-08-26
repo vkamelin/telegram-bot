@@ -409,12 +409,27 @@ class MediaBuilder
         string $caption = null,
         string $thumbnail = null,
         string $parseMode = null,
-        bool $disableContentTypeDetection
+        bool $disableContentTypeDetection = false
     ): array {
-        // TODO: Implement inputMediaDocument() method.
-        
-        $data = [];
-        
-        return $data;
+        if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
+            throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
+        }
+
+        $options = [
+            'caption' => $caption !== '' ? $caption : null,
+            'parse_mode' => $parseMode,
+            'thumbnail' => $thumbnail,
+        ];
+
+        if ($disableContentTypeDetection) {
+            $options['disable_content_type_detection'] = true;
+        }
+
+        $data = self::buildInputMedia('document', $media, $options);
+
+        return array_filter(
+            $data,
+            static fn($value) => $value !== null && $value !== ''
+        );
     }
 }
