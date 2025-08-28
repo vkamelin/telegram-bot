@@ -6,8 +6,8 @@ namespace App\Console\Commands;
 
 use App\Console\Command;
 use App\Console\Kernel;
-use App\Domain\RefreshTokenTable;
-use App\Services\Db;
+use App\Services\RefreshTokenService;
+use App\Helpers\Database;
 
 class RefreshTokenPurgeCommand extends Command
 {
@@ -19,8 +19,8 @@ class RefreshTokenPurgeCommand extends Command
      */
     public function handle(array $arguments, Kernel $kernel): int
     {
-        $repo = new RefreshTokenTable(Db::get());
-        $count = $repo->deleteExpired();
+        $svc = new RefreshTokenService(Database::getInstance());
+        $count = $svc->purgeExpired();
         echo "Purged {$count} expired tokens." . PHP_EOL;
         return 0;
     }

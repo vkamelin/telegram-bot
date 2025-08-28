@@ -109,6 +109,7 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
 $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db, $config) {
     $g->get('/health', new \App\Controllers\Api\HealthController($db));
     $g->post('/auth/login', fn(Req $req, Res $res) => (new \App\Controllers\Api\AuthController($db, $config['jwt']))->login($req, $res));
+    $g->post('/auth/refresh', fn(Req $req, Res $res) => (new \App\Controllers\Api\AuthController($db, $config['jwt']))->refresh($req, $res));
 
     $g->group('', function (\Slim\Routing\RouteCollectorProxy $auth) use ($db) {
           $auth->get('/me', function (Req $req, Res $res): Res {
