@@ -19,6 +19,8 @@ $(function () {
   toggleMessageFields();
 
   const $modeRadios = $('input[name="mode"]');
+  const $sendModeRadios = $('input[name="send_mode"]');
+  const $sendAfterInput = $('#sendAfterInput');
   const $singleSection = $('#singleUserSection');
   const $selectedSection = $('#selectedUsersSection');
   const $groupSection = $('#groupSection');
@@ -31,6 +33,14 @@ $(function () {
   }
   $modeRadios.on('change', toggleSections);
   toggleSections();
+
+  function toggleSchedule() {
+    const v = $sendModeRadios.filter(':checked').val();
+    const enabled = v === 'schedule';
+    $sendAfterInput.prop('disabled', !enabled);
+  }
+  $sendModeRadios.on('change', toggleSchedule);
+  toggleSchedule();
 
   const $searchInput = $('#userSearchInput');
   const $searchResults = $('#userSearchResults');

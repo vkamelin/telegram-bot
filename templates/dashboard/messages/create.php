@@ -163,6 +163,20 @@
             <?php endforeach; ?>
         </select>
     </div>
+    <div class="mb-3">
+        <label class="form-label">Send time</label>
+        <?php $sendMode = $data['send_mode'] ?? 'now'; ?>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="send_mode" id="sendNow" value="now" <?= $sendMode === 'now' ? 'checked' : '' ?>>
+            <label class="form-check-label" for="sendNow">Send now</label>
+        </div>
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="send_mode" id="sendLater" value="schedule" <?= $sendMode === 'schedule' ? 'checked' : '' ?>>
+            <label class="form-check-label" for="sendLater">Schedule</label>
+        </div>
+        <input type="datetime-local" class="form-control" name="send_after" id="sendAfterInput" value="<?= htmlspecialchars($data['send_after'] ?? '') ?>">
+        <div class="form-text">Server time will be used.</div>
+    </div>
     <button type="submit" class="btn btn-primary">Send</button>
 </form>
 <script>

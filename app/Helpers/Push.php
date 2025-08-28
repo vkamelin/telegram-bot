@@ -400,31 +400,21 @@ class Push
                     'priority' => $priority,
                 ];
 
-                $useSchedule = false; // Использовать расписание
-
-                // Если указано время пуша
-                if (!empty($sendAfter)) {
-                    $sendAfterTime = strtotime($sendAfter);
-                    $delayTime = $sendAfterTime - time(); // Разница времени пуша с текущим временем
-
-                    if ($delayTime > 3600) {
-                        // Если разница больше часа, то используем расписание в БД
-                        $useSchedule = true;
+                // Если указано будущее время отправки — используем таблицу расписания
+                if (!empty($sendAfter) && strtotime($sendAfter) !== false && strtotime($sendAfter) > time()) {
+                    try {
+                        $stmt = $db->prepare(
+                            'INSERT INTO `telegram_scheduled_messages` (`user_id`, `method`, `type`, `data`, `priority`, `send_after`) '
+                            . 'VALUES (:user_id, :method, :type, :data, :priority, :send_after)'
+                        );
+                        $stmt->execute($insertData + ['send_after' => $sendAfter]);
+                    } catch (Throwable $e) {
+                        Logger::error(
+                            "Не удалось добавить запланированное сообщение. {$e->getMessage()}.",
+                            ['exception' => $e]
+                        );
+                        return false;
                     }
-                }
-
-                // Если используется расписание
-                if ($useSchedule === true) {
-                    /*$sql = "INSERT INTO `schedule` (`handle_at`, `type`, `handler`, `data`, `active`) VALUES
-                    (:handle_at, :type, :handler, :data, :active)";
-                    $stmt = $db->prepare($sql);
-                    $stmt->execute([
-                        'handle_at' => $sendAfter,
-                        'type' => $type,
-                        'handler' => 'TelegramPush',
-                        'data' => json_encode($insertData, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
-                        'active' => 1
-                    ]);*/
                 } else {
                     try {
                         $stmt = $db->prepare(
