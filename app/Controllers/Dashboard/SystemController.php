@@ -26,16 +26,48 @@ final class SystemController
     public function index(Req $req, Res $res): Res
     {
         $health = HealthService::check();
+        // Helper to detect sensitive keys
+        $isSensitive = static function (string $key): bool {
+            return (bool)preg_match('/(SECRET|PASS|PASSWORD|TOKEN|KEY|PRIVATE|AUTH|DSN)/i', $key);
+        };
 
-        // Collect environment variables, mask sensitive values
-        $env = $_ENV;
-        ksort($env);
+        // Load only variables explicitly defined in .env file
+        $envFile = dirname(__DIR__, 2) . '/.env';
+        $envFromFile = [];
+        if (is_readable($envFile)) {
+            $lines = @file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+            foreach ($lines as $line) {
+                $trim = ltrim($line);
+                if ($trim === '' || str_starts_with($trim, '#')) {
+                    continue;
+                }
+                if (!preg_match('/^([A-Z0-9_]+)\s*=\s*(.*)$/', $line, $m)) {
+                    continue;
+                }
+                $key = $m[1];
+                $raw = $m[2];
+                // strip inline comments only if unquoted
+                $val = $raw;
+                $val = trim($val);
+                if ((str_starts_with($val, '"') && str_ends_with($val, '"')) || (str_starts_with($val, "'") && str_ends_with($val, "'"))) {
+                    $val = substr($val, 1, -1);
+                } else {
+                    // cut off trailing comments
+                    $hashPos = strpos($val, '#');
+                    if ($hashPos !== false) {
+                        $val = rtrim(substr($val, 0, $hashPos));
+                    }
+                }
+                $envFromFile[$key] = $val;
+            }
+        }
+        ksort($envFromFile);
+
+        // Mask sensitive values from .env
         $masked = [];
-        foreach ($env as $k => $v) {
-            $val = (string)$v;
-            if (preg_match('/(SECRET|PASS|TOKEN|KEY)/i', $k)) {
-                $len = strlen($val);
-                $masked[$k] = $len > 6 ? substr($val, 0, 3) . str_repeat('*', $len - 6) . substr($val, -3) : str_repeat('*', $len);
+        foreach ($envFromFile as $k => $val) {
+            if ($isSensitive($k)) {
+                $masked[$k] = '*** hidden ***';
             } else {
                 $masked[$k] = $val;
             }
@@ -44,6 +76,21 @@ final class SystemController
         // Load full config array
         /** @var array $configArr */
         $configArr = require __DIR__ . '/../../Config/config.php';
+
+        // Mask sensitive values in config as well (recursively)
+        $maskConfig = static function (array $arr) use (&$maskConfig, $isSensitive): array {
+            $out = [];
+            foreach ($arr as $k => $v) {
+                $key = is_int($k) ? (string)$k : (string)$k;
+                if (is_array($v)) {
+                    $out[$k] = $maskConfig($v);
+                } else {
+                    $out[$k] = $isSensitive($key) ? '*** hidden ***' : $v;
+                }
+            }
+            return $out;
+        };
+        $configMasked = $maskConfig($configArr);
 
         $workerCommands = [
             'status' => [
@@ -86,7 +133,7 @@ final class SystemController
             'title' => 'System',
             'health' => $health,
             'env' => $masked,
-            'config' => $configArr,
+            'config' => $configMasked,
             'workerCommands' => $workerCommands,
             'queueSizes' => $queueSizes,
             'sendSpeed' => $sendSpeed,
