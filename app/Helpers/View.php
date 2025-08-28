@@ -33,20 +33,20 @@ final class View
 
         $currentPath = strtok($_SERVER['REQUEST_URI'] ?? '/', '?') ?: '/';
         $menu        = require $basePath . 'menu.php';
-        foreach ($menu as &$item) {
-            $url = rtrim($item['url'], '/');
-            if ($url === '/dashboard') {
-                $item['class'] = $currentPath === '/dashboard' ? 'active' : '';
-                continue;
+        self::markActive($menu, $currentPath);
+        $submenu = [];
+        foreach ($menu as $item) {
+            if (($item['class'] ?? '') === 'active' && isset($item['children'])) {
+                $submenu = $item['children'];
+                break;
             }
-            $item['class'] = ($currentPath === $url || str_starts_with($currentPath, $url . '/')) ? 'active' : '';
         }
-        unset($item);
 
         $vars = array_merge([
             'csrfToken'   => $csrfToken,
             'currentPath' => $currentPath,
             'menu'        => $menu,
+            'submenu'     => $submenu,
         ], $params);
 
         $templatePath = $basePath . ltrim($template, '/');
@@ -65,6 +65,96 @@ final class View
 
         $res->getBody()->write($content);
         return $res->withHeader('Content-Type', 'text/html');
+    }
+
+    /**
+     * Recursively marks active menu items based on current path.
+     *
+     * @param array  $items       Menu items
+     * @param string $currentPath Current request path
+     *
+     * @return void
+     */
+    private static function markActive(array &$items, string $currentPath): void
+    {
+        [$path] = self::findActivePath($items, $currentPath);
+        self::applyActive($items, $path);
+    }
+
+    /**
+     * Finds path to the menu item with the longest URL matching current path.
+     *
+     * @param array  $items       Menu items
+     * @param string $currentPath Current request path
+     *
+     * @return array{0:array<int,int>,1:int} Path indexes and match length
+     */
+    private static function findActivePath(array $items, string $currentPath): array
+    {
+        $bestPath   = [];
+        $bestLength = 0;
+
+        foreach ($items as $index => $item) {
+            $matchLength = 0;
+            $url         = isset($item['url']) ? rtrim($item['url'], '/') : null;
+            if ($url !== null) {
+                if ($url === '/dashboard') {
+                    $matchLength = $currentPath === '/dashboard' ? strlen($url) : 0;
+                } elseif ($currentPath === $url || str_starts_with($currentPath, $url . '/')) {
+                    $matchLength = strlen($url);
+                }
+            }
+
+            $childPath   = [];
+            $childLength = 0;
+            if (!empty($item['children']) && is_array($item['children'])) {
+                [$childPath, $childLength] = self::findActivePath($item['children'], $currentPath);
+            }
+
+            if ($childLength > $matchLength) {
+                $candidatePath   = array_merge([$index], $childPath);
+                $candidateLength = $childLength;
+            } elseif ($matchLength > 0) {
+                $candidatePath   = [$index];
+                $candidateLength = $matchLength;
+            } else {
+                $candidatePath   = [];
+                $candidateLength = 0;
+            }
+
+            if ($candidateLength > $bestLength) {
+                $bestPath   = $candidatePath;
+                $bestLength = $candidateLength;
+            }
+        }
+
+        return [$bestPath, $bestLength];
+    }
+
+    /**
+     * Applies `active` class to menu items along the given path.
+     *
+     * @param array $items Menu items passed by reference
+     * @param array $path  Path indexes to active item
+     *
+     * @return void
+     */
+    private static function applyActive(array &$items, array $path): void
+    {
+        foreach ($items as $index => &$item) {
+            if ($path !== [] && $index === $path[0]) {
+                $item['class'] = 'active';
+                if (!empty($item['children']) && is_array($item['children'])) {
+                    self::applyActive($item['children'], array_slice($path, 1));
+                }
+            } else {
+                $item['class'] = '';
+                if (!empty($item['children']) && is_array($item['children'])) {
+                    self::applyActive($item['children'], []);
+                }
+            }
+        }
+        unset($item);
     }
 }
 

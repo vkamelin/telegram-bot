@@ -9,6 +9,7 @@
  * @var string $csrfToken Токен CSRF
  * @var string $currentPath Текущий путь (без параметров запроса)
  * @var array $menu Меню
+ * @var array $submenu Подменю
  */
 ?>
 <!doctype html>
