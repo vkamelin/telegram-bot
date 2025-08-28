@@ -32,7 +32,8 @@ final class SystemController
         };
 
         // Load only variables explicitly defined in .env file
-        $envFile = dirname(__DIR__, 2) . '/.env';
+        // .env lives at project root; from app/Controllers/Dashboard go up 3 levels
+        $envFile = dirname(__DIR__, 3) . '/.env';
         $envFromFile = [];
         if (is_readable($envFile)) {
             $lines = @file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
@@ -41,7 +42,7 @@ final class SystemController
                 if ($trim === '' || str_starts_with($trim, '#')) {
                     continue;
                 }
-                if (!preg_match('/^([A-Z0-9_]+)\s*=\s*(.*)$/', $line, $m)) {
+                if (!preg_match('/^([A-Z0-9_]+)\s*=\s*(.*)$/', $trim, $m)) {
                     continue;
                 }
                 $key = $m[1];
