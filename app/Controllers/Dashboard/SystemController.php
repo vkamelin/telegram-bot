@@ -27,18 +27,23 @@ final class SystemController
     {
         $health = HealthService::check();
 
-        $envKeys = [
-            'APP_ENV',
-            'APP_DEBUG',
-            'DB_DSN',
-            'DB_USER',
-            'REDIS_DSN',
-            'TELEMETRY_ENABLED',
-        ];
-        $env = [];
-        foreach ($envKeys as $key) {
-            $env[$key] = $_ENV[$key] ?? null;
+        // Collect environment variables, mask sensitive values
+        $env = $_ENV;
+        ksort($env);
+        $masked = [];
+        foreach ($env as $k => $v) {
+            $val = (string)$v;
+            if (preg_match('/(SECRET|PASS|TOKEN|KEY)/i', $k)) {
+                $len = strlen($val);
+                $masked[$k] = $len > 6 ? substr($val, 0, 3) . str_repeat('*', $len - 6) . substr($val, -3) : str_repeat('*', $len);
+            } else {
+                $masked[$k] = $val;
+            }
         }
+
+        // Load full config array
+        /** @var array $configArr */
+        $configArr = require __DIR__ . '/../../Config/config.php';
 
         $workerCommands = [
             'status' => [
@@ -80,7 +85,8 @@ final class SystemController
         $data = [
             'title' => 'System',
             'health' => $health,
-            'env' => $env,
+            'env' => $masked,
+            'config' => $configArr,
             'workerCommands' => $workerCommands,
             'queueSizes' => $queueSizes,
             'sendSpeed' => $sendSpeed,

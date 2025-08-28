@@ -10,6 +10,8 @@ return [
     'app_env' => $_ENV['APP_ENV'] ?? 'prod',
     'debug' => (bool)($_ENV['APP_DEBUG'] ?? false),
     'bot_token' => $_ENV['BOT_TOKEN'] ?? null,
+    // Default chat ID for operations where a chat must be specified explicitly
+    'default_chat_id' => (int)($_ENV['DEFAULT_CHAT_ID'] ?? 0),
 
     'db' => [
         'dsn' => $_ENV['DB_DSN'] ?? null,   // 'mysql:host=127.0.0.1;dbname=app;charset=utf8mb4'

@@ -38,6 +38,23 @@
         </table>
     </div>
     <div class="col-md-6">
+        <h4>Конфигурация</h4>
+        <div class="bg-dark text-white p-2 rounded-3" style="max-height: 400px; overflow:auto">
+            <pre class="m-0"><code><?php
+            $print = function($arr, $indent = 0) use (&$print) {
+                foreach ($arr as $k => $v) {
+                    echo str_repeat('  ', $indent) . htmlspecialchars((string)$k) . ': ';
+                    if (is_array($v)) {
+                        echo "\n";
+                        $print($v, $indent + 1);
+                    } else {
+                        echo htmlspecialchars(var_export($v, true)) . "\n";
+                    }
+                }
+            };
+            $print($config);
+            ?></code></pre>
+        </div>
         <h4>Воркеры</h4>
         <h6>Проверка статуса</h6>
         <pre class="bg-dark text-white p-2 rounded-3"><code><?= implode("\n", $workerCommands['status']) ?></code></pre>

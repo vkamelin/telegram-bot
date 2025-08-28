@@ -17,7 +17,8 @@
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
     <div class="mb-3">
         <label for="chat_id" class="form-label">Chat ID</label>
-        <input type="text" class="form-control" id="chat_id" name="chat_id" value="<?= htmlspecialchars($invoice['chat_id'] ?? '') ?>">
+        <input type="text" class="form-control" id="chat_id" name="chat_id" value="<?= htmlspecialchars($invoice['chat_id'] ?? ($_ENV['DEFAULT_CHAT_ID'] ?? '')) ?>">
+        <div class="form-text">По умолчанию используется значение из .env: DEFAULT_CHAT_ID</div>
     </div>
     <div class="mb-3">
         <label for="title" class="form-label">Заголовок</label>

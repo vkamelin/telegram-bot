@@ -18,9 +18,10 @@ final class InvoicesController
 {
     public function create(Req $req, Res $res): Res
     {
+        $defaultChatId = (int)($_ENV['DEFAULT_CHAT_ID'] ?? 0);
         $params = [
             'title' => 'Invoice',
-            'invoice' => [],
+            'invoice' => ['chat_id' => $defaultChatId],
             'errors' => [],
         ];
 
@@ -31,6 +32,9 @@ final class InvoicesController
     {
         $data = (array)$req->getParsedBody();
         $chatId = (int)($data['chat_id'] ?? 0);
+        if ($chatId <= 0) {
+            $chatId = (int)($_ENV['DEFAULT_CHAT_ID'] ?? 0);
+        }
         $title = trim((string)($data['title'] ?? ''));
         $description = trim((string)($data['description'] ?? ''));
         $payload = trim((string)($data['payload'] ?? ''));
