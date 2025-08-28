@@ -1,6 +1,6 @@
 .idea
+.vscode
 /vendor/
 /.env
 *.log
-settings.json
 *.cache
