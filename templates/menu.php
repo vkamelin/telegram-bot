@@ -51,7 +51,7 @@ $menu = [
         ],
     ],
     [
-        'url'      => '/dashboard/tg-users',
+        'url'      => '/dashboard/updates',
         'title'    => 'Telegram',
         'icon'     => 'bi bi-telegram',
         'children' => [

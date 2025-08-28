@@ -112,7 +112,9 @@ final class View
                 [$childPath, $childLength] = self::findActivePath($item['children'], $currentPath);
             }
 
-            if ($childLength > $matchLength) {
+            // Prefer deeper match when lengths are equal and > 0,
+            // so that when parent URL equals first child URL, child becomes active.
+            if ($childLength > $matchLength || ($childLength === $matchLength && $childLength > 0)) {
                 $candidatePath = array_merge([$index], $childPath);
                 $candidateLength = $childLength;
             } elseif ($matchLength > 0) {
