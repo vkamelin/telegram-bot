@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -8,9 +9,9 @@ declare(strict_types=1);
 namespace App\Controllers\Dashboard;
 
 use App\Helpers\Flash;
-use App\Helpers\Push;
 use App\Helpers\MediaBuilder;
 use App\Helpers\Path;
+use App\Helpers\Push;
 use App\Helpers\Response;
 use App\Helpers\View;
 use PDO;
@@ -22,7 +23,9 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class MessagesController
 {
-    public function __construct(private PDO $db) {}
+    public function __construct(private PDO $db)
+    {
+    }
 
     /**
      * Saves uploaded file to persistent storage.
@@ -95,9 +98,9 @@ final class MessagesController
     public function data(Req $req, Res $res): Res
     {
         $p = (array)$req->getParsedBody();
-        $start  = max(0, (int)($p['start'] ?? 0));
+        $start = max(0, (int)($p['start'] ?? 0));
         $length = (int)($p['length'] ?? 10);
-        $draw   = (int)($p['draw'] ?? 0);
+        $draw = (int)($p['draw'] ?? 0);
         if ($length === -1) {
             $start = 0;
         }
@@ -178,7 +181,7 @@ final class MessagesController
     public function resend(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->db->prepare("INSERT INTO telegram_messages (user_id, method, `type`, data, priority) SELECT user_id, method, `type`, data, priority FROM telegram_messages WHERE id = :id");
+        $stmt = $this->db->prepare('INSERT INTO telegram_messages (user_id, method, `type`, data, priority) SELECT user_id, method, `type`, data, priority FROM telegram_messages WHERE id = :id');
         $stmt->execute(['id' => $id]);
         return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
     }
@@ -253,7 +256,7 @@ final class MessagesController
                 if ($text === '') {
                     $errors[] = 'text is required';
                 }
-                $sender = static fn(int $cid) => Push::text($cid, $text);
+                $sender = static fn (int $cid) => Push::text($cid, $text);
                 break;
 
             case 'photo':
@@ -271,7 +274,7 @@ final class MessagesController
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::photo($cid, $path, $caption, 'photo', 2, $options);
+                $sender = static fn (int $cid) => Push::photo($cid, $path, $caption, 'photo', 2, $options);
                 break;
 
             case 'audio':
@@ -296,7 +299,7 @@ final class MessagesController
                     $options['title'] = $data['title'];
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::audio($cid, $path, $caption, 'audio', 2, $options);
+                $sender = static fn (int $cid) => Push::audio($cid, $path, $caption, 'audio', 2, $options);
                 break;
 
             case 'video':
@@ -326,7 +329,7 @@ final class MessagesController
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::video($cid, $path, $caption, 'video', 2, $options);
+                $sender = static fn (int $cid) => Push::video($cid, $path, $caption, 'video', 2, $options);
                 break;
 
             case 'document':
@@ -341,7 +344,7 @@ final class MessagesController
                     $options['parse_mode'] = $data['parse_mode'];
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::document($cid, $path, $caption, 'document', 2, $options);
+                $sender = static fn (int $cid) => Push::document($cid, $path, $caption, 'document', 2, $options);
                 break;
 
             case 'sticker':
@@ -351,7 +354,7 @@ final class MessagesController
                     break;
                 }
                 $storedFiles[] = $path;
-                $sender = static fn(int $cid) => Push::sticker($cid, $path);
+                $sender = static fn (int $cid) => Push::sticker($cid, $path);
                 break;
 
             case 'animation':
@@ -381,7 +384,7 @@ final class MessagesController
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn(int $cid) => Push::animation($cid, $path, $caption, 'animation', 2, $options);
+                $sender = static fn (int $cid) => Push::animation($cid, $path, $caption, 'animation', 2, $options);
                 break;
 
             case 'voice':
@@ -402,7 +405,7 @@ final class MessagesController
                 if ($d !== null) {
                     $options['duration'] = $d;
                 }
-                $sender = static fn(int $cid) => Push::voice($cid, $path, 'voice', 2, $options);
+                $sender = static fn (int $cid) => Push::voice($cid, $path, 'voice', 2, $options);
                 break;
 
             case 'video_note':
@@ -421,7 +424,7 @@ final class MessagesController
                 if ($d !== null) {
                     $options['duration'] = $d;
                 }
-                $sender = static fn(int $cid) => Push::videoNote($cid, $path, 'video-note', 2, $options);
+                $sender = static fn (int $cid) => Push::videoNote($cid, $path, 'video-note', 2, $options);
                 break;
 
             case 'media_group':
@@ -437,7 +440,7 @@ final class MessagesController
                         $storedPath = $this->storeUploadedFile([
                             'tmp_name' => $tmp,
                             'error' => $uploads['error'][$idx] ?? UPLOAD_ERR_OK,
-                            'name' => $uploads['name'][$idx] ?? ''
+                            'name' => $uploads['name'][$idx] ?? '',
                         ]);
                         if ($storedPath === null) {
                             continue;
@@ -457,7 +460,7 @@ final class MessagesController
                     $errors[] = 'media is required';
                     break;
                 }
-                $sender = static fn(int $cid) => Push::mediaGroup($cid, $media);
+                $sender = static fn (int $cid) => Push::mediaGroup($cid, $media);
                 break;
 
             default:

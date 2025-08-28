@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -22,7 +23,9 @@ final class TelegramInitDataMiddleware implements MiddlewareInterface
     /**
      * @param string $botToken Токен бота для проверки подписи
      */
-    public function __construct(private string $botToken) {}
+    public function __construct(private string $botToken)
+    {
+    }
 
     /**
      * Валидирует init data и добавляет данные пользователя в запрос.

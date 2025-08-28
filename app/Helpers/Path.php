@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-use App\Config;
-
 final class Path
 {
     private function __construct()
@@ -18,4 +16,3 @@ final class Path
         return $baseDir . ($path !== '' ? '/' . ltrim($path, '/\\') : '');
     }
 }
-

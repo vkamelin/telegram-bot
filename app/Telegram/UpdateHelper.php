@@ -46,7 +46,7 @@ final class UpdateHelper
     {
         return $update->getRawData()['removed_chat_boost'] ?? null;
     }
-    
+
     public static function getUserId(Update $update): ?int
     {
         $sources = [
@@ -64,7 +64,7 @@ final class UpdateHelper
             ['method' => 'getChatMember', 'getFrom' => true],
             ['method' => 'getChatJoinRequest', 'getFrom' => true],
         ];
-        
+
         foreach ($sources as $source) {
             $object = $update->{$source['method']}();
             if ($object) {
@@ -76,13 +76,12 @@ final class UpdateHelper
                 }
             }
         }
-        
+
         $reaction = self::getMessageReaction($update);
         if ($reaction !== null && isset($reaction['user']['id'])) {
             return (int)$reaction['user']['id'];
         }
-        
+
         return null;
     }
 }
-

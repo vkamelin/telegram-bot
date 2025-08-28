@@ -19,13 +19,13 @@ final class HealthService
      */
     public static function check(): array
     {
-        $db     = self::checkDb();
-        $redis  = self::checkRedis();
+        $db = self::checkDb();
+        $redis = self::checkRedis();
         $worker = self::checkWorker();
 
         return [
-            'db'     => $db,
-            'redis'  => $redis,
+            'db' => $db,
+            'redis' => $redis,
             'worker' => $worker,
             'status' => ($db && $redis && $worker) ? 'ok' : 'fail',
         ];
@@ -66,7 +66,7 @@ final class HealthService
     private static function checkWorker(): bool
     {
         try {
-            $output    = [];
+            $output = [];
             $returnVar = 0;
             @exec('supervisorctl status', $output, $returnVar);
             if ($returnVar !== 0) {
@@ -75,7 +75,7 @@ final class HealthService
 
             $groups = [
                 'gpt' => '/^gpt:gpt-\d+\s+RUNNING\b/',
-                'tg'  => '/^tg:tg-\d+\s+RUNNING\b/',
+                'tg' => '/^tg:tg-\d+\s+RUNNING\b/',
             ];
 
             foreach ($groups as $group => $pattern) {
@@ -95,7 +95,7 @@ final class HealthService
 
             $lpLines = array_values(array_filter(
                 $output,
-                static fn(string $line): bool => str_starts_with($line, 'lp')
+                static fn (string $line): bool => str_starts_with($line, 'lp')
             ));
 
             if (count($lpLines) !== 1 || ! preg_match('/^lp\s+RUNNING\b/', $lpLines[0])) {

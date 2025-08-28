@@ -2,13 +2,13 @@
 
 namespace App\Helpers;
 
+use App\Config;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\UidProcessor;
 use RuntimeException;
-use App\Config;
 
 /**
  * Обёртка над Monolog для централизованного логирования.

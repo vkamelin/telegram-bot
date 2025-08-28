@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use PDO;
-use RuntimeException;
 
 /**
  * Service responsible for issuing, validating and revoking refresh tokens.
@@ -21,7 +20,7 @@ final class RefreshTokenService
      */
     public function __construct(PDO $db, int $ttl = 2592000)
     {
-        $this->db  = $db;
+        $this->db = $db;
         $this->ttl = $ttl; // default 30 days
     }
 
@@ -36,15 +35,15 @@ final class RefreshTokenService
     public function generate(int $userId, string $jti): string
     {
         $token = bin2hex(random_bytes(32));
-        $hash  = hash('sha256', $token);
+        $hash = hash('sha256', $token);
         $expires = time() + $this->ttl;
 
         $stmt = $this->db->prepare('INSERT INTO refresh_tokens (user_id, token_hash, jti, expires_at) VALUES (:uid, :hash, :jti, :exp)');
         $stmt->execute([
-            'uid'  => $userId,
+            'uid' => $userId,
             'hash' => $hash,
-            'jti'  => $jti,
-            'exp'  => $expires,
+            'jti' => $jti,
+            'exp' => $expires,
         ]);
 
         return $token;

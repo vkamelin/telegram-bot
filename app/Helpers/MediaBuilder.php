@@ -26,7 +26,7 @@ class MediaBuilder
             'type' => $type,
             'media' => $media,
         ];
-        
+
         // Обработка подписи и режима парсинга. Нужно учитывать случаи,
         // когда параметр передан со значением null - такой параметр не
         // должен попадать в итоговый массив, однако его наличие не должно
@@ -34,14 +34,14 @@ class MediaBuilder
         if (array_key_exists('caption', $options)) {
             $caption = $options['caption'];
             unset($options['caption']);
-            
+
             if ($caption !== null && $caption !== '') {
                 $data['caption'] = $caption;
-                
+
                 if (array_key_exists('parse_mode', $options)) {
                     $parseMode = $options['parse_mode'];
                     unset($options['parse_mode']);
-                    
+
                     if ($parseMode !== null && $parseMode !== '') {
                         $data['parse_mode'] = $parseMode;
                     }
@@ -54,7 +54,7 @@ class MediaBuilder
                 // обработать значение parse_mode и исключить null.
                 $parseMode = $options['parse_mode'];
                 unset($options['parse_mode']);
-                
+
                 if ($parseMode !== null && $parseMode !== '') {
                     $data['parse_mode'] = $parseMode;
                 }
@@ -62,18 +62,18 @@ class MediaBuilder
         } elseif (array_key_exists('parse_mode', $options)) {
             $parseMode = $options['parse_mode'];
             unset($options['parse_mode']);
-            
+
             if ($parseMode !== null && $parseMode !== '') {
                 $data['parse_mode'] = $parseMode;
             }
         }
-        
+
         // Удаляем из options параметры со значением null
-        $options = array_filter($options, static fn($value) => $value !== null);
-        
+        $options = array_filter($options, static fn ($value) => $value !== null);
+
         return array_merge($data, $options);
     }
-    
+
     /**
      * Подготавливает данные для медиа-запросов Telegram API.
      *
@@ -96,26 +96,26 @@ class MediaBuilder
             $payload = $media;
         } else {
             $method = 'inputMedia' . ucfirst($mediaType);
-            
+
             if (method_exists(self::class, $method)) {
                 $ref = new \ReflectionMethod(self::class, $method);
                 $args = [];
-                
+
                 foreach ($ref->getParameters() as $param) {
                     $name = $param->getName();
-                    
+
                     if ($name === 'media') {
                         $args[] = $media;
                         continue;
                     }
-                    
+
                     if ($name === 'caption') {
                         $args[] = $caption !== '' ? $caption : null;
                         continue;
                     }
-                    
+
                     $optionName = self::camelToSnake($name);
-                    
+
                     if (array_key_exists($optionName, $options)) {
                         $args[] = $options[$optionName];
                         unset($options[$optionName]);
@@ -125,35 +125,35 @@ class MediaBuilder
                         $args[] = null;
                     }
                 }
-                
+
                 $payload = $ref->invokeArgs(null, $args);
             } else {
                 $payload = self::buildInputMedia($mediaType, $media, ['caption' => $caption]);
             }
         }
-        
+
         $data = [
             'chat_id' => $chatId,
             $mediaType => $payload['media'],
         ];
-        
+
         unset($payload['type'], $payload['media']);
-        
+
         if ($caption !== '' && !array_key_exists('caption', $payload)) {
             $payload['caption'] = $caption;
-            
+
             if (!array_key_exists('parse_mode', $payload)) {
                 $payload['parse_mode'] = 'html';
             }
         }
-        
+
         // Удаляем параметры со значением null как из payload, так и из options
-        $payload = array_filter($payload, static fn($value) => $value !== null);
-        $options = array_filter($options, static fn($value) => $value !== null);
-        
+        $payload = array_filter($payload, static fn ($value) => $value !== null);
+        $options = array_filter($options, static fn ($value) => $value !== null);
+
         return array_merge($data, $payload, $options);
     }
-    
+
     /**
      * @param string      $media                 Файл для отправки. Передайте file_id для отправки файла, который
      *                                           существует на серверах Telegram (рекомендуется), передайте URL-адрес
@@ -178,28 +178,28 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-        
+
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
         ];
-        
+
         if ($showCaptionAboveMedia) {
             $options['show_caption_above_media'] = true;
         }
-        
+
         if ($has_spoiler) {
             $options['has_spoiler'] = true;
         }
-        
+
         $data = self::buildInputMedia('photo', $media, $options);
-        
+
         return array_filter(
             $data,
-            static fn($value) => $value !== null && $value !== ''
+            static fn ($value) => $value !== null && $value !== ''
         );
     }
-    
+
     /**
      * @param string      $media                 Файл для отправки. Передайте file_id для отправки файла, который
      *                                           существует на серверах Telegram (рекомендуется), передайте URL-адрес
@@ -250,7 +250,7 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-        
+
         foreach (
             [
                 'width' => $width,
@@ -263,7 +263,7 @@ class MediaBuilder
                 throw new RuntimeException(sprintf('%s не может быть отрицательным', $name));
             }
         }
-        
+
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
@@ -274,27 +274,27 @@ class MediaBuilder
             'height' => $height,
             'duration' => $duration,
         ];
-        
+
         if ($showCaptionAboveMedia) {
             $options['show_caption_above_media'] = true;
         }
-        
+
         if ($supportsStreaming) {
             $options['supports_streaming'] = true;
         }
-        
+
         if ($has_spoiler) {
             $options['has_spoiler'] = true;
         }
-        
+
         $data = self::buildInputMedia('video', $media, $options);
-        
+
         return array_filter(
             $data,
-            static fn($value) => $value !== null && $value !== ''
+            static fn ($value) => $value !== null && $value !== ''
         );
     }
-    
+
     /**
      * @param string      $media       Файл для отправки. Передайте file_id для отправки файла, который существует на
      *                                 серверах Telegram (рекомендуется), передайте URL-адрес HTTP для Telegram, чтобы
@@ -329,7 +329,7 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-        
+
         foreach (
             [
                 'width' => $width,
@@ -341,7 +341,7 @@ class MediaBuilder
                 throw new RuntimeException(sprintf('%s не может быть отрицательным', $name));
             }
         }
-        
+
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
@@ -350,19 +350,19 @@ class MediaBuilder
             'height' => $height,
             'duration' => $duration,
         ];
-        
+
         if ($has_spoiler) {
             $options['has_spoiler'] = true;
         }
-        
+
         $data = self::buildInputMedia('animation', $media, $options);
-        
+
         return array_filter(
             $data,
-            static fn($value) => $value !== null && $value !== ''
+            static fn ($value) => $value !== null && $value !== ''
         );
     }
-    
+
     /**
      * @param string      $media                        Файл для отправки. Передайте file_id для отправки файла,
      *                                                  который существует на серверах Telegram (рекомендуется),
@@ -402,7 +402,7 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-        
+
         foreach (
             [
                 'performer' => $performer,
@@ -413,11 +413,11 @@ class MediaBuilder
                 throw new RuntimeException(sprintf('Длина %s должна быть не более 64 символов', $name));
             }
         }
-        
+
         if ($duration !== null && $duration < 0) {
             throw new RuntimeException('duration не может быть отрицательным');
         }
-        
+
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
@@ -426,15 +426,15 @@ class MediaBuilder
             'performer' => $performer !== '' ? $performer : null,
             'title' => $title !== '' ? $title : null,
         ];
-        
+
         $data = self::buildInputMedia('audio', $media, $options);
-        
+
         return array_filter(
             $data,
-            static fn($value) => $value !== null && $value !== ''
+            static fn ($value) => $value !== null && $value !== ''
         );
     }
-    
+
     /**
      * @param string      $media                       Файл для отправки. Передайте file_id для отправки файла, который
      *                                                 существует на серверах Telegram (рекомендуется), передайте
@@ -470,25 +470,25 @@ class MediaBuilder
         if ($caption !== null && $caption !== '' && mb_strlen($caption) > 1024) {
             throw new RuntimeException('Длина подписи должна быть не более 1024 символов');
         }
-        
+
         $options = [
             'caption' => $caption !== '' ? $caption : null,
             'parse_mode' => $parseMode,
             'thumbnail' => $thumbnail,
         ];
-        
+
         if ($disableContentTypeDetection) {
             $options['disable_content_type_detection'] = true;
         }
-        
+
         $data = self::buildInputMedia('document', $media, $options);
-        
+
         return array_filter(
             $data,
-            static fn($value) => $value !== null && $value !== ''
+            static fn ($value) => $value !== null && $value !== ''
         );
     }
-    
+
     private static function camelToSnake(string $input): string
     {
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $input));

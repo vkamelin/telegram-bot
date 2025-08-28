@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for managing uploaded files.
  */
@@ -33,9 +34,9 @@ final class FilesController
     public function data(Req $req, Res $res): Res
     {
         $p = (array)$req->getParsedBody();
-        $start  = max(0, (int)($p['start'] ?? 0));
+        $start = max(0, (int)($p['start'] ?? 0));
         $length = (int)($p['length'] ?? 10);
-        $draw   = (int)($p['draw'] ?? 0);
+        $draw = (int)($p['draw'] ?? 0);
         if ($length === -1) {
             $start = 0;
         }

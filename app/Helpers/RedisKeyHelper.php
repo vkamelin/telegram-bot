@@ -8,7 +8,6 @@ use App\Config;
 
 final class RedisKeyHelper
 {
-
     /**
      * Ключ для Redis
      *
@@ -28,7 +27,7 @@ final class RedisKeyHelper
         }
         return implode(':', $parts);
     }
-    
+
     /**
      * Ключ для записи в Redis
      *
@@ -42,7 +41,7 @@ final class RedisKeyHelper
     {
         return self::key($context, $entity, $id = null);
     }
-    
+
     /**
      * Ключ для чтения из Redis
      *
@@ -57,4 +56,3 @@ final class RedisKeyHelper
         return self::key($context, $entity, $id);
     }
 }
-

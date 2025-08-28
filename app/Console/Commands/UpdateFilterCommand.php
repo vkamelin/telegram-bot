@@ -18,11 +18,11 @@ class UpdateFilterCommand extends Command
     public function handle(array $arguments, Kernel $kernel): int
     {
         if (in_array('--help', $arguments, true)) {
-            echo "Manage Telegram update filter lists stored in Redis." . PHP_EOL;
+            echo 'Manage Telegram update filter lists stored in Redis.' . PHP_EOL;
             echo PHP_EOL;
-            echo "Examples:" . PHP_EOL;
-            echo "  php run.php filter:update" . PHP_EOL;
-            echo "  php run.php filter:update --help" . PHP_EOL;
+            echo 'Examples:' . PHP_EOL;
+            echo '  php run.php filter:update' . PHP_EOL;
+            echo '  php run.php filter:update --help' . PHP_EOL;
             return 0;
         }
 

@@ -27,13 +27,13 @@ class DefaultCommandHandler extends AbstractCommandHandler
             return;
         }
 
-        $parts    = explode(' ', $text);
-        $command  = ltrim(array_shift($parts), '/');
+        $parts = explode(' ', $text);
+        $command = ltrim(array_shift($parts), '/');
         $arguments = $parts;
 
         try {
             $data = json_encode([
-                'command'   => $command,
+                'command' => $command,
                 'arguments' => $arguments,
             ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
         } catch (JsonException) {
@@ -45,17 +45,17 @@ class DefaultCommandHandler extends AbstractCommandHandler
             . 'VALUES (:update_id, :user_id, :message_id, :type, :data, :sent_at)'
         );
         $stmt->execute([
-            'update_id'  => $update->getUpdateId(),
-            'user_id'    => $message->getFrom()->getId(),
+            'update_id' => $update->getUpdateId(),
+            'user_id' => $message->getFrom()->getId(),
             'message_id' => $message->getMessageId(),
-            'type'       => 'command',
-            'data'       => $data,
-            'sent_at'    => date('c', $message->getDate()),
+            'type' => 'command',
+            'data' => $data,
+            'sent_at' => date('c', $message->getDate()),
         ]);
 
         Request::sendMessage([
             'chat_id' => $message->getChat()->getId(),
-            'text'    => 'Команда обработана',
+            'text' => 'Команда обработана',
         ]);
     }
 }

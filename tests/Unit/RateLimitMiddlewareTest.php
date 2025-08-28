@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Middleware\RateLimitMiddleware;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
+use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Factory\ServerRequestFactory;
 use Slim\Psr7\Response as Psr7Response;
-use App\Middleware\RateLimitMiddleware;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 
 final class RateLimitMiddlewareTest extends TestCase
 {
@@ -19,7 +19,7 @@ final class RateLimitMiddlewareTest extends TestCase
         $req1 = (new ServerRequestFactory())->createServerRequest('GET', '/')
             ->withAttribute('telegramUser', ['id' => 1])
             ->withServerParams(['REMOTE_ADDR' => '8.8.8.8']);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();
@@ -46,7 +46,7 @@ final class RateLimitMiddlewareTest extends TestCase
     {
         $middleware = new RateLimitMiddleware(['bucket' => 'user', 'limit' => 1]);
 
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();

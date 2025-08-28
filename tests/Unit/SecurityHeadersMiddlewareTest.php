@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Middleware\SecurityHeadersMiddleware;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
+use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Factory\ServerRequestFactory;
 use Slim\Psr7\Response as Psr7Response;
-use App\Middleware\SecurityHeadersMiddleware;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 
 final class SecurityHeadersMiddlewareTest extends TestCase
 {
@@ -33,7 +33,7 @@ final class SecurityHeadersMiddlewareTest extends TestCase
 
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/')
             ->withHeader('Origin', 'https://example.com');
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();
@@ -66,7 +66,7 @@ final class SecurityHeadersMiddlewareTest extends TestCase
 
         $req = (new ServerRequestFactory())->createServerRequest('OPTIONS', '/')
             ->withHeader('Origin', 'https://example.com');
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response(500);

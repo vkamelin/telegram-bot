@@ -21,10 +21,10 @@ class RedisHelper
     public const string REDIS_MESSAGES_QUEUE_KEY = 'telegram:message:queue';
     public const string REDIS_LONGPOLLING_OFFSET_KEY = 'telegram:longpolling:offset';
     public const string REDIS_USER_KEY = 'telegram:user';
-    
+
     /** @var Redis|null */
     private static ?Redis $instance = null;
-    
+
     /**
      * Get a singleton Redis instance.
      *
@@ -36,18 +36,18 @@ class RedisHelper
         if (self::$instance instanceof Redis) {
             return self::$instance;
         }
-        
+
         $redis = new Redis();
-        
+
         // Connect via socket or TCP
         $redis->pconnect($_ENV['REDIS_HOST'], (int)$_ENV['REDIS_PORT'], 1.0);
-        
+
         // Apply key prefix before selecting the DB
         $prefix = (string)$_ENV['REDIS_PREFIX'];
         if ($prefix !== '') {
             $redis->setOption(Redis::OPT_PREFIX, $prefix);
         }
-        
+
         // General options
         $redis->setOption(Redis::OPT_MAX_RETRIES, 3);
         $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_JSON);
@@ -59,14 +59,14 @@ class RedisHelper
         $redis->setOption(Redis::OPT_BACKOFF_ALGORITHM, Redis::BACKOFF_ALGORITHM_EXPONENTIAL);
         $redis->setOption(Redis::OPT_BACKOFF_BASE, 100);
         $redis->setOption(Redis::OPT_BACKOFF_CAP, 1000);
-        
+
         // Select the configured database
         $dbIndex = (int)$_ENV['REDIS_DB'];
         $redis->select($dbIndex);
-        
+
         return self::$instance = $redis;
     }
-    
+
     /**
      * Store or update arbitrary user data in a Redis hash.
      *
@@ -80,11 +80,11 @@ class RedisHelper
     {
         $redis = self::getInstance();
         $key = self::REDIS_USER_KEY . ":{$userId}";
-        
+
         // Use HMSET to write all fields in one command
         $redis->hMSet($key, $data);
     }
-    
+
     /**
      * Remove an entire user hash from Redis.
      *
@@ -97,10 +97,10 @@ class RedisHelper
     {
         $redis = self::getInstance();
         $key = self::REDIS_USER_KEY . ":{$userId}";
-        
+
         return (int)$redis->del($key);
     }
-    
+
     /**
      * Remove specific fields from a user hash.
      *
@@ -114,10 +114,10 @@ class RedisHelper
     {
         $redis = self::getInstance();
         $key = self::REDIS_USER_KEY . ":{$userId}";
-        
+
         return (int)$redis->hDel($key, ...$fields);
     }
-    
+
     /**
      * Retrieve all data for a user hash.
      *
@@ -130,7 +130,7 @@ class RedisHelper
     {
         $redis = self::getInstance();
         $key = self::REDIS_USER_KEY . ":{$userId}";
-        
+
         $data = $redis->hGetAll($key);
         return is_array($data) ? $data : [];
     }

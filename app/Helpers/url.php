@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 if (!function_exists('url')) {
@@ -11,4 +12,3 @@ if (!function_exists('url')) {
         return $base . '/' . ltrim($path, '/');
     }
 }
-

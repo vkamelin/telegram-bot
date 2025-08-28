@@ -30,7 +30,7 @@ final class WorkerHandlerCommand extends Command
         }
 
         $handler = $_ENV['WORKER_HANDLER_PATH'] ?? dirname(__DIR__, 3) . '/workers/handler.php';
-        
+
         Logger::info('Handling update payload', ['path' => $handler]);
 
         require $handler;

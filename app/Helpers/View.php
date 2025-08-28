@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Helpers;
@@ -23,16 +24,16 @@ final class View
      */
     public static function render(Res $res, string $template, array $params = [], ?string $layout = null): Res
     {
-        $basePath    = dirname(__DIR__, 2) . '/templates/';
+        $basePath = dirname(__DIR__, 2) . '/templates/';
 
-        $csrfName  = $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token';
+        $csrfName = $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token';
         $csrfToken = $_COOKIE[$csrfName] ?? bin2hex(random_bytes(16));
         if (!isset($_COOKIE[$csrfName])) {
             setcookie($csrfName, $csrfToken, ['path' => '/']);
         }
 
         $currentPath = strtok($_SERVER['REQUEST_URI'] ?? '/', '?') ?: '/';
-        $menu        = require $basePath . 'menu.php';
+        $menu = require $basePath . 'menu.php';
         self::markActive($menu, $currentPath);
         $submenu = [];
         foreach ($menu as $item) {
@@ -43,10 +44,10 @@ final class View
         }
 
         $vars = array_merge([
-            'csrfToken'   => $csrfToken,
+            'csrfToken' => $csrfToken,
             'currentPath' => $currentPath,
-            'menu'        => $menu,
-            'submenu'     => $submenu,
+            'menu' => $menu,
+            'submenu' => $submenu,
         ], $params);
 
         $templatePath = $basePath . ltrim($template, '/');
@@ -91,12 +92,12 @@ final class View
      */
     private static function findActivePath(array $items, string $currentPath): array
     {
-        $bestPath   = [];
+        $bestPath = [];
         $bestLength = 0;
 
         foreach ($items as $index => $item) {
             $matchLength = 0;
-            $url         = isset($item['url']) ? rtrim($item['url'], '/') : null;
+            $url = isset($item['url']) ? rtrim($item['url'], '/') : null;
             if ($url !== null) {
                 if ($url === '/dashboard') {
                     $matchLength = $currentPath === '/dashboard' ? strlen($url) : 0;
@@ -105,25 +106,25 @@ final class View
                 }
             }
 
-            $childPath   = [];
+            $childPath = [];
             $childLength = 0;
             if (!empty($item['children']) && is_array($item['children'])) {
                 [$childPath, $childLength] = self::findActivePath($item['children'], $currentPath);
             }
 
             if ($childLength > $matchLength) {
-                $candidatePath   = array_merge([$index], $childPath);
+                $candidatePath = array_merge([$index], $childPath);
                 $candidateLength = $childLength;
             } elseif ($matchLength > 0) {
-                $candidatePath   = [$index];
+                $candidatePath = [$index];
                 $candidateLength = $matchLength;
             } else {
-                $candidatePath   = [];
+                $candidatePath = [];
                 $candidateLength = 0;
             }
 
             if ($candidateLength > $bestLength) {
-                $bestPath   = $candidatePath;
+                $bestPath = $candidatePath;
                 $bestLength = $candidateLength;
             }
         }
@@ -157,4 +158,3 @@ final class View
         unset($item);
     }
 }
-

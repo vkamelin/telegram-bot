@@ -25,7 +25,7 @@ class CacheClearCommand extends Command
                 }
             }
         }
-        echo "Cache cleared." . PHP_EOL;
+        echo 'Cache cleared.' . PHP_EOL;
         return 0;
     }
 }

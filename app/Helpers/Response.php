@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -40,8 +41,8 @@ final class Response
     public static function problem(Res $res, int $status, string $title, array $extra = []): Res
     {
         $body = array_merge([
-            'type'   => 'about:blank',
-            'title'  => $title,
+            'type' => 'about:blank',
+            'title' => $title,
             'status' => $status,
         ], $extra);
         $res->getBody()->write(json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));

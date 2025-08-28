@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace Longman\TelegramBot {
     class PhotoSize
     {
-        public function __construct(private string $fileId) {}
-        public function getFileId(): string { return $this->fileId; }
+        public function __construct(private string $fileId)
+        {
+        }
+        public function getFileId(): string
+        {
+            return $this->fileId;
+        }
     }
     class Message
     {
@@ -17,18 +22,32 @@ namespace Longman\TelegramBot {
             $this->photo = $photo;
         }
         /** @return PhotoSize[] */
-        public function getPhoto(): array { return $this->photo; }
+        public function getPhoto(): array
+        {
+            return $this->photo;
+        }
     }
     class ServerResponse
     {
-        public function __construct(private Message $result) {}
-        public function isOk(): bool { return true; }
-        public function getResult(): Message { return $this->result; }
+        public function __construct(private Message $result)
+        {
+        }
+        public function isOk(): bool
+        {
+            return true;
+        }
+        public function getResult(): Message
+        {
+            return $this->result;
+        }
     }
     class Request
     {
         public static array $last = [];
-        public static function encodeFile(string $path): string { return $path; }
+        public static function encodeFile(string $path): string
+        {
+            return $path;
+        }
         public static function sendPhoto(array $params): ServerResponse
         {
             self::$last = ['sendPhoto', $params];
@@ -63,8 +82,8 @@ namespace Longman\TelegramBot {
 }
 
 namespace Tests\Unit {
-    use App\Services\FileService;
     use App\Helpers\Database;
+    use App\Services\FileService;
     use PDO;
     use PHPUnit\Framework\TestCase;
     use ReflectionClass;

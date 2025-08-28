@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -7,9 +8,9 @@ declare(strict_types=1);
 
 namespace App\Controllers\Dashboard;
 
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\View;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
 
 /**
  * Контроллер авторизации панели управления.
@@ -46,7 +47,7 @@ final class AuthController
 
         $data = (array)$req->getParsedBody();
         $email = (string)($data['email'] ?? '');
-        $pass  = (string)($data['password'] ?? '');
+        $pass = (string)($data['password'] ?? '');
 
         $stmt = $db->prepare('SELECT id, password FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);

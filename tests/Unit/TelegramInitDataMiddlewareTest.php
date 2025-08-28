@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Middleware\TelegramInitDataMiddleware;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
+use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Factory\ServerRequestFactory;
 use Slim\Psr7\Response as Psr7Response;
-use App\Middleware\TelegramInitDataMiddleware;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 
 final class TelegramInitDataMiddlewareTest extends TestCase
 {
@@ -38,7 +38,7 @@ final class TelegramInitDataMiddlewareTest extends TestCase
         $init = $this->buildInitData(['id' => 1, 'username' => 'test']);
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/')
             ->withHeader('X-Telegram-Init-Data', $init);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public ?Req $captured = null;
             public function handle(Req $request): Res
             {
@@ -63,7 +63,7 @@ final class TelegramInitDataMiddlewareTest extends TestCase
         $init .= 'broken';
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/')
             ->withHeader('X-Telegram-Init-Data', $init);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();
@@ -81,7 +81,7 @@ final class TelegramInitDataMiddlewareTest extends TestCase
         $init = $this->buildInitData(['id' => 1], $expired);
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/')
             ->withHeader('X-Telegram-Init-Data', $init);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();

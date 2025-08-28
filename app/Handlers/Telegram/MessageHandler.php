@@ -9,9 +9,9 @@ use App\Handlers\Telegram\Commands\ResetCommandHandler;
 use App\Handlers\Telegram\Commands\StartCommandHandler;
 use App\Handlers\Telegram\Messages\TextMessageHandler;
 use App\Handlers\Telegram\Messages\WriteAccessAllowedMessageHandler;
-use Longman\TelegramBot\Entities\WriteAccessAllowed;
 use Exception;
 use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Entities\WriteAccessAllowed;
 
 class MessageHandler
 {

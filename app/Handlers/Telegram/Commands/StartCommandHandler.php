@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Handlers\Telegram\Commands;
 
 use App\Helpers\Logger;
-use App\Helpers\Push;
 use App\Helpers\MessageStorage;
+use App\Helpers\Push;
 use Exception;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Update;
@@ -14,7 +14,6 @@ use Longman\TelegramBot\Request;
 
 class StartCommandHandler extends AbstractCommandHandler
 {
-
     /**
      * @param Update $update
      *
@@ -53,7 +52,7 @@ class StartCommandHandler extends AbstractCommandHandler
         }
 
         // Проверяем, существует ли пользователь в базе данных
-        $stmt = $this->db->prepare("SELECT `id` FROM telegram_users WHERE user_id = :user_id LIMIT 1");
+        $stmt = $this->db->prepare('SELECT `id` FROM telegram_users WHERE user_id = :user_id LIMIT 1');
         $stmt->execute(['user_id' => $chatId]);
         $userExists = $stmt->fetch();
 
@@ -62,7 +61,7 @@ class StartCommandHandler extends AbstractCommandHandler
             $referralCode = uniqid('REF', true);
 
             $stmt = $this->db->prepare(
-                "INSERT INTO telegram_users (user_id, username, first_name, last_name, language_code, utm, is_premium, referral_code, invited_user_id) VALUES (:user_id, :username, :first_name, :last_name, :language_code, :utm, :is_premium, :referral_code, :invited_user_id)"
+                'INSERT INTO telegram_users (user_id, username, first_name, last_name, language_code, utm, is_premium, referral_code, invited_user_id) VALUES (:user_id, :username, :first_name, :last_name, :language_code, :utm, :is_premium, :referral_code, :invited_user_id)'
             );
             $stmt->execute([
                 'user_id' => $chatId,
@@ -77,7 +76,7 @@ class StartCommandHandler extends AbstractCommandHandler
             ]);
         } else {
             $stmt = $this->db->prepare(
-                "UPDATE telegram_users SET username = :username, first_name = :first_name, last_name = :last_name, language_code = :language_code, utm = :utm, is_premium = :is_premium, is_user_banned = 0 WHERE user_id = :user_id"
+                'UPDATE telegram_users SET username = :username, first_name = :first_name, last_name = :last_name, language_code = :language_code, utm = :utm, is_premium = :is_premium, is_user_banned = 0 WHERE user_id = :user_id'
             );
             $stmt->execute([
                 'user_id' => $chatId,
@@ -118,8 +117,8 @@ class StartCommandHandler extends AbstractCommandHandler
                 'type' => 'web_app',
                 'text' => 'Играть',
                 'web_app' => [
-                    'url' => $_ENV['WEB_APP_URL'] . '/?' . $utmString
-                ]
+                    'url' => $_ENV['WEB_APP_URL'] . '/?' . $utmString,
+                ],
             ], JSON_THROW_ON_ERROR),
         ]);
     }
@@ -170,7 +169,7 @@ class StartCommandHandler extends AbstractCommandHandler
                 $referralCode = str_replace('code___', '', $string);
 
                 // Проверяем, существует ли реферальный код в базе данных
-                $stmt = $this->db->prepare("SELECT `user_id` FROM telegram_users WHERE referral_code = :referral_code LIMIT 1");
+                $stmt = $this->db->prepare('SELECT `user_id` FROM telegram_users WHERE referral_code = :referral_code LIMIT 1');
                 $stmt->execute(['referral_code' => $referralCode]);
                 $result = $stmt->fetch();
 

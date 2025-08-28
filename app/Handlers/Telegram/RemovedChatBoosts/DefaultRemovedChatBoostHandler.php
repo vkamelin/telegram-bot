@@ -18,7 +18,7 @@ class DefaultRemovedChatBoostHandler extends AbstractRemovedChatBoostHandler
         if ($removedChatBoost === null) {
             return;
         }
-        
+
         $chat = $removedChatBoost['chat'] ?? [];
         $boost = $removedChatBoost['boost'] ?? [];
         $reason = $removedChatBoost['reason'] ?? ($boost['reason'] ?? null);

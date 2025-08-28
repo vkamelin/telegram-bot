@@ -21,14 +21,14 @@ class Database
      *   — PDO при удачном подключении
      */
     private static ?PDO $instance = null;
-    
+
     /** Максимальное число попыток подключения */
     private const int MAX_TRIES = 3;
     /** Секунд ждать между повторами */
     private const int RETRY_DELAY = 1;
-    
+
     private static int $lastPing = 0;
-    
+
     /**
      * Возвращает живой PDO-инстанс или бросает RuntimeException.
      *
@@ -45,10 +45,10 @@ class Database
             $config = self::loadConfig();
             self::$instance = self::connectWithRetry($config);
         }
-        
+
         return self::$instance;
     }
-    
+
     /**
      * Проверяет «живость» PDO через SELECT 1.
      *
@@ -70,7 +70,7 @@ class Database
             return false;
         }
     }
-    
+
     /**
      * Пробует подключиться до MAX_TRIES раз, кидает исключение при неудаче.
      *
@@ -81,7 +81,7 @@ class Database
     private static function connectWithRetry(array $config): PDO
     {
         $lastException = null;
-        
+
         for ($attempt = 1; $attempt <= self::MAX_TRIES; $attempt++) {
             try {
                 $pdo = new PDO(
@@ -110,12 +110,12 @@ class Database
 
         // Все попытки исчерпаны — фатальная ошибка
         Logger::error(
-            "Не удалось подключиться к БД после " . self::MAX_TRIES . " попыток",
+            'Не удалось подключиться к БД после ' . self::MAX_TRIES . ' попыток',
             ['exception' => $lastException]
         );
         throw new RuntimeException('Невозможно подключиться к базе данных. ' . $lastException->getMessage());
     }
-    
+
     /**
      * Загружает параметры подключения из окружения.
      *
@@ -124,45 +124,45 @@ class Database
     private static function loadConfig(): array
     {
         $connectionType = $_ENV['DB_CONNECTION_TYPE'] ?? 'tcp';
-        $dbName         = $_ENV['DB_NAME'] ?? '';
-        $user           = $_ENV['DB_USER'] ?? '';
-        $password       = $_ENV['DB_PASS'] ?? '';
-        
+        $dbName = $_ENV['DB_NAME'] ?? '';
+        $user = $_ENV['DB_USER'] ?? '';
+        $password = $_ENV['DB_PASS'] ?? '';
+
         if ($connectionType === 'socket') {
             $socket = $_ENV['DB_SOCKET'] ?? '';
-            $dsn    = "mysql:unix_socket={$socket};dbname={$dbName};charset=utf8mb4";
+            $dsn = "mysql:unix_socket={$socket};dbname={$dbName};charset=utf8mb4";
         } else {
             $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
             $port = $_ENV['DB_PORT'] ?? '3306';
-            $dsn  = sprintf(
+            $dsn = sprintf(
                 'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
                 $host,
                 $port,
                 $dbName
             );
         }
-        
+
         $options = [
             // Ошибки в виде исключений
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             // fetch_assoc по умолчанию
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             // нативные prepare
-            PDO::ATTR_EMULATE_PREPARES   => false,
+            PDO::ATTR_EMULATE_PREPARES => false,
             // кодировка
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
-            
+
             // ПЕРЕИСПОЛЬЗОВАНИЕ соединений
-            PDO::ATTR_PERSISTENT         => true,
+            PDO::ATTR_PERSISTENT => true,
             // Таймаут на подключение (секунды)
-            PDO::ATTR_TIMEOUT            => 5,
+            PDO::ATTR_TIMEOUT => 5,
         ];
-        
+
         return [
-            'dsn'      => $dsn,
-            'user'     => $user,
+            'dsn' => $dsn,
+            'user' => $user,
             'password' => $password,
-            'options'  => $options,
+            'options' => $options,
         ];
     }
 }

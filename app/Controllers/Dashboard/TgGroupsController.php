@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -18,7 +19,9 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class TgGroupsController
 {
-    public function __construct(private PDO $db) {}
+    public function __construct(private PDO $db)
+    {
+    }
 
     /**
      * Список групп.

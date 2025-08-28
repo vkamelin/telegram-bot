@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\CallbackQueries;
 
-use App\Helpers\Logger;
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use PDO;
@@ -44,7 +44,7 @@ abstract class AbstractCallbackQueryHandler
     {
         $data = [
             'callback_query_id' => $callbackQueryId,
-            'show_alert' => $showAlert
+            'show_alert' => $showAlert,
         ];
 
         // Если есть текст, то добавляем его

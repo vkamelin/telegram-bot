@@ -37,7 +37,7 @@ class DefaultEditedMessageHandler extends AbstractEditedMessageHandler
             $entitiesDiff = array_udiff(
                 $newEntities,
                 $oldEntities,
-                static fn(array $a, array $b): int => strcmp(
+                static fn (array $a, array $b): int => strcmp(
                     json_encode($a, JSON_THROW_ON_ERROR),
                     json_encode($b, JSON_THROW_ON_ERROR)
                 )

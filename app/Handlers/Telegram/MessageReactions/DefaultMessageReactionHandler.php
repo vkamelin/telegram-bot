@@ -49,8 +49,8 @@ class DefaultMessageReactionHandler extends AbstractMessageReactionHandler
             $emoji = $newReaction[0]['emoji'] ?? ($newReaction[0]['custom_emoji_id'] ?? null);
             if ($emoji !== null) {
                 $stmt = $this->db->prepare(
-                    "INSERT INTO message_reactions_agg (chat_id, message_id, agg, updated_at) "
-                    . "VALUES (:chat_id, :message_id, JSON_OBJECT(:emoji, 1), NOW()) "
+                    'INSERT INTO message_reactions_agg (chat_id, message_id, agg, updated_at) '
+                    . 'VALUES (:chat_id, :message_id, JSON_OBJECT(:emoji, 1), NOW()) '
                     . "ON DUPLICATE KEY UPDATE agg = JSON_SET(agg, CONCAT('$.', :emoji), COALESCE(JSON_EXTRACT(agg, CONCAT('$.', :emoji)), 0) + 1), updated_at = NOW()"
                 );
                 $stmt->execute([

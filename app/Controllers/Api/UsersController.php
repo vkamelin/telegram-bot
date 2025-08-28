@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -7,10 +8,10 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api;
 
-use PDO;
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
+use PDO;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
 
 /**
  * Контроллер для управления пользователями.
@@ -22,7 +23,9 @@ final class UsersController
     /**
      * @param PDO $db Подключение к базе данных
      */
-    public function __construct(private PDO $db) {}
+    public function __construct(private PDO $db)
+    {
+    }
 
     /**
      * Возвращает список пользователей.
@@ -37,7 +40,7 @@ final class UsersController
         $rows = $q->fetchAll();
         return Response::json($res, 200, ['items' => $rows]);
     }
-    
+
     /**
      * Создаёт нового пользователя.
      *

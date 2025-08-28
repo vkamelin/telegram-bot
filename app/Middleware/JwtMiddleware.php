@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -7,13 +8,13 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
+use App\Helpers\Response;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
-use App\Helpers\Response;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Throwable;
 
 /**
@@ -24,7 +25,9 @@ final class JwtMiddleware implements MiddlewareInterface
     /**
      * @param array $cfg Настройки JWT
      */
-    public function __construct(private array $cfg) {}
+    public function __construct(private array $cfg)
+    {
+    }
 
     /**
      * Проверяет JWT и добавляет его данные в запрос.

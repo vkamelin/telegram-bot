@@ -20,7 +20,7 @@ class CreateAdminCommand extends Command
         $password = $arguments[1] ?? trim(readline('Password: '));
 
         if ($email === '' || $password === '') {
-            echo "Email and password are required." . PHP_EOL;
+            echo 'Email and password are required.' . PHP_EOL;
             return 1;
         }
 
@@ -30,8 +30,7 @@ class CreateAdminCommand extends Command
         $stmt = $pdo->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
         $stmt->execute(['email' => $email, 'password' => $hash]);
 
-        echo "Administrator created." . PHP_EOL;
+        echo 'Administrator created.' . PHP_EOL;
         return 0;
     }
 }
-

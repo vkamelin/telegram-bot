@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use App\Helpers\Response;
+use PHPUnit\Framework\TestCase;
 use Slim\Psr7\Response as Psr7Response;
 
 final class ResponseTest extends TestCase

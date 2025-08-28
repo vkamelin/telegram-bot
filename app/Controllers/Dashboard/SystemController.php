@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -50,7 +51,7 @@ final class SystemController
         ];
 
         $queueSizes = null;
-        $sendSpeed  = null;
+        $sendSpeed = null;
         if (filter_var($_ENV['TELEMETRY_ENABLED'] ?? false, FILTER_VALIDATE_BOOL)) {
             try {
                 $redis = RedisHelper::getInstance();
@@ -67,7 +68,7 @@ final class SystemController
             try {
                 $db = Database::getInstance();
                 $stmt = $db->query(
-                    "SELECT COUNT(*) FROM telegram_messages " .
+                    'SELECT COUNT(*) FROM telegram_messages ' .
                     "WHERE status='success' AND processed_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)"
                 );
                 $sendSpeed = (int)$stmt->fetchColumn();
@@ -77,12 +78,12 @@ final class SystemController
         }
 
         $data = [
-            'title'          => 'System',
-            'health'         => $health,
-            'env'            => $env,
+            'title' => 'System',
+            'health' => $health,
+            'env' => $env,
             'workerCommands' => $workerCommands,
-            'queueSizes'     => $queueSizes,
-            'sendSpeed'      => $sendSpeed,
+            'queueSizes' => $queueSizes,
+            'sendSpeed' => $sendSpeed,
         ];
 
         return View::render($res, 'dashboard/system.php', $data, 'layouts/main.php');

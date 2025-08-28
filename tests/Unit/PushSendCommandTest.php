@@ -30,18 +30,30 @@ final class PushSendCommandTest extends TestCase
 
         $this->db->exec("INSERT INTO telegram_users (id, user_id, username, is_user_banned, is_bot_banned) VALUES (1, 100, 'alice', 0, 0), (2, 101, 'bob', 0, 0), (3, 102, 'carol', 1, 0)");
         $this->db->exec("INSERT INTO telegram_user_groups (id, name) VALUES (1, 'group1')");
-        $this->db->exec("INSERT INTO telegram_user_group_user (group_id, user_id) VALUES (1, 1), (1, 2)");
+        $this->db->exec('INSERT INTO telegram_user_group_user (group_id, user_id) VALUES (1, 1), (1, 2)');
 
         $dbRef = new ReflectionClass(Database::class);
         $prop = $dbRef->getProperty('instance');
         $prop->setAccessible(true);
         $prop->setValue(null, $this->db);
 
-        $redisStub = new class {
+        $redisStub = new class () {
             public array $data = [];
-            public function set($key, $value): bool { $this->data[$key] = $value; return true; }
-            public function rPush($key, $value): bool { $this->data[$key][] = $value; return true; }
-            public function del($key): int { unset($this->data[$key]); return 1; }
+            public function set($key, $value): bool
+            {
+                $this->data[$key] = $value;
+                return true;
+            }
+            public function rPush($key, $value): bool
+            {
+                $this->data[$key][] = $value;
+                return true;
+            }
+            public function del($key): int
+            {
+                unset($this->data[$key]);
+                return 1;
+            }
         };
         $redisRef = new ReflectionClass(RedisHelper::class);
         $propRedis = $redisRef->getProperty('instance');

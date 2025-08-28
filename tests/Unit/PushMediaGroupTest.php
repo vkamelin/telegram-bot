@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Helpers\Database;
-use App\Helpers\Push;
 use App\Helpers\MediaBuilder;
+use App\Helpers\Push;
 use App\Helpers\RedisHelper;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -29,11 +29,23 @@ final class PushMediaGroupTest extends TestCase
         $prop->setAccessible(true);
         $prop->setValue(null, $this->db);
 
-        $redisStub = new class {
+        $redisStub = new class () {
             public array $data = [];
-            public function set($key, $value): bool { $this->data[$key] = $value; return true; }
-            public function rPush($key, $value): bool { $this->data[$key][] = $value; return true; }
-            public function del($key): int { unset($this->data[$key]); return 1; }
+            public function set($key, $value): bool
+            {
+                $this->data[$key] = $value;
+                return true;
+            }
+            public function rPush($key, $value): bool
+            {
+                $this->data[$key][] = $value;
+                return true;
+            }
+            public function del($key): int
+            {
+                unset($this->data[$key]);
+                return 1;
+            }
         };
         $redisRef = new ReflectionClass(RedisHelper::class);
         $propRedis = $redisRef->getProperty('instance');

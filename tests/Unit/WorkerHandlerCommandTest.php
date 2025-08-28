@@ -28,8 +28,8 @@ namespace {
         }
     );
 
-    use PHPUnit\Framework\TestCase;
     use App\Console\Kernel;
+    use PHPUnit\Framework\TestCase;
 
     final class WorkerHandlerCommandTest extends TestCase
     {

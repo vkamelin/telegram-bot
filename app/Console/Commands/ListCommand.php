@@ -15,7 +15,7 @@ class ListCommand extends Command
      */
     public function handle(array $arguments, Kernel $kernel): int
     {
-        echo "Доступные команды:" . PHP_EOL;
+        echo 'Доступные команды:' . PHP_EOL;
         foreach ($kernel->commands() as $cmd) {
             echo "  {$cmd->signature}\t{$cmd->description}" . PHP_EOL;
         }

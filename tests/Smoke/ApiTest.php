@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Controllers\Api\HealthController;
+use App\Controllers\Api\MeController;
+use App\Middleware\ErrorMiddleware;
+use App\Middleware\JwtMiddleware;
+use App\Middleware\RateLimitMiddleware;
+use App\Middleware\TelegramInitDataMiddleware;
+use Firebase\JWT\JWT;
 use PHPUnit\Framework\TestCase;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Factory\ServerRequestFactory;
-use App\Middleware\TelegramInitDataMiddleware;
-use App\Middleware\JwtMiddleware;
-use App\Middleware\RateLimitMiddleware;
-use App\Middleware\ErrorMiddleware;
-use App\Controllers\Api\MeController;
-use App\Controllers\Api\HealthController;
-use Firebase\JWT\JWT;
 use Slim\Psr7\Response as PsrResponse;
 
 final class ApiTest extends TestCase

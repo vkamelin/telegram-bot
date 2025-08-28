@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Handlers\Telegram\CallbackQueries;
 
 use App\Helpers\Logger;
-use App\Helpers\Push;
 use App\Helpers\MessageStorage;
+use App\Helpers\Push;
 use Longman\TelegramBot\Entities\ChatMember\ChatMember;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Update;
@@ -33,7 +33,7 @@ class CheckSubscriptionHandler extends AbstractCallbackQueryHandler
 
         $response = Request::getChatMember([
             'chat_id' => $channel,
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         if ($response->isOk()) {
@@ -58,13 +58,13 @@ class CheckSubscriptionHandler extends AbstractCallbackQueryHandler
                     [
                         [
                             'text' => 'Канал',
-                            'url' => 'https://t.me/' . $_ENV['CHANNEL']
+                            'url' => 'https://t.me/' . $_ENV['CHANNEL'],
                         ],
                     ],
                     [
                         [
                             'text' => 'Проверить подписку',
-                            'callback_data' => 'checkSubscription'
+                            'callback_data' => 'checkSubscription',
                         ],
                     ],
                 );

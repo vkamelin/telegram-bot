@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\Commands;
 
-use App\Helpers\Push;
 use App\Helpers\MessageStorage;
-use Longman\TelegramBot\Entities\Update;
+use App\Helpers\Push;
 use Exception;
+use Longman\TelegramBot\Entities\Update;
 
 class AboutCommandHandler extends AbstractCommandHandler
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -19,7 +20,9 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class PanelUsersController
 {
-    public function __construct(private PDO $db) {}
+    public function __construct(private PDO $db)
+    {
+    }
 
     /**
      * Отображает список пользователей панели.
@@ -39,9 +42,9 @@ final class PanelUsersController
     public function data(Req $req, Res $res): Res
     {
         $p = (array)$req->getParsedBody();
-        $start  = max(0, (int)($p['start'] ?? 0));
+        $start = max(0, (int)($p['start'] ?? 0));
         $length = (int)($p['length'] ?? 10);
-        $draw   = (int)($p['draw'] ?? 0);
+        $draw = (int)($p['draw'] ?? 0);
         if ($length === -1) {
             $start = 0;
         }

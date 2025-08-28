@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Middleware\CsrfMiddleware;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
+use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Factory\ServerRequestFactory;
 use Slim\Psr7\Response as Psr7Response;
-use App\Middleware\CsrfMiddleware;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 
 final class CsrfMiddlewareTest extends TestCase
 {
@@ -19,7 +19,7 @@ final class CsrfMiddlewareTest extends TestCase
         $req = (new ServerRequestFactory())->createServerRequest('POST', '/')
             ->withParsedBody(['_csrf_token' => 'token'])
             ->withCookieParams(['_csrf_token' => 'token']);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();
@@ -37,7 +37,7 @@ final class CsrfMiddlewareTest extends TestCase
         $req = (new ServerRequestFactory())->createServerRequest('POST', '/')
             ->withParsedBody(['_csrf_token' => 'one'])
             ->withCookieParams(['_csrf_token' => 'two']);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();
@@ -54,7 +54,7 @@ final class CsrfMiddlewareTest extends TestCase
 
         $req = (new ServerRequestFactory())->createServerRequest('POST', '/')
             ->withParsedBody(['_csrf_token' => 'token']);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();
@@ -71,7 +71,7 @@ final class CsrfMiddlewareTest extends TestCase
 
         $req = (new ServerRequestFactory())->createServerRequest('POST', '/')
             ->withCookieParams(['_csrf_token' => 'token']);
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(Req $request): Res
             {
                 return new Psr7Response();

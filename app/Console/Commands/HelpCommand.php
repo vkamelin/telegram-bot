@@ -16,7 +16,7 @@ class HelpCommand extends Command
     {
         $name = $arguments[0] ?? null;
         if (!$name) {
-            echo "Usage: help <command>" . PHP_EOL;
+            echo 'Usage: help <command>' . PHP_EOL;
             return 0;
         }
 

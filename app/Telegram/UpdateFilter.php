@@ -60,12 +60,12 @@ final class UpdateFilter
             if ($redis instanceof Redis) {
                 try {
                     $prefix = $this->redisPrefix;
-                    $this->allowUpdates  = $this->normalizeList($redis->sMembers("{$prefix}:allow_updates"));
-                    $this->denyUpdates   = $this->normalizeList($redis->sMembers("{$prefix}:deny_updates"));
-                    $this->allowChats    = $this->normalizeList($redis->sMembers("{$prefix}:allow_chats"));
-                    $this->denyChats     = $this->normalizeList($redis->sMembers("{$prefix}:deny_chats"));
+                    $this->allowUpdates = $this->normalizeList($redis->sMembers("{$prefix}:allow_updates"));
+                    $this->denyUpdates = $this->normalizeList($redis->sMembers("{$prefix}:deny_updates"));
+                    $this->allowChats = $this->normalizeList($redis->sMembers("{$prefix}:allow_chats"));
+                    $this->denyChats = $this->normalizeList($redis->sMembers("{$prefix}:deny_chats"));
                     $this->allowCommands = $this->normalizeList($redis->sMembers("{$prefix}:allow_commands"));
-                    $this->denyCommands  = $this->normalizeList($redis->sMembers("{$prefix}:deny_commands"));
+                    $this->denyCommands = $this->normalizeList($redis->sMembers("{$prefix}:deny_commands"));
                     return;
                 } catch (RedisException|Throwable $e) {
                     $this->debouncedLog('redis_unreachable');
@@ -73,12 +73,12 @@ final class UpdateFilter
             }
         }
 
-        $this->allowUpdates   = $this->normalizeList($_ENV['TG_ALLOW_UPDATES'] ?? '');
-        $this->denyUpdates    = $this->normalizeList($_ENV['TG_DENY_UPDATES'] ?? '');
-        $this->allowChats     = $this->normalizeList($_ENV['TG_ALLOW_CHATS'] ?? '');
-        $this->denyChats      = $this->normalizeList($_ENV['TG_DENY_CHATS'] ?? '');
-        $this->allowCommands  = $this->normalizeList($_ENV['TG_ALLOW_COMMANDS'] ?? '');
-        $this->denyCommands   = $this->normalizeList($_ENV['TG_DENY_COMMANDS'] ?? '');
+        $this->allowUpdates = $this->normalizeList($_ENV['TG_ALLOW_UPDATES'] ?? '');
+        $this->denyUpdates = $this->normalizeList($_ENV['TG_DENY_UPDATES'] ?? '');
+        $this->allowChats = $this->normalizeList($_ENV['TG_ALLOW_CHATS'] ?? '');
+        $this->denyChats = $this->normalizeList($_ENV['TG_DENY_CHATS'] ?? '');
+        $this->allowCommands = $this->normalizeList($_ENV['TG_ALLOW_COMMANDS'] ?? '');
+        $this->denyCommands = $this->normalizeList($_ENV['TG_DENY_COMMANDS'] ?? '');
     }
 
     /**

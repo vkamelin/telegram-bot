@@ -22,7 +22,7 @@ return [
             PDO::ATTR_STRINGIFY_FETCHES => false,
         ],
     ],
-    
+
     'jwt' => [
         'secret' => $_ENV['JWT_SECRET'] ?? null,
         'alg' => 'HS256',
@@ -36,13 +36,13 @@ return [
         'POST /api/auth/login',
         'POST /api/auth/refresh',
     ],
-    
+
     'cors' => [
         'origins' => explode(',', $_ENV['CORS_ORIGINS'] ?? ''),
         'methods' => 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
         'headers' => 'Authorization,Content-Type,X-Request-Id',
     ],
-    
+
     'rate_limit' => [
         'bucket' => 'ip',   // 'ip' или 'user'
         'limit' => 60,     // запросов в минуту

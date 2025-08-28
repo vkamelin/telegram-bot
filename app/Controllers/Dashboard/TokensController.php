@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -18,7 +19,9 @@ use Psr\Http\Message\ServerRequestInterface as Req;
  */
 final class TokensController
 {
-    public function __construct(private PDO $db) {}
+    public function __construct(private PDO $db)
+    {
+    }
 
     /**
      * Отображает таблицу токенов.
@@ -38,9 +41,9 @@ final class TokensController
     public function data(Req $req, Res $res): Res
     {
         $p = (array)$req->getParsedBody();
-        $start  = max(0, (int)($p['start'] ?? 0));
+        $start = max(0, (int)($p['start'] ?? 0));
         $length = (int)($p['length'] ?? 10);
-        $draw   = (int)($p['draw'] ?? 0);
+        $draw = (int)($p['draw'] ?? 0);
         if ($length === -1) {
             $start = 0;
         }
@@ -56,7 +59,7 @@ final class TokensController
             $parts = explode(',', (string)$p['period']);
             if (count($parts) === 2) {
                 $from = strtotime($parts[0]);
-                $to   = strtotime($parts[1]);
+                $to = strtotime($parts[1]);
                 if ($from && $to) {
                     $conds[] = 'expires_at BETWEEN :expires_from AND :expires_to';
                     $params['expires_from'] = $from;

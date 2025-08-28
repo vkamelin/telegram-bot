@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -7,10 +8,10 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api;
 
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
 use App\Services\HealthService;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
 
 /**
  * Контроллер проверки состояния сервиса.
@@ -19,7 +20,6 @@ use App\Services\HealthService;
  */
 final class HealthController
 {
-
     /**
      * Проверяет работоспособность сервисов и возвращает статус.
      *

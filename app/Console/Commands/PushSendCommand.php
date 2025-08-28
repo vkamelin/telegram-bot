@@ -51,7 +51,7 @@ final class PushSendCommand extends Command
         } else {
             // Пользователи по ID
             if (isset($options['user']) && $options['user'] !== '') {
-                $ids = array_filter(array_map('trim', explode(',', $options['user'])), static fn($v) => $v !== '');
+                $ids = array_filter(array_map('trim', explode(',', $options['user'])), static fn ($v) => $v !== '');
                 if ($ids !== []) {
                     $placeholders = implode(',', array_fill(0, count($ids), '?'));
                     $stmt = $pdo->prepare("SELECT user_id FROM telegram_users WHERE user_id IN ($placeholders)");
@@ -62,7 +62,7 @@ final class PushSendCommand extends Command
 
             // Пользователи по username
             if (isset($options['username']) && $options['username'] !== '') {
-                $names = array_filter(array_map('trim', explode(',', $options['username'])), static fn($v) => $v !== '');
+                $names = array_filter(array_map('trim', explode(',', $options['username'])), static fn ($v) => $v !== '');
                 if ($names !== []) {
                     $placeholders = implode(',', array_fill(0, count($names), '?'));
                     $stmt = $pdo->prepare("SELECT user_id FROM telegram_users WHERE username IN ($placeholders)");
@@ -73,9 +73,9 @@ final class PushSendCommand extends Command
 
             // Группы пользователей
             if (isset($options['group']) && $options['group'] !== '') {
-                $groups = array_filter(array_map('trim', explode(',', $options['group'])), static fn($v) => $v !== '');
+                $groups = array_filter(array_map('trim', explode(',', $options['group'])), static fn ($v) => $v !== '');
                 if ($groups !== []) {
-                    $numeric = array_filter($groups, static fn($g) => ctype_digit($g));
+                    $numeric = array_filter($groups, static fn ($g) => ctype_digit($g));
                     $names = array_diff($groups, $numeric);
                     $conditions = [];
                     $params = [];

@@ -40,15 +40,15 @@ class Push
         $data = [
             'chat_id' => $chatId,
             'text' => $text,
-            'parse_mode' => 'html'
+            'parse_mode' => 'html',
         ];
-        
+
         $data = array_merge($data, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
-        
+
         return self::push($chatId, 'sendMessage', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь изображение по ссылке в Телеграм
      *
@@ -76,7 +76,7 @@ class Push
 
         return self::push($chatId, 'sendPhoto', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь аудио в Телеграм
      *
@@ -103,7 +103,7 @@ class Push
 
         return self::push($chatId, 'sendAudio', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь документа в Телеграм
      *
@@ -132,7 +132,7 @@ class Push
 
         return self::push($chatId, 'sendDocument', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь видео в Телеграм
      *
@@ -192,7 +192,7 @@ class Push
 
         return self::push($chatId, 'sendMediaGroup', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь стикер в Телеграм
      *
@@ -217,13 +217,13 @@ class Push
             'chat_id' => $chatId,
             'sticker' => $sticker,
         ];
-        
+
         $data = array_merge($data, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
-        
+
         return self::push($chatId, 'sendSticker', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь анимацию в Телеграм
      *
@@ -250,17 +250,17 @@ class Push
             'chat_id' => $chatId,
             'animation' => $animation,
         ];
-        
+
         if (!empty($caption)) {
             $data['caption'] = $caption;
         }
-        
+
         $data = array_merge($data, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
-        
+
         return self::push($chatId, 'sendAnimation', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь голосовое сообщение в Телеграм
      *
@@ -285,12 +285,12 @@ class Push
             'chat_id' => $chatId,
             'voice' => $voice,
         ];
-        
+
         $data = array_merge($data, $options);
-        
+
         return self::push($chatId, 'sendVoice', $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * Метод добавляет в очередь видео кружочек в Телеграм
      *
@@ -315,9 +315,9 @@ class Push
             'chat_id' => $chatId,
             'video_note' => $videoNote,
         ];
-        
+
         $data = array_merge($data, $options);
-        
+
         return self::push($chatId, 'sendVideoNote', $data, $type, $priority, $sendAfter);
     }
 
@@ -367,7 +367,7 @@ class Push
     ): bool {
         return self::push($chatId, $method, $data, $type, $priority, $sendAfter);
     }
-    
+
     /**
      * @param int|null    $chatId    ID чата
      * @param string      $method    Метод пуша
@@ -389,7 +389,7 @@ class Push
         try {
             $redis = RedisHelper::getInstance();
             $db = Database::getInstance();
-            
+
             if ($redis !== null && $db !== null) {
                 // Данные для вставки в БД
                 $insertData = [
@@ -399,20 +399,20 @@ class Push
                     'type' => $type,
                     'priority' => $priority,
                 ];
-                
+
                 $useSchedule = false; // Использовать расписание
-                
+
                 // Если указано время пуша
                 if (!empty($sendAfter)) {
                     $sendAfterTime = strtotime($sendAfter);
                     $delayTime = $sendAfterTime - time(); // Разница времени пуша с текущим временем
-                    
+
                     if ($delayTime > 3600) {
                         // Если разница больше часа, то используем расписание в БД
                         $useSchedule = true;
                     }
                 }
-                
+
                 // Если используется расписание
                 if ($useSchedule === true) {
                     /*$sql = "INSERT INTO `schedule` (`handle_at`, `type`, `handler`, `data`, `active`) VALUES
@@ -428,10 +428,10 @@ class Push
                 } else {
                     try {
                         $stmt = $db->prepare(
-                            "INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)"
+                            'INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)'
                         );
                         $stmt->execute($insertData);
-                        
+
                         // ID записанного сообщения
                         $id = $db->lastInsertId();
                     } catch (Throwable $e) {
@@ -441,7 +441,7 @@ class Push
                         );
                         return false;
                     }
-                    
+
                     // $messageKey = RedisHelper::REDIS_MESSAGE_KEY . ':' . $id; // Ключ сообщения
                     $messageKey = RedisKeyHelper::key('telegram', 'message', (string)$id);
                     //  Ключ очереди сообщений
@@ -449,55 +449,55 @@ class Push
                         RedisHelper::REDIS_MESSAGES_QUEUE_KEY,
                         (string) $priority
                     );
-                    
+
                     // Добавляем сообщение в Redis с уникальным ключом
                     $redisMessage = $insertData;
                     $redisMessage['key'] = (string)$id;
                     $addMessageResult = $redis->set($messageKey, $redisMessage);
-                    
+
                     if (empty($addMessageResult)) {
-                        $errorMessage = "Не удалось добавить сообщение в Redis.";
-                        
+                        $errorMessage = 'Не удалось добавить сообщение в Redis.';
+
                         $stmt = $db->prepare(
-                            "UPDATE `telegram_messages` SET `status` = :status, `error` = :error WHERE `id` = :id"
+                            'UPDATE `telegram_messages` SET `status` = :status, `error` = :error WHERE `id` = :id'
                         );
                         $stmt->execute(['status' => 'error', 'error' => $errorMessage, 'id' => $id]);
-                        
+
                         throw new RuntimeException($errorMessage);
                     }
-                    
+
                     // Добавляем сообщение в очередь с учетом приоритета
                     $messageData = [
                         'id' => $id,
                         'send_after' => $sendAfter ? strtotime($sendAfter) : null,
                         'key' => (string)$id,
                     ];
-                    
+
                     $addQueueResult = $redis->rPush($queueKey, $messageData);
-                    
+
                     if ($addQueueResult === false) {
                         $redis->del($messageKey);
-                        
-                        $errorMessage = "Не удалось добавить сообщение в очередь в Redis.";
-                        
+
+                        $errorMessage = 'Не удалось добавить сообщение в очередь в Redis.';
+
                         $stmt = $db->prepare(
-                            "UPDATE `telegram_messages` SET `status` = :status, `error` = :error WHERE `id` = :id"
+                            'UPDATE `telegram_messages` SET `status` = :status, `error` = :error WHERE `id` = :id'
                         );
                         $stmt->execute(['status' => 'error', 'error' => $errorMessage, 'id' => $id]);
-                        
+
                         throw new RuntimeException($errorMessage);
                     }
                 }
-                
+
                 return true;
             }
         } catch (Throwable $e) {
             Logger::error(
-                "Не удалось добавить в очередь пуш в Телеграм.",
+                'Не удалось добавить в очередь пуш в Телеграм.',
                 ['exception' => $e]
             );
         }
-        
+
         return false;
     }
 }

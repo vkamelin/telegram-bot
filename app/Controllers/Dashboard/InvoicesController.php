@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for sending invoices via dashboard.
  */

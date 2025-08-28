@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2025. Vitaliy Kamelin <v.kamelin@gmail.com>
  */
@@ -7,11 +8,11 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api;
 
-use PDO;
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
 use App\Services\RefreshTokenService;
+use PDO;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
 
 /**
  * Контроллер авторизации пользователей.
@@ -24,7 +25,9 @@ final class AuthController
      * @param PDO   $db
      * @param array $jwtCfg Настройки JWT (secret, alg, ttl)
      */
-    public function __construct(private PDO $db, private array $jwtCfg) {}
+    public function __construct(private PDO $db, private array $jwtCfg)
+    {
+    }
 
     /**
      * Выполняет вход пользователя и возвращает JWT.
@@ -37,15 +40,15 @@ final class AuthController
     {
         $data = (array)$req->getParsedBody();
         $email = (string)($data['email'] ?? '');
-        $pass  = (string)($data['password'] ?? '');
-        
+        $pass = (string)($data['password'] ?? '');
+
         $stmt = $this->db->prepare('SELECT id, password FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);
         $u = $stmt->fetch();
         if (!$u || !password_verify($pass, $u['password'])) {
             return Response::problem($res, 401, 'Invalid credentials');
         }
-        
+
         $jti = bin2hex(random_bytes(16));
         $payload = ['uid' => (int)$u['id'], 'exp' => time() + $this->jwtCfg['ttl'], 'jti' => $jti];
         $token = \Firebase\JWT\JWT::encode($payload, $this->jwtCfg['secret'], $this->jwtCfg['alg']);

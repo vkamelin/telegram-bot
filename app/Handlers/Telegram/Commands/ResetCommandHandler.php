@@ -29,7 +29,7 @@ class ResetCommandHandler extends AbstractCommandHandler
 
         try {
             // Удаляем данные пользователя
-            $userStmt = $this->db->prepare("DELETE FROM telegram_users WHERE user_id = :user_id");
+            $userStmt = $this->db->prepare('DELETE FROM telegram_users WHERE user_id = :user_id');
             $userStmt->execute([':user_id' => $chatId]);
 
             // Подтверждаем транзакцию
@@ -44,7 +44,7 @@ class ResetCommandHandler extends AbstractCommandHandler
             Logger::error("Ошибка при сбросе данных для пользователя {$chatId}. {$e->getMessage()}");
 
             // Отправляем сообщение об ошибке пользователю
-            Push::text($chatId, "Произошла ошибка при сбросе данных. Пожалуйста, попробуйте позже.");
+            Push::text($chatId, 'Произошла ошибка при сбросе данных. Пожалуйста, попробуйте позже.');
         }
     }
 }

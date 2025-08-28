@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Handlers\Telegram\ChosenInlineResults;
 
+use App\Helpers\Database;
 use JsonException;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
-use App\Helpers\Database;
 
 class DefaultChosenInlineResultHandler extends AbstractChosenInlineResultHandler
 {
