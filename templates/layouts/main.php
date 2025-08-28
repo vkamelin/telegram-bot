@@ -108,6 +108,8 @@ $messages = Flash::get();
                 <?php endforeach; ?>
             <?php endif; ?>
 
+            <?php if (!empty($submenu)) { require __DIR__ . '/../partials/submenu.php'; } ?>
+
             <?= $content ?>
         </div>
     </div>
