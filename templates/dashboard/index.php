@@ -26,7 +26,7 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-                <h4>Pending</h4>
+                <h4>Ожидают</h4>
                 <p class="lead"><?= $pendingMessages ?></p>
             </div>
         </div>
@@ -34,7 +34,7 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-            <h4>Processing</h4>
+            <h4>Обрабатываются</h4>
             <p class="lead"><?= $processingMessages ?></p>
         </div></div>
     </div>
@@ -62,7 +62,7 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-            <h4>Success/Failed (1ч)</h4>
+            <h4>Успешные/Неудачные (1ч)</h4>
             <p class="lead"><?= $lastHourSuccess ?> / <?= $lastHourFailed ?></p>
             <small><?= $lastHourSuccessShare ?>% / <?= $lastHourFailedShare ?>%</small>
         </div></div>
@@ -114,9 +114,9 @@
             <thead>
             <tr>
                 <th>ID</th>
-                <th>User</th>
-                <th>Code</th>
-                <th>Error</th>
+                <th>Пользователь</th>
+                <th>Код ошибки</th>
+                <th>Ошибка</th>
                 <th>Время</th>
             </tr>
             </thead>

@@ -4,14 +4,16 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Tokens</h1>
+<h1>Токены</h1>
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
-        <input type="text" name="revoked" value="<?= htmlspecialchars($_GET['revoked'] ?? '') ?>" class="form-control" placeholder="revoked">
+        <input type="text" name="revoked" value="<?= htmlspecialchars($_GET['revoked'] ?? '') ?>"
+               class="form-control" placeholder="аннулирован">
     </div>
     <div class="col-auto">
-        <input type="text" name="period" value="<?= htmlspecialchars($_GET['period'] ?? '') ?>" class="form-control" placeholder="YYYY-MM-DD,YYYY-MM-DD">
+        <input type="text" name="period" value="<?= htmlspecialchars($_GET['period'] ?? '') ?>" class="form-control"
+               placeholder="YYYY-MM-DD,YYYY-MM-DD">
     </div>
     <div class="col-auto">
         <button type="submit" class="btn btn-primary">Filter</button>
@@ -24,11 +26,11 @@
         <th>ID</th>
         <th>User ID</th>
         <th>JTI</th>
-        <th>Expires At</th>
-        <th>Revoked</th>
-        <th>Created At</th>
-        <th>Updated At</th>
-        <th>Actions</th>
+        <th>Истекает</th>
+        <th>Аннулирован</th>
+        <th>Создан</th>
+        <th>Обновлен</th>
+        <th>Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -37,11 +39,11 @@
         <th>ID</th>
         <th>User ID</th>
         <th>JTI</th>
-        <th>Expires At</th>
-        <th>Revoked</th>
-        <th>Created At</th>
-        <th>Updated At</th>
-        <th>Actions</th>
+        <th>Истекает</th>
+        <th>Аннулирован</th>
+        <th>Создан</th>
+        <th>Обновлен</th>
+        <th>Действия</th>
     </tr>
     </tfoot>
 </table>

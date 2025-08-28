@@ -13,9 +13,9 @@
         <th>Update ID</th>
         <th>User ID</th>
         <th>Message ID</th>
-        <th>Type</th>
-        <th>Sent At</th>
-        <th>Created At</th>
+        <th>Тип</th>
+        <th>Отправлено</th>
+        <th>Создано</th>
         <th class="text-end">Действия</th>
     </tr>
     </thead>
@@ -26,9 +26,9 @@
         <th>Update ID</th>
         <th>User ID</th>
         <th>Message ID</th>
-        <th>Type</th>
-        <th>Sent At</th>
-        <th>Created At</th>
+        <th>Тип</th>
+        <th>Отправлено</th>
+        <th>Создано</th>
         <th class="text-end">Действия</th>
     </tr>
     </tfoot>

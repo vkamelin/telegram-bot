@@ -7,21 +7,21 @@
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['user_id']) ?></dd>
             <dt class="col-sm-3">Username</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['username']) ?></dd>
-            <dt class="col-sm-3">First name</dt>
+            <dt class="col-sm-3">Имя</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['first_name']) ?></dd>
-            <dt class="col-sm-3">Last name</dt>
+            <dt class="col-sm-3">Фамилия</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['last_name']) ?></dd>
-            <dt class="col-sm-3">Language</dt>
+            <dt class="col-sm-3">Язык</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['language_code']) ?></dd>
-            <dt class="col-sm-3">Premium</dt>
+            <dt class="col-sm-3">Премиум</dt>
             <dd class="col-sm-9"><?= (int)$user['is_premium'] ?></dd>
-            <dt class="col-sm-3">User banned</dt>
+            <dt class="col-sm-3">Забанен</dt>
             <dd class="col-sm-9"><?= (int)$user['is_user_banned'] ?></dd>
-            <dt class="col-sm-3">Bot banned</dt>
+            <dt class="col-sm-3">Бот забанен</dt>
             <dd class="col-sm-9"><?= (int)$user['is_bot_banned'] ?></dd>
-            <dt class="col-sm-3">Subscribed</dt>
+            <dt class="col-sm-3">Подписан</dt>
             <dd class="col-sm-9"><?= (int)$user['is_subscribed'] ?></dd>
-            <dt class="col-sm-3">Referral code</dt>
+            <dt class="col-sm-3">Реферальный код</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['referral_code']) ?></dd>
             <dt class="col-sm-3">UTM</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['utm']) ?></dd>
@@ -34,10 +34,10 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Method</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Processed at</th>
+        <th>Метод</th>
+        <th>Тип</th>
+        <th>Статус</th>
+        <th>Обработано</th>
     </tr>
     </thead>
     <tbody>
@@ -59,8 +59,8 @@
     <tr>
         <th>ID</th>
         <th>Update ID</th>
-        <th>Type</th>
-        <th>Created at</th>
+        <th>Тип</th>
+        <th>Создано</th>
     </tr>
     </thead>
     <tbody>
