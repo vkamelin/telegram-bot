@@ -27,6 +27,14 @@ return [
         'secret' => $_ENV['JWT_SECRET'] ?? null,
         'alg' => 'HS256',
         'ttl' => 3600,
+        // time to live for refresh tokens (30 days by default)
+        'refresh_ttl' => 60 * 60 * 24 * 30,
+    ],
+
+    // API routes list for documentation/tests
+    'routes' => [
+        'POST /api/auth/login',
+        'POST /api/auth/refresh',
     ],
     
     'cors' => [

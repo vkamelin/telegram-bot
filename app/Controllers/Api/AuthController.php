@@ -11,6 +11,7 @@ use PDO;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Message\ResponseInterface as Res;
 use App\Helpers\Response;
+use App\Services\RefreshTokenService;
 
 /**
  * Контроллер авторизации пользователей.
@@ -45,9 +46,41 @@ final class AuthController
             return Response::problem($res, 401, 'Invalid credentials');
         }
         
-        $payload = ['uid' => (int)$u['id'], 'exp' => time() + $this->jwtCfg['ttl']];
+        $jti = bin2hex(random_bytes(16));
+        $payload = ['uid' => (int)$u['id'], 'exp' => time() + $this->jwtCfg['ttl'], 'jti' => $jti];
         $token = \Firebase\JWT\JWT::encode($payload, $this->jwtCfg['secret'], $this->jwtCfg['alg']);
-        
-        return Response::json($res, 200, ['token' => $token]);
+
+        $refresh = (new RefreshTokenService($this->db, $this->jwtCfg['refresh_ttl'] ?? 2592000))->generate((int)$u['id'], $jti);
+
+        return Response::json($res, 200, ['token' => $token, 'refresh_token' => $refresh]);
+    }
+
+    /**
+     * Issue new JWT using provided refresh token.
+     */
+    public function refresh(Req $req, Res $res): Res
+    {
+        $data = (array)$req->getParsedBody();
+        $refresh = (string)($data['refresh_token'] ?? '');
+        if ($refresh === '') {
+            return Response::problem($res, 400, 'Refresh token required');
+        }
+
+        $svc = new RefreshTokenService($this->db, $this->jwtCfg['refresh_ttl'] ?? 2592000);
+        $row = $svc->validate($refresh);
+        if ($row === null) {
+            return Response::problem($res, 401, 'Invalid refresh token');
+        }
+
+        // revoke old token to prevent reuse
+        $svc->revoke($refresh);
+
+        $jti = bin2hex(random_bytes(16));
+        $payload = ['uid' => (int)$row['user_id'], 'exp' => time() + $this->jwtCfg['ttl'], 'jti' => $jti];
+        $token = \Firebase\JWT\JWT::encode($payload, $this->jwtCfg['secret'], $this->jwtCfg['alg']);
+
+        $newRefresh = $svc->generate((int)$row['user_id'], $jti);
+
+        return Response::json($res, 200, ['token' => $token, 'refresh_token' => $newRefresh]);
     }
 }
