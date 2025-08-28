@@ -63,11 +63,6 @@ $menu = [
                 'icon'  => 'bi bi-people',
             ],
             [
-                'url'   => '/dashboard/updates',
-                'title' => 'Входяшие',
-                'icon'  => 'bi bi-telegram',
-            ],
-            [
                 'url'   => '/dashboard/join-requests',
                 'title' => 'Запросы на вступление',
                 'icon'  => 'bi bi-person-plus',
@@ -78,9 +73,9 @@ $menu = [
                 'icon'  => 'bi bi-people',
             ],
             [
-                'url'   => '/dashboard/sessions',
-                'title' => 'Сессии',
-                'icon'  => 'bi bi-clock-history',
+                'url'   => '/dashboard/updates',
+                'title' => 'Входящие',
+                'icon'  => 'bi bi-telegram',
             ],
         ],
     ],
@@ -88,6 +83,11 @@ $menu = [
         'title'    => 'Администрирование',
         'icon'     => 'bi bi-gear',
         'children' => [
+            [
+                'url'   => '/dashboard/sessions',
+                'title' => 'Сессии',
+                'icon'  => 'bi bi-clock-history',
+            ],
             [
                 'url'   => '/dashboard/users',
                 'title' => 'Администраторы',
