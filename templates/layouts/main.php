@@ -66,10 +66,16 @@ $messages = Flash::get();
                     <ul class="nav nav-pills flex-column mb-auto">
                         <?php foreach ($menu as $menuItem):?>
                         <li class="nav-item">
-                            <a href="<?= url($menuItem['url']) ?>" class="nav-link <?= $menuItem['class'] ?> text-white"
-                               aria-current="page">
-                                <i class="<?= $menuItem['icon'] ?>"></i>&nbsp;&nbsp;<?= $menuItem['title'] ?>
-                            </a>
+                            <?php $hasUrl = isset($menuItem['url']) && $menuItem['url'] !== null && $menuItem['url'] !== ''; ?>
+                            <?php if ($hasUrl): ?>
+                                <a href="<?= url($menuItem['url']) ?>" class="nav-link <?= $menuItem['class'] ?> text-white" aria-current="page">
+                                    <i class="<?= $menuItem['icon'] ?>"></i>&nbsp;&nbsp;<?= $menuItem['title'] ?>
+                                </a>
+                            <?php else: ?>
+                                <span class="nav-link <?= $menuItem['class'] ?> text-white">
+                                    <i class="<?= $menuItem['icon'] ?>"></i>&nbsp;&nbsp;<?= $menuItem['title'] ?>
+                                </span>
+                            <?php endif; ?>
                         </li>
                         <?php endforeach;?>
                     </ul>
@@ -86,9 +92,16 @@ $messages = Flash::get();
                 <ul class="nav nav-pills flex-column mb-auto">
                     <?php foreach ($menu as $menuItem):?>
                     <li class="nav-item">
-                        <a href="<?= url($menuItem['url']) ?>" class="nav-link <?= $menuItem['class'] ?>" aria-current="page">
-                            <i class="<?= $menuItem['icon'] ?>"></i>&nbsp;&nbsp;<?= $menuItem['title'] ?>
-                        </a>
+                        <?php $hasUrl = isset($menuItem['url']) && $menuItem['url'] !== null && $menuItem['url'] !== ''; ?>
+                        <?php if ($hasUrl): ?>
+                            <a href="<?= url($menuItem['url']) ?>" class="nav-link <?= $menuItem['class'] ?>" aria-current="page">
+                                <i class="<?= $menuItem['icon'] ?>"></i>&nbsp;&nbsp;<?= $menuItem['title'] ?>
+                            </a>
+                        <?php else: ?>
+                            <span class="nav-link <?= $menuItem['class'] ?>">
+                                <i class="<?= $menuItem['icon'] ?>"></i>&nbsp;&nbsp;<?= $menuItem['title'] ?>
+                            </span>
+                        <?php endif; ?>
                     </li>
                     <?php endforeach;?>
                 </ul>

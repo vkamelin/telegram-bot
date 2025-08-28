@@ -7,6 +7,7 @@ $menu = [
         'icon'  => 'bi bi-speedometer2',
     ],
     [
+        'url'      => '/dashboard/messages',
         'title'    => 'Сообщения',
         'icon'     => 'bi bi-telegram',
         'children' => [
@@ -28,6 +29,7 @@ $menu = [
         ],
     ],
     [
+        'url'      => '/dashboard/pre-checkout',
         'title'    => 'Платежи',
         'icon'     => 'bi bi-receipt',
         'children' => [
@@ -49,6 +51,7 @@ $menu = [
         ],
     ],
     [
+        'url'      => '/dashboard/tg-users',
         'title'    => 'Telegram',
         'icon'     => 'bi bi-telegram',
         'children' => [
@@ -80,6 +83,7 @@ $menu = [
         ],
     ],
     [
+        'url'      => '/dashboard/sessions',
         'title'    => 'Администрирование',
         'icon'     => 'bi bi-gear',
         'children' => [
