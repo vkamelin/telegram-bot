@@ -164,6 +164,11 @@
         </select>
     </div>
     <div class="mb-3">
+        <label for="msgTypeInput" class="form-label">Message kind (DB type)</label>
+        <input class="form-control" name="msg_type" id="msgTypeInput" placeholder="e.g. campaign, promo, service" value="<?= htmlspecialchars($data['msg_type'] ?? 'message') ?>">
+        <div class="form-text">Сохранится в колонке <code>type</code> таблиц сообщений.</div>
+    </div>
+    <div class="mb-3">
         <label class="form-label">Send time</label>
         <?php $sendMode = $data['send_mode'] ?? 'now'; ?>
         <div class="form-check">

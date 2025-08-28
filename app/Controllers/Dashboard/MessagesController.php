@@ -244,6 +244,7 @@ final class MessagesController
             'user' => trim((string)($p['user'] ?? '')),
             'users' => $p['users'] ?? [],
             'group_id' => $p['group_id'] ?? '',
+            'msg_type' => trim((string)($p['msg_type'] ?? 'message')),
             'send_mode' => (string)($p['send_mode'] ?? 'now'),
             'send_after' => trim((string)($p['send_after'] ?? '')),
         ];
@@ -266,13 +267,15 @@ final class MessagesController
             }
         }
 
+        $msgType = $data['msg_type'] !== '' ? $data['msg_type'] : 'message';
+
         switch ($type) {
             case 'text':
                 $text = $data['text'];
                 if ($text === '') {
                     $errors[] = 'text is required';
                 }
-                $sender = static fn (int $cid) => Push::text($cid, $text, 'message', 2, [], $sendAfter);
+                $sender = static fn (int $cid) => Push::text($cid, $text, $msgType, 2, [], $sendAfter);
                 break;
 
             case 'photo':
@@ -290,7 +293,7 @@ final class MessagesController
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn (int $cid) => Push::photo($cid, $path, $caption, 'photo', 2, $options, $sendAfter);
+                $sender = static fn (int $cid) => Push::photo($cid, $path, $caption, $msgType, 2, $options, $sendAfter);
                 break;
 
             case 'audio':
@@ -315,7 +318,7 @@ final class MessagesController
                     $options['title'] = $data['title'];
                 }
                 $caption = $data['caption'];
-                $sender = static fn (int $cid) => Push::audio($cid, $path, $caption, 'audio', 2, $options, $sendAfter);
+                $sender = static fn (int $cid) => Push::audio($cid, $path, $caption, $msgType, 2, $options, $sendAfter);
                 break;
 
             case 'video':
@@ -345,7 +348,7 @@ final class MessagesController
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn (int $cid) => Push::video($cid, $path, $caption, 'video', 2, $options, $sendAfter);
+                $sender = static fn (int $cid) => Push::video($cid, $path, $caption, $msgType, 2, $options, $sendAfter);
                 break;
 
             case 'document':
@@ -360,7 +363,7 @@ final class MessagesController
                     $options['parse_mode'] = $data['parse_mode'];
                 }
                 $caption = $data['caption'];
-                $sender = static fn (int $cid) => Push::document($cid, $path, $caption, 'document', 2, $options, $sendAfter);
+                $sender = static fn (int $cid) => Push::document($cid, $path, $caption, $msgType, 2, $options, $sendAfter);
                 break;
 
             case 'sticker':
@@ -370,7 +373,7 @@ final class MessagesController
                     break;
                 }
                 $storedFiles[] = $path;
-                $sender = static fn (int $cid) => Push::sticker($cid, $path, 'sticker', 2, [], $sendAfter);
+                $sender = static fn (int $cid) => Push::sticker($cid, $path, $msgType, 2, [], $sendAfter);
                 break;
 
             case 'animation':
@@ -400,7 +403,7 @@ final class MessagesController
                     $options['has_spoiler'] = true;
                 }
                 $caption = $data['caption'];
-                $sender = static fn (int $cid) => Push::animation($cid, $path, $caption, 'animation', 2, $options, $sendAfter);
+                $sender = static fn (int $cid) => Push::animation($cid, $path, $caption, $msgType, 2, $options, $sendAfter);
                 break;
 
             case 'voice':
@@ -421,7 +424,7 @@ final class MessagesController
                 if ($d !== null) {
                     $options['duration'] = $d;
                 }
-                $sender = static fn (int $cid) => Push::voice($cid, $path, 'voice', 2, $options, $sendAfter);
+                $sender = static fn (int $cid) => Push::voice($cid, $path, $msgType, 2, $options, $sendAfter);
                 break;
 
             case 'video_note':
@@ -440,7 +443,7 @@ final class MessagesController
                 if ($d !== null) {
                     $options['duration'] = $d;
                 }
-                $sender = static fn (int $cid) => Push::videoNote($cid, $path, 'video-note', 2, $options, $sendAfter);
+                $sender = static fn (int $cid) => Push::videoNote($cid, $path, $msgType, 2, $options, $sendAfter);
                 break;
 
             case 'media_group':
@@ -476,7 +479,7 @@ final class MessagesController
                     $errors[] = 'media is required';
                     break;
                 }
-                $sender = static fn (int $cid) => Push::mediaGroup($cid, $media, 'media-group', 2, [], $sendAfter);
+                $sender = static fn (int $cid) => Push::mediaGroup($cid, $media, $msgType, 2, [], $sendAfter);
                 break;
 
             default:

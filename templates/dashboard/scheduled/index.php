@@ -15,6 +15,7 @@
         <th>Type</th>
         <th>Priority</th>
         <th>Send After</th>
+        <th>Status</th>
         <th>Created At</th>
         <th class="text-end">Действия</th>
     </tr>
@@ -28,6 +29,7 @@
         <th>Type</th>
         <th>Priority</th>
         <th>Send After</th>
+        <th>Status</th>
         <th>Created At</th>
         <th class="text-end">Действия</th>
     </tr>

@@ -97,8 +97,11 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/users/{id}', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->update($req, $res));
         $auth->get('/scheduled', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->index($req, $res));
         $auth->post('/scheduled/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->data($req, $res));
-        $auth->post('/scheduled/{id}/send-now', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->sendNow($req, $res));
-        $auth->post('/scheduled/{id}/delete', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->delete($req, $res));
+        $auth->get('/scheduled/{id}/edit', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->edit($req, $res, $args));
+        $auth->post('/scheduled/{id}/update', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->update($req, $res, $args));
+        $auth->post('/scheduled/{id}/cancel', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->cancel($req, $res, $args));
+        $auth->post('/scheduled/{id}/send-now', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->sendNow($req, $res, $args));
+        $auth->post('/scheduled/{id}/delete', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->delete($req, $res, $args));
         $auth->get('/system', [\App\Controllers\Dashboard\SystemController::class, 'index']);
         // добавляйте страницы админки здесь
     })->add(new \App\Middleware\AuthMiddleware());

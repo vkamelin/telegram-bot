@@ -51,13 +51,23 @@ function dispatchScheduledMessages(): void
     }
 
     $stmt = $db->prepare(
-        "SELECT * FROM `telegram_scheduled_messages` WHERE `send_after` <= NOW() ORDER BY `id` ASC LIMIT 100"
+        "SELECT * FROM `telegram_scheduled_messages` WHERE `send_after` <= NOW() AND `status` = 'pending' ORDER BY `id` ASC LIMIT 100"
     );
     $stmt->execute();
     $messages = $stmt->fetchAll();
 
     foreach ($messages as $msg) {
         try {
+            // Mark as processing to prevent double-dispatch
+            $lock = $db->prepare('UPDATE `telegram_scheduled_messages` SET `status` = \"processing\", `started_at` = NOW() WHERE `id` = :id AND `status` = \"pending\"');
+            $lock->execute(['id' => $msg['id']]);
+            // Re-check we actually locked this row
+            $check = $db->prepare('SELECT `status` FROM `telegram_scheduled_messages` WHERE `id` = :id');
+            $check->execute(['id' => $msg['id']]);
+            $cur = $check->fetchColumn();
+            if ($cur !== 'processing') {
+                continue;
+            }
             $insert = $db->prepare(
                 "INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)"
             );
@@ -89,10 +99,16 @@ function dispatchScheduledMessages(): void
                 'key' => (string)$id,
             ]);
 
-            $del = $db->prepare('DELETE FROM `telegram_scheduled_messages` WHERE `id` = :id');
-            $del->execute(['id' => $msg['id']]);
+            // Keep record with processing status as indication that sending has started
         } catch (Throwable $e) {
             Logger::error('Failed to dispatch scheduled message: ' . $e->getMessage());
+            // Rollback status to pending on failure so it can be retried
+            try {
+                $db->prepare('UPDATE `telegram_scheduled_messages` SET `status` = \"pending\" WHERE `id` = :id')
+                    ->execute(['id' => $msg['id']]);
+            } catch (Throwable $ex) {
+                // ignore
+            }
         }
     }
 }

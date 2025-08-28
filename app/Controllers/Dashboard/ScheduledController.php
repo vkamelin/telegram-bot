@@ -85,7 +85,7 @@ final class ScheduledController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT id, user_id, method, `type`, priority, send_after, created_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
+        $sql = "SELECT id, user_id, method, `type`, priority, send_after, status, created_at, started_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
         if ($length > 0) {
             $sql .= ' LIMIT :limit OFFSET :offset';
         }
@@ -118,19 +118,79 @@ final class ScheduledController
     }
 
     /**
+     * Показывает форму редактирования (только для не начатых).
+     */
+    public function edit(Req $req, Res $res, array $args): Res
+    {
+        $id = (int)($args['id'] ?? 0);
+        $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status FROM telegram_scheduled_messages WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        if (!$row) {
+            return $res->withStatus(404);
+        }
+        if ($row['status'] !== 'pending') {
+            return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
+        }
+        return View::render($res, 'dashboard/scheduled/edit.php', [
+            'title' => 'Edit scheduled',
+            'item' => $row,
+        ], 'layouts/main.php');
+    }
+
+    /**
+     * Сохраняет изменения (только для не начатых).
+     */
+    public function update(Req $req, Res $res, array $args): Res
+    {
+        $id = (int)($args['id'] ?? 0);
+        $p = (array)$req->getParsedBody();
+        $priority = (int)($p['priority'] ?? 2);
+        $sendAfter = trim((string)($p['send_after'] ?? ''));
+        $errors = [];
+        if ($sendAfter === '' || strtotime($sendAfter) === false) {
+            $errors[] = 'send_after is invalid';
+        }
+        if ($errors) {
+            $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status FROM telegram_scheduled_messages WHERE id = :id');
+            $stmt->execute(['id' => $id]);
+            $row = $stmt->fetch();
+            return View::render($res, 'dashboard/scheduled/edit.php', [
+                'title' => 'Edit scheduled',
+                'item' => array_merge($row ?: [], ['priority' => $priority, 'send_after' => $sendAfter]),
+                'errors' => $errors,
+            ], 'layouts/main.php');
+        }
+        $stmt = $this->db->prepare('UPDATE telegram_scheduled_messages SET priority = :priority, send_after = :send_after WHERE id = :id AND status = \"pending\"');
+        $stmt->execute(['priority' => $priority, 'send_after' => $sendAfter, 'id' => $id]);
+        return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
+    }
+
+    /**
+     * Отменяет отправку (только для не начатых): переводит в canceled.
+     */
+    public function cancel(Req $req, Res $res, array $args): Res
+    {
+        $id = (int)($args['id'] ?? 0);
+        $stmt = $this->db->prepare('UPDATE telegram_scheduled_messages SET status = \"canceled\", canceled_at = NOW() WHERE id = :id AND status = \"pending\"');
+        $stmt->execute(['id' => $id]);
+        return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
+    }
+
+    /**
      * Немедленно отправляет запланированное сообщение.
      */
     public function sendNow(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
+        // Only for pending
+        $lock = $this->db->prepare('UPDATE telegram_scheduled_messages SET status = \"processing\", started_at = NOW() WHERE id = :id AND status = \"pending\"');
+        $lock->execute(['id' => $id]);
         $insert = $this->db->prepare(
             'INSERT INTO telegram_messages (user_id, method, `type`, data, priority) ' .
             'SELECT user_id, method, `type`, data, priority FROM telegram_scheduled_messages WHERE id = :id'
         );
         $insert->execute(['id' => $id]);
-
-        $del = $this->db->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id');
-        $del->execute(['id' => $id]);
 
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
     }
@@ -141,7 +201,8 @@ final class ScheduledController
     public function delete(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->db->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id');
+        // Allow delete only if not started
+        $stmt = $this->db->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id AND status = \"pending\"');
         $stmt->execute(['id' => $id]);
 
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);

@@ -51,7 +51,7 @@ final class HomeController
 
         // 2. COUNT telegram_scheduled_messages с send_after <= NOW()
         $stmt = $this->db->query(
-            'SELECT COUNT(*) FROM telegram_scheduled_messages WHERE send_after <= NOW()'
+            "SELECT COUNT(*) FROM telegram_scheduled_messages WHERE send_after <= NOW() AND status = 'pending'"
         );
         $scheduled = (int)$stmt->fetchColumn();
 
