@@ -2,7 +2,6 @@
 /** @var array $item */
 /** @var array $errors */
 /** @var string $csrfToken */
-var_dump($item);
 ?>
 <h1 class="mb-3">Редактировать сообщение</h1>
 <?php if (!empty($errors)): ?>
@@ -17,8 +16,7 @@ var_dump($item);
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
 
     <div class="mb-3">
-        <label class="form-label">ID</label>
-        <div class="form-control-plaintext">#<?= htmlspecialchars((string)($item['id'] ?? '')) ?></div>
+        <b>ID</b> #<?= htmlspecialchars((string)($item['id'] ?? '')) ?>
     </div>
     <div class="mb-3">
         <label class="form-label">Приоритет</label>
