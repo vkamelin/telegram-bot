@@ -114,3 +114,37 @@ code, pre {
 .dataTables_empty {
     color: #cccccc !important;
 }
+
+/* Telegram-like spoiler styling */
+tg-spoiler {
+    position: relative;
+    display: inline;
+    padding: 0 .2em;
+    border-radius: .25rem;
+    cursor: pointer;
+    color: transparent; /* hide text color */
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone; /* keep background on wrapped lines */
+    transition: background-color .2s ease, color .2s ease, text-shadow .2s ease;
+    background: var(--tg-spoiler-bg);
+    text-shadow: 0 0 .6em var(--tg-spoiler-shadow); /* obscure glyph shapes */
+}
+
+[data-bs-theme="light"] tg-spoiler {
+    --tg-spoiler-bg: repeating-linear-gradient(135deg, rgba(0,0,0,.08) 0 8px, rgba(0,0,0,.12) 8px 16px);
+    --tg-spoiler-shadow: rgba(0,0,0,.6);
+}
+
+[data-bs-theme="dark"] tg-spoiler {
+    --tg-spoiler-bg: repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 8px, rgba(255,255,255,.14) 8px 16px);
+    --tg-spoiler-shadow: rgba(255,255,255,.8);
+}
+
+/* Reveal on hover/focus or when toggled with class */
+tg-spoiler:hover,
+tg-spoiler:focus,
+tg-spoiler.revealed {
+    color: inherit;
+    background: transparent;
+    text-shadow: none;
+}
