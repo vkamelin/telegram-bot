@@ -9,9 +9,9 @@ $(document).ready(function() {
     { data: 'priority' },
     { data: 'send_after' },
     { data: 'status', render: function(data){
-      if (data === 'pending') return '<span class="badge bg-warning text-dark">pending</span>';
-      if (data === 'processing') return '<span class="badge bg-info text-dark">processing</span>';
-      if (data === 'canceled') return '<span class="badge bg-secondary">canceled</span>';
+      if (data === 'pending') return '<span class="badge bg-warning text-dark">ожидает</span>';
+      if (data === 'processing') return '<span class="badge bg-info text-dark">отправляется</span>';
+      if (data === 'canceled') return '<span class="badge bg-secondary">отменено</span>';
       return data;
     }},
     { data: 'created_at' },

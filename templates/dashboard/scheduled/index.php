@@ -11,12 +11,12 @@
     <tr>
         <th>ID</th>
         <th>User ID</th>
-        <th>Method</th>
-        <th>Type</th>
-        <th>Priority</th>
-        <th>Send After</th>
-        <th>Status</th>
-        <th>Created At</th>
+        <th>Метод</th>
+        <th>Тип</th>
+        <th>Приоритет</th>
+        <th>Время отправки</th>
+        <th>Статус</th>
+        <th>Создано</th>
         <th class="text-end">Действия</th>
     </tr>
     </thead>
@@ -25,12 +25,12 @@
     <tr>
         <th>ID</th>
         <th>User ID</th>
-        <th>Method</th>
-        <th>Type</th>
-        <th>Priority</th>
-        <th>Send After</th>
-        <th>Status</th>
-        <th>Created At</th>
+        <th>Метод</th>
+        <th>Тип</th>
+        <th>Приоритет</th>
+        <th>Время отправки</th>
+        <th>Статус</th>
+        <th>Создано</th>
         <th class="text-end">Действия</th>
     </tr>
     </tfoot>
