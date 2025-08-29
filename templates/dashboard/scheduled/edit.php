@@ -2,6 +2,7 @@
 /** @var array $item */
 /** @var array $errors */
 /** @var string $csrfToken */
+var_dump($item);
 ?>
 <h1 class="mb-3">Редактировать сообщение</h1>
 <?php if (!empty($errors)): ?>
@@ -23,9 +24,21 @@
         <label class="form-label">Приоритет</label>
         <input type="number" class="form-control" name="priority" value="<?= htmlspecialchars((string)($item['priority'] ?? 2)) ?>" min="0" max="2">
     </div>
+    <?php
+    $sendAfterRaw = (string)($item['send_after'] ?? '');
+    $sendAfterVal = '';
+    if ($sendAfterRaw !== '') {
+        // Поддерживаем как "YYYY-MM-DD HH:MM:SS", так и "YYYY-MM-DDTHH:MM[:SS]"
+        $normalized = str_replace('T', ' ', substr($sendAfterRaw, 0, 19));
+        $ts = strtotime($normalized);
+        if ($ts !== false) {
+            $sendAfterVal = date('Y-m-d\TH:i', $ts);
+        }
+    }
+    ?>
     <div class="mb-3">
         <label class="form-label">Время отправки</label>
-        <input type="datetime-local" class="form-control" name="send_after" value="<?= htmlspecialchars((string)($item['send_after'] ?? '')) ?>">
+        <input type="datetime-local" class="form-control" name="send_after" value="<?= htmlspecialchars($sendAfterVal) ?>">
     </div>
     <button type="submit" class="btn btn-outline-success">Сохранить</button>
     <a href="<?= url('/dashboard/scheduled') ?>" class="btn btn-outline-secondary ms-2">Отменить</a>

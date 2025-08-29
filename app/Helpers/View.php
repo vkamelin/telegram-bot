@@ -36,9 +36,9 @@ final class View
         $menu = require $basePath . 'menu.php';
         self::markActive($menu, $currentPath);
         $submenu = [];
-        foreach ($menu as $item) {
-            if (($item['class'] ?? '') === 'active' && isset($item['children'])) {
-                $submenu = $item['children'];
+        foreach ($menu as $menuItem) {
+            if (($menuItem['class'] ?? '') === 'active' && isset($menuItem['children'])) {
+                $submenu = $menuItem['children'];
                 break;
             }
         }
@@ -52,7 +52,8 @@ final class View
 
         $templatePath = $basePath . ltrim($template, '/');
         ob_start();
-        extract($vars, EXTR_SKIP);
+        // Allow page-specific params to override any local names
+        extract($vars, EXTR_OVERWRITE);
         require $templatePath;
         $content = ob_get_clean();
 
