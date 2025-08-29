@@ -4,7 +4,7 @@
 /** @var array $data */
 /** @var string $csrfToken */
 ?>
-<h1 class="mb-3">Send message</h1>
+<h1 class="mb-3">Отправить сообщение</h1>
 <?php if (!empty($errors)): ?>
     <div class="alert alert-danger">
         <?php foreach ($errors as $e): ?>
@@ -16,20 +16,20 @@
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
 
     <div class="mb-3">
-        <label for="messageType" class="form-label">Type</label>
+        <label for="messageType" class="form-label">Тип</label>
         <select class="form-select" name="type" id="messageType">
             <?php
             $types = [
-                'text' => 'Text',
-                'photo' => 'Photo',
-                'audio' => 'Audio',
-                'video' => 'Video',
-                'document' => 'Document',
-                'sticker' => 'Sticker',
-                'animation' => 'Animation',
-                'voice' => 'Voice',
-                'video_note' => 'Video Note',
-                'media_group' => 'Media Group'
+                'text' => 'Текст',
+                'photo' => 'Фото',
+                'audio' => 'Аудио',
+                'video' => 'Видео',
+                'document' => 'Документ',
+                'sticker' => 'Стикер',
+                'animation' => 'Анимация (GIF)',
+                'voice' => 'Голосовое смообщение',
+                'video_note' => 'Видео кружочек',
+                'media_group' => 'Медиа группа'
             ];
             $curType = $data['type'] ?? 'text';
             foreach ($types as $val => $label): ?>
@@ -38,151 +38,149 @@
         </select>
     </div>
 
-    <div class="mb-3 message-fields <?= $curType === 'text' ? '' : 'd-none' ?>" data-type="text">
-        <textarea class="form-control" name="text" rows="3" placeholder="Text message"><?= htmlspecialchars($data['text'] ?? '') ?></textarea>
-    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="message-fields <?= $curType === 'text' ? '' : 'd-none' ?>" data-type="text">
+                <textarea class="form-control" name="text" rows="3" placeholder="Сообщение"><?= htmlspecialchars($data['text'] ?? '') ?></textarea>
+            </div>
 
-    <div class="mb-3 message-fields <?= $curType === 'photo' ? '' : 'd-none' ?>" data-type="photo">
-        <input class="form-control mb-2" type="file" name="photo">
-        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
-        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="has_spoiler" id="photoSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
-            <label class="form-check-label" for="photoSpoiler">Has spoiler</label>
+            <div class="message-fields <?= $curType === 'photo' ? '' : 'd-none' ?>" data-type="photo">
+                <input class="form-control mb-2" type="file" name="photo">
+                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="has_spoiler" id="photoSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="photoSpoiler">Спойлер</label>
+                </div>
+            </div>
+
+            <div class="message-fields <?= $curType === 'audio' ? '' : 'd-none' ?>" data-type="audio">
+                <input class="form-control mb-2" type="file" name="audio">
+                <input class="form-control mb-2" type="text" name="caption" placeholder="Текст" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <input class="form-control mb-2" type="number" name="duration" placeholder="Продолжительность (секунд)" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+                <input class="form-control mb-2" type="text" name="performer" placeholder="Автор" value="<?= htmlspecialchars($data['performer'] ?? '') ?>">
+                <input class="form-control" type="text" name="title" placeholder="Название" value="<?= htmlspecialchars($data['title'] ?? '') ?>">
+            </div>
+
+            <div class="message-fields <?= $curType === 'video' ? '' : 'd-none' ?>" data-type="video">
+                <input class="form-control mb-2" type="file" name="video">
+                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="row g-2 mb-2">
+                    <div class="col"><input class="form-control" type="number" name="width" placeholder="Ширина" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
+                    <div class="col"><input class="form-control" type="number" name="height" placeholder="Высота" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
+                </div>
+                <input class="form-control mb-2" type="number" name="duration" placeholder="Продолжительность (секунд)" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="has_spoiler" id="videoSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="videoSpoiler">Спойлер</label>
+                </div>
+            </div>
+
+            <div class="message-fields <?= $curType === 'document' ? '' : 'd-none' ?>" data-type="document">
+                <input class="form-control mb-2" type="file" name="document">
+                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+            </div>
+
+            <div class="message-fields <?= $curType === 'sticker' ? '' : 'd-none' ?>" data-type="sticker">
+                <input class="form-control" type="file" name="sticker">
+            </div>
+
+            <div class="message-fields <?= $curType === 'animation' ? '' : 'd-none' ?>" data-type="animation">
+                <input class="form-control mb-2" type="file" name="animation">
+                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="row g-2 mb-2">
+                    <div class="col"><input class="form-control" type="number" name="width" placeholder="Шитрина" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
+                    <div class="col"><input class="form-control" type="number" name="height" placeholder="Высота" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
+                </div>
+                <input class="form-control mb-2" type="number" name="duration" placeholder="Продолжительность (секунд)" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="has_spoiler" id="animationSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="animationSpoiler">Спойлер</label>
+                </div>
+            </div>
+
+            <div class="message-fields <?= $curType === 'voice' ? '' : 'd-none' ?>" data-type="voice">
+                <input class="form-control mb-2" type="file" name="voice">
+                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <input class="form-control" type="number" name="duration" placeholder="Продолжительность (секунд)" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
+            </div>
+
+            <div class="message-fields <?= $curType === 'video_note' ? '' : 'd-none' ?>" data-type="video_note">
+                <input class="form-control" type="file" name="video_note">
+                <div class="row g-2 mt-2">
+                    <div class="col"><input class="form-control" type="number" name="length" placeholder="Ширина/Высота" value="<?= htmlspecialchars($data['length'] ?? '') ?>"></div>
+                    <div class="col"><input class="form-control" type="number" name="duration" placeholder="Продолжительность (секунд)" value="<?= htmlspecialchars($data['duration'] ?? '') ?>"></div>
+                </div>
+            </div>
+
+            <div class="message-fields <?= $curType === 'media_group' ? '' : 'd-none' ?>" data-type="media_group">
+                <input class="form-control mb-2" type="file" name="media[]" multiple>
+                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+            </div>
         </div>
     </div>
 
-    <div class="mb-3 message-fields <?= $curType === 'audio' ? '' : 'd-none' ?>" data-type="audio">
-        <input class="form-control mb-2" type="file" name="audio">
-        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
-        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
-        <input class="form-control mb-2" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
-        <input class="form-control mb-2" type="text" name="performer" placeholder="Performer" value="<?= htmlspecialchars($data['performer'] ?? '') ?>">
-        <input class="form-control" type="text" name="title" placeholder="Title" value="<?= htmlspecialchars($data['title'] ?? '') ?>">
-    </div>
-
-    <div class="mb-3 message-fields <?= $curType === 'video' ? '' : 'd-none' ?>" data-type="video">
-        <input class="form-control mb-2" type="file" name="video">
-        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
-        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
-        <div class="row g-2 mb-2">
-            <div class="col"><input class="form-control" type="number" name="width" placeholder="Width" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
-            <div class="col"><input class="form-control" type="number" name="height" placeholder="Height" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
-        </div>
-        <input class="form-control mb-2" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="has_spoiler" id="videoSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
-            <label class="form-check-label" for="videoSpoiler">Has spoiler</label>
-        </div>
-    </div>
-
-    <div class="mb-3 message-fields <?= $curType === 'document' ? '' : 'd-none' ?>" data-type="document">
-        <input class="form-control mb-2" type="file" name="document">
-        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
-        <input class="form-control" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
-    </div>
-
-    <div class="mb-3 message-fields <?= $curType === 'sticker' ? '' : 'd-none' ?>" data-type="sticker">
-        <input class="form-control" type="file" name="sticker">
-    </div>
-
-    <div class="mb-3 message-fields <?= $curType === 'animation' ? '' : 'd-none' ?>" data-type="animation">
-        <input class="form-control mb-2" type="file" name="animation">
-        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
-        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
-        <div class="row g-2 mb-2">
-            <div class="col"><input class="form-control" type="number" name="width" placeholder="Width" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
-            <div class="col"><input class="form-control" type="number" name="height" placeholder="Height" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
-        </div>
-        <input class="form-control mb-2" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="has_spoiler" id="animationSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
-            <label class="form-check-label" for="animationSpoiler">Has spoiler</label>
-        </div>
-    </div>
-
-    <div class="mb-3 message-fields <?= $curType === 'voice' ? '' : 'd-none' ?>" data-type="voice">
-        <input class="form-control mb-2" type="file" name="voice">
-        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
-        <input class="form-control mb-2" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
-        <input class="form-control" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
-    </div>
-
-    <div class="mb-3 message-fields <?= $curType === 'video_note' ? '' : 'd-none' ?>" data-type="video_note">
-        <input class="form-control" type="file" name="video_note">
-        <div class="row g-2 mt-2">
-            <div class="col"><input class="form-control" type="number" name="length" placeholder="Length" value="<?= htmlspecialchars($data['length'] ?? '') ?>"></div>
-            <div class="col"><input class="form-control" type="number" name="duration" placeholder="Duration" value="<?= htmlspecialchars($data['duration'] ?? '') ?>"></div>
-        </div>
-    </div>
-
-    <div class="mb-3 message-fields <?= $curType === 'media_group' ? '' : 'd-none' ?>" data-type="media_group">
-        <input class="form-control mb-2" type="file" name="media[]" multiple>
-        <input class="form-control mb-2" type="text" name="caption" placeholder="Caption" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
-        <input class="form-control" type="text" name="parse_mode" placeholder="Parse mode" value="<?= htmlspecialchars($data['parse_mode'] ?? '') ?>">
-    </div>
     <div class="mb-3">
         <div class="form-check">
             <input class="form-check-input" type="radio" name="mode" id="modeAll" value="all" <?= (($data['mode'] ?? '') === 'all') ? 'checked' : '' ?>>
-            <label class="form-check-label" for="modeAll">All users</label>
+            <label class="form-check-label" for="modeAll">Все пользователи</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="mode" id="modeSingle" value="single" <?= (($data['mode'] ?? '') === 'single') ? 'checked' : '' ?>>
-            <label class="form-check-label" for="modeSingle">Single user</label>
+            <label class="form-check-label" for="modeSingle">Отдельный пользователь/канал/чат</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="mode" id="modeSelected" value="selected" <?= (($data['mode'] ?? '') === 'selected') ? 'checked' : '' ?>>
-            <label class="form-check-label" for="modeSelected">Selected users</label>
+            <label class="form-check-label" for="modeSelected">Выбранные пользователи</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="mode" id="modeGroup" value="group" <?= (($data['mode'] ?? '') === 'group') ? 'checked' : '' ?>>
-            <label class="form-check-label" for="modeGroup">Group</label>
+            <label class="form-check-label" for="modeGroup">Группа</label>
         </div>
     </div>
     <div id="singleUserSection" class="mb-3 d-none">
         <input type="text" class="form-control" name="user" id="singleUserInput" placeholder="User ID or username" value="<?= htmlspecialchars($data['user'] ?? '') ?>">
     </div>
     <div id="selectedUsersSection" class="mb-3 d-none">
-        <input type="text" class="form-control mb-2" id="userSearchInput" placeholder="Search user">
+        <input type="text" class="form-control mb-2" id="userSearchInput" placeholder="Поиск пользователя">
         <ul class="list-group mb-2" id="userSearchResults"></ul>
         <ul class="list-group" id="selectedUsers">
             <?php if (!empty($data['users']) && is_array($data['users'])): foreach ($data['users'] as $u): ?>
                 <li class="list-group-item d-flex justify-content-between align-items-center" data-user-id="<?= htmlspecialchars((string)$u) ?>">
                     <span><?= htmlspecialchars((string)$u) ?></span>
                     <input type="hidden" name="users[]" value="<?= htmlspecialchars((string)$u) ?>">
-                    <button type="button" class="btn btn-sm btn-outline-danger remove-user">Remove</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-user">Удалить</button>
                 </li>
             <?php endforeach; endif; ?>
         </ul>
     </div>
     <div id="groupSection" class="mb-3 d-none">
         <select class="form-select" name="group_id" id="groupSelect">
-            <option value="">Select group</option>
+            <option value="">Выберите группу</option>
             <?php foreach ($groups as $g): ?>
                 <option value="<?= $g['id'] ?>" <?= (($data['group_id'] ?? '') == $g['id']) ? 'selected' : '' ?>><?= htmlspecialchars($g['name']) ?></option>
             <?php endforeach; ?>
         </select>
     </div>
     <div class="mb-3">
-        <label for="msgTypeInput" class="form-label">Message kind (DB type)</label>
-        <input class="form-control" name="msg_type" id="msgTypeInput" placeholder="e.g. campaign, promo, service" value="<?= htmlspecialchars($data['msg_type'] ?? 'message') ?>">
+        <label for="msgTypeInput" class="form-label">Тип сообщения (латиница)</label>
+        <input class="form-control" name="msg_type" id="msgTypeInput" placeholder="например, campaign, promo, service" value="<?= htmlspecialchars($data['msg_type'] ?? 'message') ?>">
         <div class="form-text">Сохранится в колонке <code>type</code> таблиц сообщений.</div>
     </div>
     <div class="mb-3">
-        <label class="form-label">Send time</label>
+        <label class="form-label">Время отправки</label>
         <?php $sendMode = $data['send_mode'] ?? 'now'; ?>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="send_mode" id="sendNow" value="now" <?= $sendMode === 'now' ? 'checked' : '' ?>>
-            <label class="form-check-label" for="sendNow">Send now</label>
+            <label class="form-check-label" for="sendNow">Отправить сейчас</label>
         </div>
         <div class="form-check mb-2">
             <input class="form-check-input" type="radio" name="send_mode" id="sendLater" value="schedule" <?= $sendMode === 'schedule' ? 'checked' : '' ?>>
-            <label class="form-check-label" for="sendLater">Schedule</label>
+            <label class="form-check-label" for="sendLater">По расписанию</label>
         </div>
         <input type="datetime-local" class="form-control" name="send_after" id="sendAfterInput" value="<?= htmlspecialchars($data['send_after'] ?? '') ?>">
-        <div class="form-text">Server time will be used.</div>
+        <div class="form-text">Будет использовано серверное время (<?= date('H:i d.m.Y') ?>).</div>
     </div>
-    <button type="submit" class="btn btn-primary">Send</button>
+    <button type="submit" class="btn btn-outline-success">Отправить</button>
 </form>
 <script>
     window.tgUserSearchUrl = '<?= url('/dashboard/tg-users/search') ?>';

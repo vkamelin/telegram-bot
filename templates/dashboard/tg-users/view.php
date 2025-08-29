@@ -14,13 +14,13 @@
             <dt class="col-sm-3">Язык</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['language_code']) ?></dd>
             <dt class="col-sm-3">Премиум</dt>
-            <dd class="col-sm-9"><?= (int)$user['is_premium'] ?></dd>
+            <dd class="col-sm-9"><?= (int)$user['is_premium'] == 0 ? 'Нет' : 'Да' ?></dd>
             <dt class="col-sm-3">Забанен</dt>
-            <dd class="col-sm-9"><?= (int)$user['is_user_banned'] ?></dd>
+            <dd class="col-sm-9"><?= (int)$user['is_user_banned'] == 0 ? 'Нет' : 'Да' ?></dd>
             <dt class="col-sm-3">Бот забанен</dt>
-            <dd class="col-sm-9"><?= (int)$user['is_bot_banned'] ?></dd>
+            <dd class="col-sm-9"><?= (int)$user['is_bot_banned'] == 0 ? 'Нет' : 'Да' ?></dd>
             <dt class="col-sm-3">Подписан</dt>
-            <dd class="col-sm-9"><?= (int)$user['is_subscribed'] ?></dd>
+            <dd class="col-sm-9"><?= (int)$user['is_subscribed'] == 0 ? 'Нет' : 'Да' ?></dd>
             <dt class="col-sm-3">Реферальный код</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['referral_code']) ?></dd>
             <dt class="col-sm-3">UTM</dt>
