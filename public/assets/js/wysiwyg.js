@@ -89,8 +89,8 @@
     });
   }
 
-  function initEditor(selector, hiddenSelector, counterSelector, limit) {
-    const $editor = $(selector);
+  function initEditorEl(editorEl, hiddenSelector, counterSelector, limit) {
+    const $editor = $(editorEl);
     const editor = $editor[0];
     const $counter = counterSelector ? $(counterSelector) : null;
     if (!editor) return;
@@ -119,12 +119,14 @@
   }
 
   $(function () {
-    // Auto-init from window._wysiwygEditors (created per view)
-    if (Array.isArray(window._wysiwygEditors)) {
-      window._wysiwygEditors.forEach(cfg => {
-        initEditor(cfg.editor, cfg.hidden, cfg.counter, cfg.limit);
-      });
-    }
+    // Auto-scan editors by data-attributes to avoid inline config
+    $('.wysiwyg-editor').each(function () {
+      const hiddenId = $(this).data('hiddenId');
+      const counterId = $(this).data('counterId');
+      const limit = parseInt($(this).data('limit'), 10) || null;
+      const hiddenSel = hiddenId ? ('#' + hiddenId) : null;
+      const counterSel = counterId ? ('#' + counterId) : null;
+      initEditorEl(this, hiddenSel, counterSel, limit);
+    });
   });
 })();
-

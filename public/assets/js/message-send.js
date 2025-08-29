@@ -1,7 +1,7 @@
 $(function () {
   const csrfToken = window.csrfToken || $('meta[name="csrf-token"]').attr('content');
   window.csrfToken = csrfToken;
-  const searchUrl = window.tgUserSearchUrl;
+  const searchUrl = $('#message-send-form').data('tgUserSearchUrl') || window.tgUserSearchUrl;
 
   const $typeSelect = $('#messageType');
   const $messageFields = $('.message-fields');
