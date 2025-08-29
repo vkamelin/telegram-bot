@@ -12,7 +12,7 @@
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
-<form method="post" action="<?= url('/dashboard/messages/send') ?>" enctype="multipart/form-data">
+<form id="message-send-form" method="post" action="<?= url('/dashboard/messages/send') ?>" enctype="multipart/form-data">
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
 
     <div class="mb-3">
@@ -41,12 +41,39 @@
     <div class="card mb-3">
         <div class="card-body">
             <div class="message-fields <?= $curType === 'text' ? '' : 'd-none' ?>" data-type="text">
-                <textarea class="form-control" name="text" rows="3" placeholder="Сообщение"><?= htmlspecialchars($data['text'] ?? '') ?></textarea>
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="pre"><i class="bi bi-braces"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-text" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 140px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['text'] ?? '')) ?></div>
+                <textarea class="d-none" name="text" id="text"></textarea>
+                <div class="form-text"><span id="counter-text">0</span>/4096</div>
             </div>
 
             <div class="message-fields <?= $curType === 'photo' ? '' : 'd-none' ?>" data-type="photo">
                 <input class="form-control mb-2" type="file" name="photo">
-                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-caption-photo" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 80px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['caption'] ?? '')) ?></div>
+                <textarea class="d-none" name="caption" id="caption-photo"></textarea>
+                <div class="form-text"><span id="counter-caption-photo">0</span>/1024</div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="has_spoiler" id="photoSpoiler" <?= !empty($data['has_spoiler']) ? 'checked' : '' ?>>
                     <label class="form-check-label" for="photoSpoiler">Спойлер</label>
@@ -55,7 +82,20 @@
 
             <div class="message-fields <?= $curType === 'audio' ? '' : 'd-none' ?>" data-type="audio">
                 <input class="form-control mb-2" type="file" name="audio">
-                <input class="form-control mb-2" type="text" name="caption" placeholder="Текст" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-caption-audio" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 80px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['caption'] ?? '')) ?></div>
+                <textarea class="d-none" name="caption" id="caption-audio"></textarea>
+                <div class="form-text"><span id="counter-caption-audio">0</span>/1024</div>
                 <input class="form-control mb-2" type="number" name="duration" placeholder="Продолжительность (секунд)" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
                 <input class="form-control mb-2" type="text" name="performer" placeholder="Автор" value="<?= htmlspecialchars($data['performer'] ?? '') ?>">
                 <input class="form-control" type="text" name="title" placeholder="Название" value="<?= htmlspecialchars($data['title'] ?? '') ?>">
@@ -63,7 +103,20 @@
 
             <div class="message-fields <?= $curType === 'video' ? '' : 'd-none' ?>" data-type="video">
                 <input class="form-control mb-2" type="file" name="video">
-                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-caption-video" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 80px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['caption'] ?? '')) ?></div>
+                <textarea class="d-none" name="caption" id="caption-video"></textarea>
+                <div class="form-text"><span id="counter-caption-video">0</span>/1024</div>
                 <div class="row g-2 mb-2">
                     <div class="col"><input class="form-control" type="number" name="width" placeholder="Ширина" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
                     <div class="col"><input class="form-control" type="number" name="height" placeholder="Высота" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
@@ -77,7 +130,20 @@
 
             <div class="message-fields <?= $curType === 'document' ? '' : 'd-none' ?>" data-type="document">
                 <input class="form-control mb-2" type="file" name="document">
-                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-caption-document" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 80px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['caption'] ?? '')) ?></div>
+                <textarea class="d-none" name="caption" id="caption-document"></textarea>
+                <div class="form-text"><span id="counter-caption-document">0</span>/1024</div>
             </div>
 
             <div class="message-fields <?= $curType === 'sticker' ? '' : 'd-none' ?>" data-type="sticker">
@@ -86,7 +152,20 @@
 
             <div class="message-fields <?= $curType === 'animation' ? '' : 'd-none' ?>" data-type="animation">
                 <input class="form-control mb-2" type="file" name="animation">
-                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-caption-animation" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 80px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['caption'] ?? '')) ?></div>
+                <textarea class="d-none" name="caption" id="caption-animation"></textarea>
+                <div class="form-text"><span id="counter-caption-animation">0</span>/1024</div>
                 <div class="row g-2 mb-2">
                     <div class="col"><input class="form-control" type="number" name="width" placeholder="Шитрина" value="<?= htmlspecialchars($data['width'] ?? '') ?>"></div>
                     <div class="col"><input class="form-control" type="number" name="height" placeholder="Высота" value="<?= htmlspecialchars($data['height'] ?? '') ?>"></div>
@@ -100,7 +179,20 @@
 
             <div class="message-fields <?= $curType === 'voice' ? '' : 'd-none' ?>" data-type="voice">
                 <input class="form-control mb-2" type="file" name="voice">
-                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-caption-voice" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 80px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['caption'] ?? '')) ?></div>
+                <textarea class="d-none" name="caption" id="caption-voice"></textarea>
+                <div class="form-text"><span id="counter-caption-voice">0</span>/1024</div>
                 <input class="form-control" type="number" name="duration" placeholder="Продолжительность (секунд)" value="<?= htmlspecialchars($data['duration'] ?? '') ?>">
             </div>
 
@@ -114,7 +206,20 @@
 
             <div class="message-fields <?= $curType === 'media_group' ? '' : 'd-none' ?>" data-type="media_group">
                 <input class="form-control mb-2" type="file" name="media[]" multiple>
-                <input class="form-control mb-2" type="text" name="caption" placeholder="Подпись" value="<?= htmlspecialchars($data['caption'] ?? '') ?>">
+                <div class="mb-2 d-flex flex-wrap gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-cmd="underline"><i class="bi bi-type-underline"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="s"><i class="bi bi-type-strikethrough"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary wysi-btn" data-wrap="code"><i class="bi bi-code"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="link"><i class="bi bi-link-45deg"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="spoiler">tg-spoiler</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="blockquote"><i class="bi bi-chat-right-quote"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="clear"><i class="bi bi-eraser"></i></button>
+                </div>
+                <div id="editor-caption-media_group" class="form-control wysiwyg-editor" contenteditable="true" style="min-height: 80px; white-space: pre-wrap;"><?= nl2br(htmlspecialchars($data['caption'] ?? '')) ?></div>
+                <textarea class="d-none" name="caption" id="caption-media_group"></textarea>
+                <div class="form-text"><span id="counter-caption-media_group">0</span>/1024</div>
             </div>
         </div>
     </div>
@@ -184,5 +289,17 @@
 </form>
 <script>
     window.tgUserSearchUrl = '<?= url('/dashboard/tg-users/search') ?>';
+    window._wysiwygEditors = [
+        { editor: '#editor-text', hidden: '#text', counter: '#counter-text', limit: 4096 },
+        { editor: '#editor-caption-photo', hidden: '#caption-photo', counter: '#counter-caption-photo', limit: 1024 },
+        { editor: '#editor-caption-audio', hidden: '#caption-audio', counter: '#counter-caption-audio', limit: 1024 },
+        { editor: '#editor-caption-video', hidden: '#caption-video', counter: '#counter-caption-video', limit: 1024 },
+        { editor: '#editor-caption-document', hidden: '#caption-document', counter: '#counter-caption-document', limit: 1024 },
+        { editor: '#editor-caption-animation', hidden: '#caption-animation', counter: '#counter-caption-animation', limit: 1024 },
+        { editor: '#editor-caption-voice', hidden: '#caption-voice', counter: '#counter-caption-voice', limit: 1024 },
+        { editor: '#editor-caption-media_group', hidden: '#caption-media_group', counter: '#counter-caption-media_group', limit: 1024 },
+    ];
 </script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+<script src="<?= url('/assets/js/wysiwyg.js') ?>"></script>
 <script src="<?= url('/assets/js/message-send.js') ?>"></script>
