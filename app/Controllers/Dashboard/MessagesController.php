@@ -257,11 +257,11 @@ final class MessagesController
         if ($data['send_mode'] === 'schedule') {
             $sa = $data['send_after'];
             if ($sa === '') {
-                $errors[] = 'send_after is required for schedule';
+                $errors[] = 'дата отправки требуется для расписания';
             } elseif (strtotime($sa) === false) {
-                $errors[] = 'send_after is invalid datetime';
+                $errors[] = 'дата отправки - недопустимая дата и время';
             } elseif (strtotime($sa) <= time()) {
-                $errors[] = 'send_after must be in the future';
+                $errors[] = 'дата отправки должен быть в будущем';
             } else {
                 $sendAfter = $sa;
             }
@@ -273,7 +273,7 @@ final class MessagesController
             case 'text':
                 $text = $data['text'];
                 if ($text === '') {
-                    $errors[] = 'text is required';
+                    $errors[] = 'требуется текст сообщения';
                 }
                 $sender = static fn (int $cid) => Push::text($cid, $text, $msgType, 2, [], $sendAfter);
                 break;
@@ -281,7 +281,7 @@ final class MessagesController
             case 'photo':
                 $path = $this->storeUploadedFile($_FILES['photo'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'photo is required';
+                    $errors[] = 'требуется файл изображения';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -299,7 +299,7 @@ final class MessagesController
             case 'audio':
                 $path = $this->storeUploadedFile($_FILES['audio'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'audio is required';
+                    $errors[] = 'требуется файл аудио';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -324,7 +324,7 @@ final class MessagesController
             case 'video':
                 $path = $this->storeUploadedFile($_FILES['video'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'video is required';
+                    $errors[] = 'требуется файл видео';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -354,7 +354,7 @@ final class MessagesController
             case 'document':
                 $path = $this->storeUploadedFile($_FILES['document'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'document is required';
+                    $errors[] = 'требуется файл документа';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -369,7 +369,7 @@ final class MessagesController
             case 'sticker':
                 $path = $this->storeUploadedFile($_FILES['sticker'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'sticker is required';
+                    $errors[] = 'требуется файл стикера';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -379,7 +379,7 @@ final class MessagesController
             case 'animation':
                 $path = $this->storeUploadedFile($_FILES['animation'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'animation is required';
+                    $errors[] = 'требуется файл анимации';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -409,7 +409,7 @@ final class MessagesController
             case 'voice':
                 $path = $this->storeUploadedFile($_FILES['voice'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'voice is required';
+                    $errors[] = 'требуется файл голосового сообщения';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -430,7 +430,7 @@ final class MessagesController
             case 'video_note':
                 $path = $this->storeUploadedFile($_FILES['video_note'] ?? []);
                 if ($path === null) {
-                    $errors[] = 'video_note is required';
+                    $errors[] = 'требуется файл видео кружочка';
                     break;
                 }
                 $storedFiles[] = $path;
@@ -476,18 +476,18 @@ final class MessagesController
                     }
                 }
                 if (!$media) {
-                    $errors[] = 'media is required';
+                    $errors[] = 'требуются медиа файлы';
                     break;
                 }
                 $sender = static fn (int $cid) => Push::mediaGroup($cid, $media, $msgType, 2, [], $sendAfter);
                 break;
 
             default:
-                $errors[] = 'unknown message type';
+                $errors[] = 'неизвестный тип сообщения';
         }
 
         if (!in_array($mode, ['all', 'single', 'selected', 'group'], true)) {
-            $errors[] = 'mode is invalid';
+            $errors[] = 'режим недействителен';
         }
 
         $chatIds = [];
@@ -500,7 +500,7 @@ final class MessagesController
                 case 'single':
                     $q = $data['user'];
                     if ($q === '') {
-                        $errors[] = 'user is required';
+                        $errors[] = 'требуется пользователь';
                         break;
                     }
                     if (ctype_digit($q)) {
@@ -514,13 +514,13 @@ final class MessagesController
                     if ($id !== false) {
                         $chatIds[] = (int)$id;
                     } else {
-                        $errors[] = 'User not found';
+                        $errors[] = 'Пользователь не найден';
                     }
                     break;
                 case 'selected':
                     $users = is_array($p['users'] ?? null) ? $p['users'] : [];
                     if (!$users) {
-                        $errors[] = 'No users selected';
+                        $errors[] = 'Не выбрано ни одного пользователя';
                         break;
                     }
                     foreach ($users as $u) {
@@ -541,13 +541,13 @@ final class MessagesController
                         }
                     }
                     if (!$chatIds) {
-                        $errors[] = 'No users found';
+                        $errors[] = 'Пользователи не найдены';
                     }
                     break;
                 case 'group':
                     $gid = (int)($p['group_id'] ?? 0);
                     if ($gid <= 0) {
-                        $errors[] = 'group_id is required';
+                        $errors[] = 'требуется идентификатор group_id';
                         break;
                     }
                     $stmt = $this->db->prepare('SELECT tu.user_id FROM telegram_user_group_user ugu JOIN telegram_users tu ON tu.id = ugu.user_id WHERE ugu.group_id = :gid');
@@ -567,10 +567,10 @@ final class MessagesController
                 $ok = $sender($cid) && $ok;
             }
             if ($ok) {
-                Flash::add('success', 'Message queued');
+                Flash::add('success', 'Сообщение поставлено в очередьd');
                 return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
             }
-            $errors[] = 'Failed to queue message';
+            $errors[] = 'Не удалось поместить сообщение в очередь';
         }
 
         if ($errors) {
@@ -581,7 +581,7 @@ final class MessagesController
 
         $groups = $this->db->query('SELECT id,name FROM telegram_user_groups ORDER BY name')->fetchAll();
         $params = [
-            'title' => 'Send message',
+            'title' => 'Отправить сообщение',
             'groups' => $groups,
             'errors' => $errors,
             'data' => $data,
