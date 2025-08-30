@@ -143,20 +143,41 @@ final class MessagesController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT id, user_id, method, `type`, status, priority, error, code, processed_at, scheduled_id FROM telegram_messages {$whereSql} ORDER BY id DESC";
-        if ($length > 0) {
-            $sql .= ' LIMIT :limit OFFSET :offset';
+        try {
+            $sql = "SELECT id, user_id, method, `type`, status, priority, error, code, processed_at, scheduled_id FROM telegram_messages {$whereSql} ORDER BY id DESC";
+            if ($length > 0) {
+                $sql .= ' LIMIT :limit OFFSET :offset';
+            }
+            $stmt = $this->db->prepare($sql);
+            foreach ($params as $key => $val) {
+                $stmt->bindValue(':' . $key, $val);
+            }
+            if ($length > 0) {
+                $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            $rows = $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            // Fallback for legacy schema without scheduled_id
+            $sql = "SELECT id, user_id, method, `type`, status, priority, error, code, processed_at FROM telegram_messages {$whereSql} ORDER BY id DESC";
+            if ($length > 0) {
+                $sql .= ' LIMIT :limit OFFSET :offset';
+            }
+            $stmt = $this->db->prepare($sql);
+            foreach ($params as $key => $val) {
+                $stmt->bindValue(':' . $key, $val);
+            }
+            if ($length > 0) {
+                $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            $rows = array_map(static function ($r) {
+                $r['scheduled_id'] = null;
+                return $r;
+            }, $stmt->fetchAll() ?: []);
         }
-        $stmt = $this->db->prepare($sql);
-        foreach ($params as $key => $val) {
-            $stmt->bindValue(':' . $key, $val);
-        }
-        if ($length > 0) {
-            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
-        }
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
 
         $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_messages {$whereSql}");
         foreach ($params as $key => $val) {
