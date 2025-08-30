@@ -85,20 +85,43 @@ final class ScheduledController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT id, user_id, method, `type`, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
-        if ($length > 0) {
-            $sql .= ' LIMIT :limit OFFSET :offset';
+        try {
+            $sql = "SELECT id, user_id, method, `type`, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
+            if ($length > 0) {
+                $sql .= ' LIMIT :limit OFFSET :offset';
+            }
+            $stmt = $this->db->prepare($sql);
+            foreach ($params as $key => $val) {
+                $stmt->bindValue(':' . $key, $val);
+            }
+            if ($length > 0) {
+                $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            $rows = $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            // Fallback for legacy schema without counters
+            $sql = "SELECT id, user_id, method, `type`, priority, send_after, status, created_at, started_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
+            if ($length > 0) {
+                $sql .= ' LIMIT :limit OFFSET :offset';
+            }
+            $stmt = $this->db->prepare($sql);
+            foreach ($params as $key => $val) {
+                $stmt->bindValue(':' . $key, $val);
+            }
+            if ($length > 0) {
+                $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            $rows = array_map(static function ($r) {
+                $r['selected_count'] = 0;
+                $r['success_count'] = 0;
+                $r['failed_count'] = 0;
+                return $r;
+            }, $stmt->fetchAll() ?: []);
         }
-        $stmt = $this->db->prepare($sql);
-        foreach ($params as $key => $val) {
-            $stmt->bindValue(':' . $key, $val);
-        }
-        if ($length > 0) {
-            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
-        }
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
 
         $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_scheduled_messages {$whereSql}");
         foreach ($params as $key => $val) {
@@ -123,9 +146,20 @@ final class ScheduledController
     public function show(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
-        $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch();
+        try {
+            $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
+            $stmt->execute(['id' => $id]);
+            $row = $stmt->fetch();
+        } catch (\Throwable $e) {
+            $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
+            $stmt->execute(['id' => $id]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $row['selected_count'] = 0;
+                $row['success_count'] = 0;
+                $row['failed_count'] = 0;
+            }
+        }
         if (!$row) {
             return $res->withStatus(404);
         }
