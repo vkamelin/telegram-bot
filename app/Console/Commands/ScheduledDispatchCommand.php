@@ -115,9 +115,11 @@ final class ScheduledDispatchCommand extends Command
 
                 $recipients = array_values(array_unique(array_filter($recipients, static fn($v) => is_int($v) || ctype_digit((string)$v))));
 
-                // Update selected_count for reporting
-                $db->prepare('UPDATE `telegram_scheduled_messages` SET `selected_count` = :cnt WHERE `id` = :id')
-                    ->execute(['cnt' => count($recipients), 'id' => $row['id']]);
+                // Update selected_count for reporting (if column exists)
+                if ($this->columnExists($db, 'telegram_scheduled_messages', 'selected_count')) {
+                    $db->prepare('UPDATE `telegram_scheduled_messages` SET `selected_count` = :cnt WHERE `id` = :id')
+                        ->execute(['cnt' => count($recipients), 'id' => $row['id']]);
+                }
 
                 if (!$recipients) {
                     // Nothing to send; return to pending to allow manual fix or cancel
@@ -166,7 +168,6 @@ final class ScheduledDispatchCommand extends Command
         echo "Scheduled dispatched: {$processed}" . PHP_EOL;
         return 0;
     }
-}
 
     /**
      * Checks if a column exists in the given table.
@@ -181,3 +182,4 @@ final class ScheduledDispatchCommand extends Command
             return false;
         }
     }
+}
