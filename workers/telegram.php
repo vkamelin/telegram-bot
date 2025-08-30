@@ -36,82 +36,6 @@ $workerCount = max(1, (int)($_ENV['WORKERS_BOT_PROCS'] ?? 1));
 const MAX_ATTEMPTS = 5;
 $perWorkerRps = max(1, intdiv($globalMaxRps, $workerCount));
 
-/**
- * Перемещает сообщения из расписания в основную очередь,
- * если пришло время их отправлять.
- */
-function dispatchScheduledMessages(): void
-{
-    $db = Database::getInstance();
-    try {
-        $redis = RedisHelper::getInstance();
-    } catch (\RedisException $e) {
-        Logger::error('Redis connection failed: ' . $e->getMessage());
-        return;
-    }
-
-    $stmt = $db->prepare(
-        "SELECT * FROM `telegram_scheduled_messages` WHERE `send_after` <= NOW() AND `status` = 'pending' ORDER BY `id` ASC LIMIT 100"
-    );
-    $stmt->execute();
-    $messages = $stmt->fetchAll();
-
-    foreach ($messages as $msg) {
-        try {
-            // Mark as processing to prevent double-dispatch
-            $lock = $db->prepare('UPDATE `telegram_scheduled_messages` SET `status` = \"processing\", `started_at` = NOW() WHERE `id` = :id AND `status` = \"pending\"');
-            $lock->execute(['id' => $msg['id']]);
-            // Re-check we actually locked this row
-            $check = $db->prepare('SELECT `status` FROM `telegram_scheduled_messages` WHERE `id` = :id');
-            $check->execute(['id' => $msg['id']]);
-            $cur = $check->fetchColumn();
-            if ($cur !== 'processing') {
-                continue;
-            }
-            $insert = $db->prepare(
-                "INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)"
-            );
-            $insert->execute([
-                'user_id' => $msg['user_id'],
-                'method' => $msg['method'],
-                'type' => $msg['type'],
-                'data' => $msg['data'],
-                'priority' => $msg['priority'],
-            ]);
-
-            $id = (int)$db->lastInsertId();
-            $messageKey = RedisKeyHelper::key('telegram', 'message', (string)$id);
-            $queueKey = RedisKeyHelper::key('telegram', 'queue', (string)$msg['priority']);
-
-            $redis->set($messageKey, [
-                'user_id' => $msg['user_id'],
-                'method' => $msg['method'],
-                'data' => $msg['data'],
-                'type' => $msg['type'],
-                'priority' => $msg['priority'],
-                'key' => (string)$id,
-            ]);
-
-            $redis->rPush($queueKey, [
-                'id' => $id,
-                'send_after' => strtotime($msg['send_after']),
-                'attempts' => 0,
-                'key' => (string)$id,
-            ]);
-
-            // Keep record with processing status as indication that sending has started
-        } catch (Throwable $e) {
-            Logger::error('Failed to dispatch scheduled message: ' . $e->getMessage());
-            // Rollback status to pending on failure so it can be retried
-            try {
-                $db->prepare('UPDATE `telegram_scheduled_messages` SET `status` = \"pending\" WHERE `id` = :id')
-                    ->execute(['id' => $msg['id']]);
-            } catch (Throwable $ex) {
-                // ignore
-            }
-        }
-    }
-}
 
 $queues = [
     RedisKeyHelper::get('telegram', 'message:queue', '2') => ['priority' => 2],
@@ -137,7 +61,7 @@ function runWorker(): void
             return;
         }
 
-        dispatchScheduledMessages();
+        // Отложенные сообщения более не обрабатываются воркером
 
         $totalQueue = 0;
         foreach ($queues as $queueKey => $queueInfo) {

@@ -161,7 +161,7 @@ final class ScheduledController
                 'errors' => $errors,
             ], 'layouts/main.php');
         }
-        $stmt = $this->db->prepare('UPDATE telegram_scheduled_messages SET priority = :priority, send_after = :send_after WHERE id = :id AND status = \"pending\"');
+        $stmt = $this->db->prepare("UPDATE telegram_scheduled_messages SET priority = :priority, send_after = :send_after WHERE id = :id AND status = 'pending'");
         $stmt->execute(['priority' => $priority, 'send_after' => $sendAfter, 'id' => $id]);
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
     }
@@ -172,7 +172,7 @@ final class ScheduledController
     public function cancel(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->db->prepare('UPDATE telegram_scheduled_messages SET status = \"canceled\", canceled_at = NOW() WHERE id = :id AND status = \"pending\"');
+        $stmt = $this->db->prepare("UPDATE telegram_scheduled_messages SET status = 'canceled', canceled_at = NOW() WHERE id = :id AND status = 'pending'");
         $stmt->execute(['id' => $id]);
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
     }
@@ -184,13 +184,46 @@ final class ScheduledController
     {
         $id = (int)($args['id'] ?? 0);
         // Only for pending
-        $lock = $this->db->prepare('UPDATE telegram_scheduled_messages SET status = \"processing\", started_at = NOW() WHERE id = :id AND status = \"pending\"');
+        $lock = $this->db->prepare("UPDATE telegram_scheduled_messages SET status = 'processing', started_at = NOW() WHERE id = :id AND status = 'pending'");
         $lock->execute(['id' => $id]);
-        $insert = $this->db->prepare(
-            'INSERT INTO telegram_messages (user_id, method, `type`, data, priority) ' .
-            'SELECT user_id, method, `type`, data, priority FROM telegram_scheduled_messages WHERE id = :id'
+
+        if ($lock->rowCount() === 0) {
+            return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
+        }
+
+        // Load scheduled record
+        $select = $this->db->prepare('SELECT user_id, method, `type`, data, priority FROM telegram_scheduled_messages WHERE id = :id');
+        $select->execute(['id' => $id]);
+        $msg = $select->fetch();
+        if (!$msg) {
+            return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
+        }
+
+        // Decode payload and enqueue via Push helper
+        try {
+            $payload = json_decode((string)$msg['data'], true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Throwable $e) {
+            \App\Helpers\Logger::error('Invalid scheduled message payload', ['id' => $id, 'exception' => $e]);
+            // rollback status so it can be retried
+            $this->db->prepare("UPDATE telegram_scheduled_messages SET status = 'pending' WHERE id = :id")
+                ->execute(['id' => $id]);
+            return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
+        }
+
+        $ok = \App\Helpers\Push::custom(
+            (string)$msg['method'],
+            is_array($payload) ? $payload : [],
+            isset($msg['user_id']) ? (int)$msg['user_id'] : null,
+            (string)$msg['type'],
+            (int)$msg['priority'],
+            null
         );
-        $insert->execute(['id' => $id]);
+
+        if (!$ok) {
+            // Return to pending so a user can retry later
+            $this->db->prepare("UPDATE telegram_scheduled_messages SET status = 'pending' WHERE id = :id")
+                ->execute(['id' => $id]);
+        }
 
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
     }
@@ -202,7 +235,7 @@ final class ScheduledController
     {
         $id = (int)($args['id'] ?? 0);
         // Allow delete only if not started
-        $stmt = $this->db->prepare('DELETE FROM telegram_scheduled_messages WHERE id = :id AND status = \"pending\"');
+        $stmt = $this->db->prepare("DELETE FROM telegram_scheduled_messages WHERE id = :id AND status = 'pending'");
         $stmt->execute(['id' => $id]);
 
         return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);

@@ -19,6 +19,7 @@ class Kernel
         Commands\UpdateFilterCommand::class,
         Commands\WorkerHandlerCommand::class,
         Commands\PushSendCommand::class,
+        Commands\ScheduledDispatchCommand::class,
     ];
 
     /**
