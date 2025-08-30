@@ -105,6 +105,9 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/scheduled/{id}/send-now', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->sendNow($req, $res, $args));
         $auth->post('/scheduled/{id}/delete', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->delete($req, $res, $args));
         $auth->get('/system', [\App\Controllers\Dashboard\SystemController::class, 'index']);
+        $auth->get('/logs', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->index($req, $res));
+        $auth->post('/logs/files', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->files($req, $res));
+        $auth->post('/logs/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->data($req, $res));
         // добавляйте страницы админки здесь
     })->add(new \App\Middleware\AuthMiddleware());
 })->add(new \App\Middleware\CsrfMiddleware())

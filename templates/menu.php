@@ -107,6 +107,11 @@ $menu = [
                 'title' => 'Система',
                 'icon'  => 'bi bi-gear',
             ],
+            [
+                'url'   => '/dashboard/logs',
+                'title' => 'Логи',
+                'icon'  => 'bi bi-journal-text',
+            ],
         ],
     ],
 ];
