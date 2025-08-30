@@ -6,7 +6,7 @@
 <h1>Лог: <?= htmlspecialchars($file) ?> (строка <?= (int)($item['line_no'] ?? 0) ?>)</h1>
 
 <div class="mb-3">
-  <a href="<?= url('/dashboard/logs') ?>" class="btn btn-outline-secondary">
+  <a href="<?= url('/dashboard/logs') . '?file=' . rawurlencode((string)$file) ?>" class="btn btn-outline-secondary">
     <i class="bi bi-arrow-left"></i> К списку логов
   </a>
 </div>
@@ -93,4 +93,3 @@
     Файл: <code><?= htmlspecialchars($file) ?></code>, строка: <code><?= (int)($item['line_no'] ?? 0) ?></code>
   </div>
 </div>
-

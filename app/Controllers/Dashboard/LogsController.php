@@ -51,6 +51,19 @@ final class LogsController
         $search = (string)($p['search']['value'] ?? '');
         $level = (string)($p['level'] ?? '');
         $file = basename((string)($p['file'] ?? ''));
+        if ($file === '') {
+            // Fallback to query param (when returning from details with ?file=...)
+            $q = $req->getQueryParams();
+            $file = basename((string)($q['file'] ?? ''));
+        }
+        if ($file === '') {
+            // As a last resort, pick the newest app-*.log
+            $candidates = glob($this->logsDir . '/app-*.log') ?: [];
+            if ($candidates !== []) {
+                usort($candidates, static fn($a, $b) => strcmp(basename($b), basename($a)));
+                $file = basename($candidates[0]);
+            }
+        }
         $path = $this->logsDir . '/' . $file;
 
         if ($file === '' || !is_file($path)) {

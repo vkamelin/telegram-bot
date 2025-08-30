@@ -4,16 +4,23 @@ $(document).ready(function(){
   const $search = $('#logSearch');
 
   function loadFiles() {
+    const qs = new URLSearchParams(window.location.search);
+    const qsFile = qs.get('file') || '';
     return $.post('/dashboard/logs/files', {_csrf_token: window.csrfToken})
       .then(function(resp){
         const files = resp.files || [];
         $file.empty();
+        const names = [];
         files.forEach(function(f){
           const opt = $('<option/>').val(f.name).text(f.name + ' (' + f.mtime + ', ' + humanSize(f.size) + ')');
           $file.append(opt);
+          names.push(f.name);
         });
         if (files.length > 0) {
           $file.val(files[0].name);
+          if (qsFile && names.indexOf(qsFile) !== -1) {
+            $file.val(qsFile);
+          }
         }
       });
   }

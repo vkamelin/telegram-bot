@@ -16,7 +16,7 @@
             // для неактивного — обводка как у outline-кнопок
             $linkClass = $isActive
                 ? 'nav-link active'
-                : 'btn btn-outline-primary';
+                : 'btn btn-outline-secondary text-body';
         ?>
         <li class="nav-item me-2 mb-2">
             <a href="<?= url($item['url']) ?>" class="<?= $linkClass ?>">
@@ -26,4 +26,3 @@
         </li>
     <?php endforeach; ?>
 </ul>
-
