@@ -108,6 +108,7 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/logs', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->index($req, $res));
         $auth->post('/logs/files', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->files($req, $res));
         $auth->post('/logs/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->data($req, $res));
+        $auth->get('/logs/view', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->show($req, $res));
         // добавляйте страницы админки здесь
     })->add(new \App\Middleware\AuthMiddleware());
 })->add(new \App\Middleware\CsrfMiddleware())

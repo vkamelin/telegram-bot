@@ -28,8 +28,8 @@ $(document).ready(function(){
   let table;
   loadFiles().then(function(){
     table = createDatatable('#logsTable', '/dashboard/logs/data', [
-      { data: 'datetime' },
-      { data: 'level_name' },
+      { data: 'datetime', render: function(v){ return formatDate(v); } },
+      { data: 'level_name', render: function(v){ return levelBadge(v); } },
       { data: 'channel' },
       { data: 'message', render: function(v){ return $('<div/>').text(v || '').html(); } },
       { data: null, render: function(row){
@@ -39,7 +39,13 @@ $(document).ready(function(){
           return '<span title="' + $('<div/>').text(msg).html() + '">' + $('<div/>').text(cls).html() + '</span>';
         }
       },
-      { data: 'request_id' }
+      { data: 'request_id' },
+      { data: null, className: 'text-end', render: function(row){
+          const file = encodeURIComponent($file.val() || '');
+          const line = row.line_no || '';
+          if (!file || !line) return '';
+          return '<a class="btn btn-sm btn-outline-secondary" href="/dashboard/logs/view?file=' + file + '&line=' + line + '"><i class="bi bi-box-arrow-up-right"></i></a>';
+        }, orderable: false, searchable: false }
     ], function(d){
       d.file = $file.val();
       d.level = $level.val();
@@ -54,5 +60,28 @@ $(document).ready(function(){
   $('#logReload, #logLevel').on('click change', function(){ table && table.ajax.reload(); });
   $('#logFile').on('change', function(){ table && table.ajax.reload(); });
   $('#logSearch').on('keypress', function(e){ if (e.which === 13) { table && table.ajax.reload(); } });
-});
 
+  function levelBadge(v){
+    v = (v || '').toUpperCase();
+    const map = {
+      'DEBUG': 'bg-secondary',
+      'INFO': 'bg-primary',
+      'NOTICE': 'bg-info text-dark',
+      'WARNING': 'bg-warning text-dark',
+      'ERROR': 'bg-danger',
+      'CRITICAL': 'bg-danger',
+      'ALERT': 'bg-danger',
+      'EMERGENCY': 'bg-danger'
+    };
+    const cls = map[v] || 'bg-light text-dark';
+    return '<span class="badge ' + cls + '">' + v + '</span>';
+  }
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function formatDate(s){
+    if (!s) return '';
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return $('<div/>').text(s).html();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+});

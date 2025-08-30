@@ -109,6 +109,37 @@ final class LogsController
     }
 
     /**
+     * Детальный просмотр одной записи лога по номеру строки.
+     */
+    public function show(Req $req, Res $res): Res
+    {
+        $q = $req->getQueryParams();
+        $file = basename((string)($q['file'] ?? ''));
+        $lineNo = (int)($q['line'] ?? 0);
+        $path = $this->logsDir . '/' . $file;
+        if ($file === '' || !is_file($path) || $lineNo <= 0) {
+            return $res->withStatus(404);
+        }
+        $rows = $this->readLogLines($path, 50000);
+        $item = null;
+        foreach ($rows as $r) {
+            if ((int)($r['line_no'] ?? 0) === $lineNo) {
+                $item = $r;
+                break;
+            }
+        }
+        if ($item === null) {
+            return $res->withStatus(404);
+        }
+
+        return View::render($res, 'dashboard/logs/view.php', [
+            'title' => 'Лог: ' . $file,
+            'file' => $file,
+            'item' => $item,
+        ], 'layouts/main.php');
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     private function readLogLines(string $path, int $limitLines = 50000): array
@@ -119,6 +150,7 @@ final class LogsController
             return $rows;
         }
         $count = 0;
+        $lineNo = 0;
         while (!feof($fh)) {
             $line = fgets($fh);
             if ($line === false) {
@@ -128,7 +160,11 @@ final class LogsController
             if ($line === '') {
                 continue;
             }
-            $rows[] = $this->parseLogLine($line);
+            $lineNo++;
+            $row = $this->parseLogLine($line);
+            $row['line_no'] = $lineNo;
+            $row['raw'] = $line;
+            $rows[] = $row;
             $count++;
             if ($count >= $limitLines) {
                 break;
@@ -170,4 +206,3 @@ final class LogsController
         return $row;
     }
 }
-
