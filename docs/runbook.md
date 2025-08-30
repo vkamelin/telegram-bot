@@ -33,6 +33,13 @@ kubectl rollout restart deployment app
 supervisorctl restart workers
 ```
 
+### Ручная постановка отложенных сообщений в очередь
+Если воркер отложенных сообщений не работает или требуется запустить обработку вручную:
+```bash
+php run scheduled:dispatch --limit=200
+```
+Где `--limit` — максимальное количество записей за один проход.
+
 ## Очистка очередей и логов
 ```bash
 redis-cli FLUSHALL

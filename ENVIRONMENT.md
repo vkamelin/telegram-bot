@@ -45,11 +45,14 @@ TELEMETRY_ENABLED=false  # включить метрики и трассиров
 # === Workers ===
 WORKERS_GPT_PROCS=1       # число процессов GPT
 WORKERS_TELEGRAM_PROCS=1  # число процессов Telegram
+WORKERS_SCHEDULED_PROCS=1 # число процессов воркера отложенных сообщений
+SCHEDULED_DISPATCH_LIMIT=100 # сколько отложенных записей обрабатывать за проход
 ````
 
 `TELEMETRY_ENABLED=true` включает отправку метрик и трассировку (при наличии зависимостей). При `false` вызовы `App\\Telemetry` становятся no-op.
 
-`WORKERS_GPT_PROCS` и `WORKERS_TELEGRAM_PROCS` задают количество процессов для GPT и Telegram воркеров (по умолчанию 1).
+`WORKERS_GPT_PROCS`, `WORKERS_TELEGRAM_PROCS` и `WORKERS_SCHEDULED_PROCS` задают количество процессов для GPT, Telegram и отложенных сообщений (по умолчанию 1).
+`SCHEDULED_DISPATCH_LIMIT` управляет батч-размером одного прохода командой `scheduled:dispatch` и воркером `scheduled_dispatcher.php`.
 
 ## Использование
 
