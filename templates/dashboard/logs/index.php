@@ -39,6 +39,7 @@
       <th>Сообщение</th>
       <th>Исключение</th>
       <th>RID</th>
+      <th class="text-end">Действия</th>
     </tr>
   </thead>
   <tbody></tbody>
@@ -50,6 +51,7 @@
       <th>Сообщение</th>
       <th>Исключение</th>
       <th>RID</th>
+      <th class="text-end">Действия</th>
     </tr>
   </tfoot>
 </table>
@@ -67,4 +69,3 @@
 
 <script src="<?= url('/assets/js/datatable.common.js') ?>"></script>
 <script src="<?= url('/assets/js/datatable.logs.js') ?>"></script>
-
