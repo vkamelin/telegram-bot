@@ -567,7 +567,7 @@ final class MessagesController
                 $ok = $sender($cid) && $ok;
             }
             if ($ok) {
-                Flash::add('success', 'Сообщение поставлено в очередьd');
+                Flash::add('success', 'Сообщение поставлено в очередь');
                 return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
             }
             $errors[] = 'Не удалось поместить сообщение в очередь';
