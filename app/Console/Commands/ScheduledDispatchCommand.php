@@ -37,9 +37,11 @@ final class ScheduledDispatchCommand extends Command
 
         $db = Database::getInstance();
 
-        // Try to select targeting columns if they exist; fallback to legacy schema
-        $rows = [];
-        try {
+        // Use schema detection to avoid noisy warnings in logs
+        $hasTargeting = $this->columnExists($db, 'telegram_scheduled_messages', 'target_type')
+            && $this->columnExists($db, 'telegram_scheduled_messages', 'target_group_id');
+
+        if ($hasTargeting) {
             $stmt = $db->prepare(
                 "SELECT id, user_id, method, `type`, `data`, priority, target_type, target_group_id
                    FROM `telegram_scheduled_messages`
@@ -47,12 +49,7 @@ final class ScheduledDispatchCommand extends Command
                   ORDER BY `id` ASC
                   LIMIT :limit"
             );
-            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-            $stmt->execute();
-            $rows = $stmt->fetchAll();
-        } catch (Throwable $e) {
-            // Older schema without targeting columns
-            Logger::warning('Scheduled targeting columns not found, using legacy selection');
+        } else {
             $stmt = $db->prepare(
                 "SELECT id, user_id, method, `type`, `data`, priority
                    FROM `telegram_scheduled_messages`
@@ -60,13 +57,16 @@ final class ScheduledDispatchCommand extends Command
                   ORDER BY `id` ASC
                   LIMIT :limit"
             );
-            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-            $stmt->execute();
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+        if (!$hasTargeting) {
             $rows = array_map(static function ($r) {
                 $r['target_type'] = null;
                 $r['target_group_id'] = null;
                 return $r;
-            }, $stmt->fetchAll() ?: []);
+            }, $rows ?: []);
         }
 
         $processed = 0;
@@ -167,3 +167,17 @@ final class ScheduledDispatchCommand extends Command
         return 0;
     }
 }
+
+    /**
+     * Checks if a column exists in the given table.
+     */
+    private function columnExists(PDO $db, string $table, string $column): bool
+    {
+        try {
+            $stmt = $db->prepare("SHOW COLUMNS FROM `{$table}` LIKE :col");
+            $stmt->execute(['col' => $column]);
+            return (bool)$stmt->fetchColumn();
+        } catch (Throwable) {
+            return false;
+        }
+    }
