@@ -363,9 +363,10 @@ class Push
         ?int $chatId = null,
         string $type = 'push',
         int $priority = 2,
-        ?string $sendAfter = null
+        ?string $sendAfter = null,
+        ?int $scheduledId = null
     ): bool {
-        return self::push($chatId, $method, $data, $type, $priority, $sendAfter);
+        return self::push($chatId, $method, $data, $type, $priority, $sendAfter, $scheduledId);
     }
 
     /**
@@ -384,7 +385,8 @@ class Push
         array $data,
         string $type = 'push',
         int $priority = 2,
-        ?string $sendAfter = null
+        ?string $sendAfter = null,
+        ?int $scheduledId = null
     ): bool {
         try {
             $redis = RedisHelper::getInstance();
@@ -417,10 +419,17 @@ class Push
                     }
                 } else {
                     try {
-                        $stmt = $db->prepare(
-                            'INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)'
-                        );
-                        $stmt->execute($insertData);
+                        if ($scheduledId !== null) {
+                            $stmt = $db->prepare(
+                                'INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `scheduled_id`, `data`, `priority`) VALUES (:user_id, :method, :type, :scheduled_id, :data, :priority)'
+                            );
+                            $stmt->execute($insertData + ['scheduled_id' => $scheduledId]);
+                        } else {
+                            $stmt = $db->prepare(
+                                'INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)'
+                            );
+                            $stmt->execute($insertData);
+                        }
 
                         // ID записанного сообщения
                         $id = $db->lastInsertId();

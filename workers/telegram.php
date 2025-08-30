@@ -298,6 +298,24 @@ function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
             'code' => $errorCode,
             'id' => $id,
         ]);
+
+        // If this message belongs to a scheduled batch, increment its counters
+        try {
+            $sidStmt = $db->prepare('SELECT scheduled_id FROM telegram_messages WHERE id = :id');
+            $sidStmt->execute(['id' => $id]);
+            $scheduledId = $sidStmt->fetchColumn();
+            if ($scheduledId !== false && $scheduledId !== null) {
+                if ($status === 'success') {
+                    $db->prepare('UPDATE `telegram_scheduled_messages` SET `success_count` = `success_count` + 1 WHERE id = :sid')
+                        ->execute(['sid' => (int)$scheduledId]);
+                } elseif ($status === 'failed') {
+                    $db->prepare('UPDATE `telegram_scheduled_messages` SET `failed_count` = `failed_count` + 1 WHERE id = :sid')
+                        ->execute(['sid' => (int)$scheduledId]);
+                }
+            }
+        } catch (Throwable $e) {
+            Logger::error('Failed to update scheduled counters: ' . $e->getMessage());
+        }
     } catch (\Exception $e) {
         Logger::error("Error saving update for ID {$id}: {$e->getMessage()}");
     }

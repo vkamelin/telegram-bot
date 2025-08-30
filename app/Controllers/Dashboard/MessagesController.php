@@ -561,7 +561,196 @@ final class MessagesController
             }
         }
 
-        if (!$errors && $chatIds && $sender !== null) {
+        // If it's a scheduled batch, create a single record with targeting metadata
+        if (!$errors && $data['send_mode'] === 'schedule') {
+            $method = null;
+            $payload = [];
+            $priority = 2;
+
+            // Build method/payload based on message type, excluding chat_id
+            switch ($type) {
+                case 'text':
+                    $method = 'sendMessage';
+                    $payload = array_filter([
+                        'text' => $data['text'],
+                        'parse_mode' => $data['parse_mode'] ?: null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'photo':
+                    $method = 'sendPhoto';
+                    $payload = array_filter([
+                        'photo' => $storedFiles[0] ?? null,
+                        'caption' => $data['caption'] ?: null,
+                        'parse_mode' => $data['parse_mode'] ?: null,
+                        'has_spoiler' => $data['has_spoiler'] ? true : null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'audio':
+                    $method = 'sendAudio';
+                    $payload = array_filter([
+                        'audio' => $storedFiles[0] ?? null,
+                        'caption' => $data['caption'] ?: null,
+                        'parse_mode' => $data['parse_mode'] ?: null,
+                        'duration' => $this->filterInt($data['duration'], 'duration', $errors) ?? null,
+                        'performer' => $data['performer'] ?: null,
+                        'title' => $data['title'] ?: null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'video':
+                    $method = 'sendVideo';
+                    $payload = array_filter([
+                        'video' => $storedFiles[0] ?? null,
+                        'caption' => $data['caption'] ?: null,
+                        'parse_mode' => $data['parse_mode'] ?: null,
+                        'width' => $this->filterInt($data['width'], 'width', $errors) ?? null,
+                        'height' => $this->filterInt($data['height'], 'height', $errors) ?? null,
+                        'duration' => $this->filterInt($data['duration'], 'duration', $errors) ?? null,
+                        'has_spoiler' => $data['has_spoiler'] ? true : null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'document':
+                    $method = 'sendDocument';
+                    $payload = array_filter([
+                        'document' => $storedFiles[0] ?? null,
+                        'caption' => $data['caption'] ?: null,
+                        'parse_mode' => $data['parse_mode'] ?: null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'sticker':
+                    $method = 'sendSticker';
+                    $payload = array_filter([
+                        'sticker' => $storedFiles[0] ?? null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'animation':
+                    $method = 'sendAnimation';
+                    $payload = array_filter([
+                        'animation' => $storedFiles[0] ?? null,
+                        'caption' => $data['caption'] ?: null,
+                        'parse_mode' => $data['parse_mode'] ?: null,
+                        'width' => $this->filterInt($data['width'], 'width', $errors) ?? null,
+                        'height' => $this->filterInt($data['height'], 'height', $errors) ?? null,
+                        'duration' => $this->filterInt($data['duration'], 'duration', $errors) ?? null,
+                        'has_spoiler' => $data['has_spoiler'] ? true : null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'voice':
+                    $method = 'sendVoice';
+                    $payload = array_filter([
+                        'voice' => $storedFiles[0] ?? null,
+                        'caption' => $data['caption'] ?: null,
+                        'parse_mode' => $data['parse_mode'] ?: null,
+                        'duration' => $this->filterInt($data['duration'], 'duration', $errors) ?? null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'video_note':
+                    $method = 'sendVideoNote';
+                    $payload = array_filter([
+                        'video_note' => $storedFiles[0] ?? null,
+                    ], static fn ($v) => $v !== null && $v !== '');
+                    break;
+                case 'media_group':
+                    $method = 'sendMediaGroup';
+                    $payload = [];
+                    $media = [];
+                    foreach (($_FILES['media'] ?? []) as $idx => $f) {
+                        $storedPath = $this->storeUploadedFile($f);
+                        if ($storedPath !== null) {
+                            $opts = [];
+                            if (($p['parse_mode'][$idx] ?? '') !== '') {
+                                $opts['parse_mode'] = (string)$p['parse_mode'][$idx];
+                            }
+                            if (!empty($p['has_spoiler'][$idx])) {
+                                $opts['has_spoiler'] = true;
+                            }
+                            $caption = trim((string)($p['caption'][$idx] ?? ''));
+                            $media[] = \App\Helpers\MediaBuilder::buildInputMedia('photo', $storedPath, $caption, $opts);
+                        }
+                    }
+                    if (!$media) {
+                        $errors[] = 'требуются медиа файлы';
+                    }
+                    $payload['media'] = $media;
+                    break;
+                default:
+                    $errors[] = 'неизвестный тип сообщения';
+            }
+
+            if (!$errors && $method !== null) {
+                $target = ['type' => $mode];
+                if ($mode === 'group') {
+                    $gid = (int)($p['group_id'] ?? 0);
+                    if ($gid <= 0) {
+                        $errors[] = 'требуется идентификатор group_id';
+                    }
+                    $target['group_id'] = $gid;
+                } elseif ($mode === 'selected') {
+                    $users = is_array($p['users'] ?? null) ? $p['users'] : [];
+                    $userIds = [];
+                    foreach ($users as $u) {
+                        $u = trim((string)$u);
+                        if ($u === '') {
+                            continue;
+                        }
+                        if (ctype_digit($u)) {
+                            $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE user_id = :uid');
+                            $stmt->execute(['uid' => (int)$u]);
+                        } else {
+                            $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE username = :uname');
+                            $stmt->execute(['uname' => $u]);
+                        }
+                        $id = $stmt->fetchColumn();
+                        if ($id !== false) {
+                            $userIds[] = (int)$id;
+                        }
+                    }
+                    if (!$userIds) {
+                        $errors[] = 'Пользователи не найдены';
+                    }
+                    $target['user_ids'] = $userIds;
+                } elseif ($mode === 'single') {
+                    // Convert single to selected with single recipient
+                    $q = trim((string)($p['user'] ?? ''));
+                    if ($q === '') {
+                        $errors[] = 'требуется пользователь';
+                    } else {
+                        if (ctype_digit($q)) {
+                            $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE user_id = :uid');
+                            $stmt->execute(['uid' => (int)$q]);
+                        } else {
+                            $stmt = $this->db->prepare('SELECT user_id FROM telegram_users WHERE username = :uname');
+                            $stmt->execute(['uname' => $q]);
+                        }
+                        $id = $stmt->fetchColumn();
+                        if ($id === false) {
+                            $errors[] = 'Пользователь не найден';
+                        } else {
+                            $target['type'] = 'selected';
+                            $target['user_ids'] = [(int)$id];
+                        }
+                    }
+                }
+
+                if (!$errors) {
+                    $ok = \App\Helpers\Scheduled::createBatch(
+                        $method,
+                        $payload,
+                        $msgType,
+                        $priority,
+                        (string)$sendAfter,
+                        $target
+                    );
+                    if ($ok) {
+                        Flash::add('success', 'Рассылка запланирована');
+                        return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
+                    }
+                    $errors[] = 'Не удалось создать отложенную рассылку';
+                }
+            }
+        }
+
+        // Immediate (non-scheduled) send path stays as before
+        if (!$errors && $data['send_mode'] !== 'schedule' && $chatIds && $sender !== null) {
             $ok = true;
             foreach ($chatIds as $cid) {
                 $ok = $sender($cid) && $ok;

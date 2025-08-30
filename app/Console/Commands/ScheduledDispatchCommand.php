@@ -38,7 +38,11 @@ final class ScheduledDispatchCommand extends Command
         $db = Database::getInstance();
 
         $stmt = $db->prepare(
-            "SELECT id, user_id, method, `type`, `data`, priority FROM `telegram_scheduled_messages` WHERE `send_after` <= NOW() AND `status` = 'pending' ORDER BY `id` ASC LIMIT :limit"
+            "SELECT id, user_id, method, `type`, `data`, priority, target_type, target_group_id
+               FROM `telegram_scheduled_messages`
+              WHERE `send_after` <= NOW() AND `status` = 'pending'
+              ORDER BY `id` ASC
+              LIMIT :limit"
         );
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
@@ -65,17 +69,62 @@ final class ScheduledDispatchCommand extends Command
                     continue;
                 }
 
-                $ok = Push::custom(
-                    (string)$row['method'],
-                    is_array($payload) ? $payload : [],
-                    isset($row['user_id']) ? (int)$row['user_id'] : null,
-                    (string)$row['type'],
-                    (int)$row['priority'],
-                    null // immediate enqueue
-                );
+                // Determine recipients based on targeting
+                $recipients = [];
+                $targetType = (string)($row['target_type'] ?? '');
 
-                if (!$ok) {
-                    // Roll back to pending to retry later
+                if ($row['user_id'] !== null && $targetType === '') {
+                    // Legacy single-user scheduled message
+                    $recipients = [(int)$row['user_id']];
+                } elseif ($targetType === 'selected') {
+                    $getUsers = $db->prepare('SELECT target_user_id FROM telegram_scheduled_targets WHERE scheduled_id = :sid');
+                    $getUsers->execute(['sid' => $row['id']]);
+                    $recipients = array_map('intval', $getUsers->fetchAll(PDO::FETCH_COLUMN));
+                } elseif ($targetType === 'group') {
+                    $gid = (int)($row['target_group_id'] ?? 0);
+                    if ($gid > 0) {
+                        $q = $db->prepare('SELECT tu.user_id FROM telegram_user_group_user ugu JOIN telegram_users tu ON tu.id = ugu.user_id WHERE ugu.group_id = :gid AND tu.is_user_banned = 0 AND tu.is_bot_banned = 0');
+                        $q->execute(['gid' => $gid]);
+                        $recipients = array_map('intval', $q->fetchAll(PDO::FETCH_COLUMN));
+                    }
+                } elseif ($targetType === 'all') {
+                    $q = $db->query('SELECT user_id FROM telegram_users WHERE is_user_banned = 0 AND is_bot_banned = 0');
+                    $recipients = array_map('intval', $q->fetchAll(PDO::FETCH_COLUMN));
+                }
+
+                $recipients = array_values(array_unique(array_filter($recipients, static fn($v) => is_int($v) || ctype_digit((string)$v))));
+
+                // Update selected_count for reporting
+                $db->prepare('UPDATE `telegram_scheduled_messages` SET `selected_count` = :cnt WHERE `id` = :id')
+                    ->execute(['cnt' => count($recipients), 'id' => $row['id']]);
+
+                if (!$recipients) {
+                    // Nothing to send; return to pending to allow manual fix or cancel
+                    $db->prepare("UPDATE `telegram_scheduled_messages` SET `status` = 'pending' WHERE `id` = :id")
+                        ->execute(['id' => $row['id']]);
+                    continue;
+                }
+
+                $okAll = true;
+                foreach ($recipients as $uid) {
+                    $perPayload = is_array($payload) ? $payload : [];
+                    // Ensure chat_id matches current recipient; override if present
+                    $perPayload['chat_id'] = (int)$uid;
+
+                    $ok = Push::custom(
+                        (string)$row['method'],
+                        $perPayload,
+                        (int)$uid,
+                        (string)$row['type'],
+                        (int)$row['priority'],
+                        null,
+                        (int)$row['id'] // link to scheduled batch
+                    );
+                    $okAll = $okAll && $ok;
+                }
+
+                if (!$okAll) {
+                    // If some failed to enqueue, roll back status to pending to retry later
                     $db->prepare("UPDATE `telegram_scheduled_messages` SET `status` = 'pending' WHERE `id` = :id")
                         ->execute(['id' => $row['id']]);
                     continue;
@@ -97,4 +146,3 @@ final class ScheduledDispatchCommand extends Command
         return 0;
     }
 }
-
