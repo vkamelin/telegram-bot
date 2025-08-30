@@ -37,16 +37,37 @@ final class ScheduledDispatchCommand extends Command
 
         $db = Database::getInstance();
 
-        $stmt = $db->prepare(
-            "SELECT id, user_id, method, `type`, `data`, priority, target_type, target_group_id
-               FROM `telegram_scheduled_messages`
-              WHERE `send_after` <= NOW() AND `status` = 'pending'
-              ORDER BY `id` ASC
-              LIMIT :limit"
-        );
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
+        // Try to select targeting columns if they exist; fallback to legacy schema
+        $rows = [];
+        try {
+            $stmt = $db->prepare(
+                "SELECT id, user_id, method, `type`, `data`, priority, target_type, target_group_id
+                   FROM `telegram_scheduled_messages`
+                  WHERE `send_after` <= NOW() AND `status` = 'pending'
+                  ORDER BY `id` ASC
+                  LIMIT :limit"
+            );
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll();
+        } catch (Throwable $e) {
+            // Older schema without targeting columns
+            Logger::warning('Scheduled targeting columns not found, using legacy selection');
+            $stmt = $db->prepare(
+                "SELECT id, user_id, method, `type`, `data`, priority
+                   FROM `telegram_scheduled_messages`
+                  WHERE `send_after` <= NOW() AND `status` = 'pending'
+                  ORDER BY `id` ASC
+                  LIMIT :limit"
+            );
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = array_map(static function ($r) {
+                $r['target_type'] = null;
+                $r['target_group_id'] = null;
+                return $r;
+            }, $stmt->fetchAll() ?: []);
+        }
 
         $processed = 0;
         foreach ($rows as $row) {
