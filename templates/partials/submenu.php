@@ -16,7 +16,7 @@
             // для неактивного — обводка как у outline-кнопок
             $linkClass = $isActive
                 ? 'nav-link active'
-                : 'btn btn-sm btn-outline-secondary';
+                : 'btn btn-outline-primary';
         ?>
         <li class="nav-item me-2 mb-2">
             <a href="<?= url($item['url']) ?>" class="<?= $linkClass ?>">
