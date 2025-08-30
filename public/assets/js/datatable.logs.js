@@ -28,6 +28,7 @@ $(document).ready(function(){
   let table;
   loadFiles().then(function(){
     table = createDatatable('#logsTable', '/dashboard/logs/data', [
+      { data: 'line_no' },
       { data: 'datetime', render: function(v){ return formatDate(v); } },
       { data: 'level_name', render: function(v){ return levelBadge(v); } },
       { data: 'channel' },
@@ -53,7 +54,7 @@ $(document).ready(function(){
       d.search = d.search || {};
       d.search.value = $search.val();
     }, {
-      order: [[0, 'desc']]
+      order: [[1, 'desc']]
     });
   });
 

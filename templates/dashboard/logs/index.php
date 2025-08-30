@@ -33,6 +33,7 @@
 <table id="logsTable" class="table table-center table-striped table-hover">
   <thead>
     <tr>
+      <th>Строка</th>
       <th>Время</th>
       <th>Уровень</th>
       <th>Канал</th>
@@ -45,6 +46,7 @@
   <tbody></tbody>
   <tfoot>
     <tr>
+      <th>Строка</th>
       <th>Время</th>
       <th>Уровень</th>
       <th>Канал</th>
