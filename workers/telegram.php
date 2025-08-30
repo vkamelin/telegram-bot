@@ -79,7 +79,9 @@ function runWorker(): void
                 } catch (\RedisException $e) {
                     $msg = $e->getMessage();
                     Logger::error("Redis lPop error on {$queueKey}: {$msg}");
-                    // TODO: Подумать что делать дальше
+                    // На ошибке чтения из очереди пропускаем текущую итерацию очереди
+                    // чтобы избежать бесконечного цикла и лишней нагрузки
+                    $queueValue = false;
                 }
 
                 if ($queueValue === false || $queueValue === null) {
