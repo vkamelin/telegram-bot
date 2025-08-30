@@ -85,7 +85,7 @@ final class ScheduledController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT id, user_id, method, `type`, priority, send_after, status, created_at, started_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
+        $sql = "SELECT id, user_id, method, `type`, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages {$whereSql} ORDER BY id DESC";
         if ($length > 0) {
             $sql .= ' LIMIT :limit OFFSET :offset';
         }
@@ -108,6 +108,83 @@ final class ScheduledController
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
         $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM telegram_scheduled_messages')->fetchColumn();
+
+        return Response::json($res, 200, [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
+        ]);
+    }
+
+    /**
+     * Детальная страница конкретной рассылки/отложенного сообщения.
+     */
+    public function show(Req $req, Res $res, array $args): Res
+    {
+        $id = (int)($args['id'] ?? 0);
+        $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        if (!$row) {
+            return $res->withStatus(404);
+        }
+
+        return View::render($res, 'dashboard/scheduled/view.php', [
+            'title' => 'Scheduled details',
+            'item' => $row,
+        ], 'layouts/main.php');
+    }
+
+    /**
+     * Данные сообщений для DataTables по scheduled_id
+     */
+    public function messages(Req $req, Res $res, array $args): Res
+    {
+        $id = (int)($args['id'] ?? 0);
+        $p = (array)$req->getParsedBody();
+        $start = max(0, (int)($p['start'] ?? 0));
+        $length = (int)($p['length'] ?? 10);
+        $draw = (int)($p['draw'] ?? 0);
+        if ($length === -1) {
+            $start = 0;
+        }
+
+        $conds = ['scheduled_id = :sid'];
+        $params = ['sid' => $id];
+
+        if (($p['status'] ?? '') !== '') {
+            $conds[] = 'status = :status';
+            $params['status'] = $p['status'];
+        }
+
+        $whereSql = 'WHERE ' . implode(' AND ', $conds);
+
+        $sql = "SELECT id, user_id, method, status, error, code, priority, message_id, processed_at FROM telegram_messages {$whereSql} ORDER BY id DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $val) {
+            $stmt->bindValue(':' . $key, $val);
+        }
+        if ($length > 0) {
+            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM telegram_messages {$whereSql}");
+        foreach ($params as $key => $val) {
+            $countStmt->bindValue(':' . $key, $val);
+        }
+        $countStmt->execute();
+        $recordsFiltered = (int)$countStmt->fetchColumn();
+
+        $recordsTotalStmt = $this->db->prepare('SELECT COUNT(*) FROM telegram_messages WHERE scheduled_id = :sid');
+        $recordsTotalStmt->execute(['sid' => $id]);
+        $recordsTotal = (int)$recordsTotalStmt->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,

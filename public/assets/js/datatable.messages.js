@@ -6,6 +6,11 @@ $(document).ready(function() {
     { data: 'type' },
     { data: 'status' },
     { data: 'priority' },
+    { data: 'scheduled_id', render: function(v){
+        if (!v) return '';
+        return '<a href="/dashboard/scheduled/' + v + '" class="link-secondary">#' + v + '</a>';
+      }
+    },
     { data: 'error' },
     { data: 'code' },
     { data: 'processed_at' },
@@ -16,7 +21,7 @@ $(document).ready(function() {
         return '<a href="/dashboard/messages/' + row.id + '/resend" class="btn btn-sm btn-outline-secondary">' +
             '<i class="bi bi-repeat" title="Отправит повторно"></i>' +
             '</a> '
-          + '<a href="/dashboard/messages/' + row.id + '/response" class="btn btn-sm btn-outline-secondary">' +
+          + '<a href="/dashboard/messages/' + row.id + '/response" class="btn btn-sm btn-outline-secondary ms-1">' +
             '<i class="bi bi-send" title="Ответить"></i>' +
             '</a>';
       },

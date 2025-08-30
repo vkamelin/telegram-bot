@@ -97,6 +97,8 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/users/{id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\PanelUsersController($db))->update($req, $res, $args));
         $auth->get('/scheduled', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->index($req, $res));
         $auth->post('/scheduled/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ScheduledController($db))->data($req, $res));
+        $auth->get('/scheduled/{id:\\d+}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->show($req, $res, $args));
+        $auth->post('/scheduled/{id:\\d+}/messages', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->messages($req, $res, $args));
         $auth->get('/scheduled/{id}/edit', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->edit($req, $res, $args));
         $auth->post('/scheduled/{id}/update', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->update($req, $res, $args));
         $auth->post('/scheduled/{id}/cancel', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ScheduledController($db))->cancel($req, $res, $args));

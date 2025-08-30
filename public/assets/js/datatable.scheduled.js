@@ -8,6 +8,9 @@ $(document).ready(function() {
     { data: 'type' },
     { data: 'priority' },
     { data: 'send_after' },
+    { data: 'selected_count', render: function(v){ return v ?? 0; } },
+    { data: 'success_count', render: function(v){ return v ?? 0; } },
+    { data: 'failed_count', render: function(v){ return v ?? 0; } },
     { data: 'status', render: function(data){
       if (data === 'pending') return '<span class="badge bg-warning text-dark">ожидает</span>';
       if (data === 'processing') return '<span class="badge bg-info text-dark">отправляется</span>';
@@ -20,6 +23,9 @@ $(document).ready(function() {
       className: 'text-end',
       render: function(data, type, row) {
         const isPending = row.status === 'pending';
+        const detailsLink = '<a href="/dashboard/scheduled/' + row.id + '" class="btn btn-sm btn-outline-secondary" title="Подробнее">' +
+          '<i class="bi bi-bar-chart"></i>'+
+          '</a>';
         const sendForm = isPending ? ('<form method="post" action="/dashboard/scheduled/' + row.id + '/send-now" class="d-inline">'
           + '<input type="hidden" name="_csrf_token" value="' + csrfToken + '">'
           + '<button type="submit" class="btn btn-sm btn-outline-secondary" title="Отправить сейчас">'
@@ -41,7 +47,7 @@ $(document).ready(function() {
             + '<i class="bi bi-trash"></i>'
           + '</button>'
           + '</form>') : '';
-        return sendForm + editLink + cancelForm + delForm;
+        return detailsLink + ' ' + sendForm + editLink + cancelForm + delForm;
       },
       orderable: false,
       searchable: false

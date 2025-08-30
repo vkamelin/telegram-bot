@@ -143,7 +143,7 @@ final class MessagesController
         }
         $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-        $sql = "SELECT id, user_id, method, `type`, status, priority, error, code, processed_at FROM telegram_messages {$whereSql} ORDER BY id DESC";
+        $sql = "SELECT id, user_id, method, `type`, status, priority, error, code, processed_at, scheduled_id FROM telegram_messages {$whereSql} ORDER BY id DESC";
         if ($length > 0) {
             $sql .= ' LIMIT :limit OFFSET :offset';
         }
