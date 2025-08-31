@@ -17,6 +17,7 @@ use App\Helpers\View;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
+use Random\RandomException;
 
 /**
  * Контроллер для просмотра и управления отправленными сообщениями.
@@ -26,60 +27,7 @@ final class MessagesController
     public function __construct(private PDO $db)
     {
     }
-
-    /**
-     * Saves uploaded file to persistent storage.
-     */
-    private function storeUploadedFile(array $file): ?string
-    {
-        $tmp = $file['tmp_name'] ?? '';
-        $err = $file['error'] ?? UPLOAD_ERR_NO_FILE;
-        if ($tmp === '' || $err !== UPLOAD_ERR_OK) {
-            return null;
-        }
-
-        $ext = pathinfo($file['name'] ?? '', PATHINFO_EXTENSION);
-        $dir = Path::base('storage/messages');
-        if (!is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
-            return null;
-        }
-
-        $name = bin2hex(random_bytes(16));
-        if ($ext !== '') {
-            $name .= '.' . $ext;
-        }
-        $dest = $dir . '/' . $name;
-
-        // move_uploaded_file works only for HTTP uploads; fall back to rename for tests
-        if (!@move_uploaded_file($tmp, $dest)) {
-            if (!@rename($tmp, $dest)) {
-                return null;
-            }
-        }
-
-        return $dest;
-    }
-
-    /**
-     * Validates an integer field with optional range.
-     */
-    private function filterInt(string $value, string $field, array &$errors, int $min = 0, int $max = PHP_INT_MAX): ?int
-    {
-        if ($value === '') {
-            return null;
-        }
-        if (!ctype_digit($value)) {
-            $errors[] = $field . ' must be an integer';
-            return null;
-        }
-        $int = (int)$value;
-        if ($int < $min || $int > $max) {
-            $errors[] = $field . ' must be between ' . $min . ' and ' . $max;
-            return null;
-        }
-        return $int;
-    }
-
+    
     /**
      * Отображает таблицу сообщений.
      */
@@ -226,7 +174,7 @@ final class MessagesController
     }
 
     /**
-     * Shows form for sending new message.
+     * Форма для отправки нового сообщения.
      */
     public function create(Req $req, Res $res): Res
     {
@@ -241,7 +189,7 @@ final class MessagesController
     }
 
     /**
-     * Sends text message to selected users.
+     * Отправляет текстовое сообщение выбранным пользователям.
      */
     public function send(Req $req, Res $res): Res
     {
@@ -797,5 +745,61 @@ final class MessagesController
             'data' => $data,
         ];
         return View::render($res, 'dashboard/messages/create.php', $params, 'layouts/main.php');
+    }
+    
+    /**
+     * Сохраняет загруженный файл в постоянном хранилище.
+     *
+     * @param array $file Массив данных файла, включающий 'tmp_name' и 'error'.
+     *
+     * @return string|null Путь к сохраненному файлу или null, если загрузка не удалась.
+     * @throws RandomException
+     */
+    private function storeUploadedFile(array $file): ?string
+    {
+        $tmp = $file['tmp_name'] ?? '';
+        $err = $file['error'] ?? UPLOAD_ERR_NO_FILE;
+        if ($tmp === '' || $err !== UPLOAD_ERR_OK) {
+            return null;
+        }
+        
+        $ext = pathinfo($file['name'] ?? '', PATHINFO_EXTENSION);
+        $dir = Path::base('storage/messages');
+        if (!is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
+            return null;
+        }
+        
+        $name = bin2hex(random_bytes(16));
+        if ($ext !== '') {
+            $name .= '.' . $ext;
+        }
+        $dest = $dir . '/' . $name;
+        
+        // move_uploaded_file works only for HTTP uploads; fall back to rename for tests
+        if (!@move_uploaded_file($tmp, $dest) && !@rename($tmp, $dest)) {
+            return null;
+        }
+        
+        return $dest;
+    }
+    
+    /**
+     * Валидирует целое поле с возможностью диапазона.
+     */
+    private function filterInt(string $value, string $field, array &$errors, int $min = 0, int $max = PHP_INT_MAX): ?int
+    {
+        if ($value === '') {
+            return null;
+        }
+        if (!ctype_digit($value)) {
+            $errors[] = $field . ' must be an integer';
+            return null;
+        }
+        $int = (int)$value;
+        if ($int < $min || $int > $max) {
+            $errors[] = $field . ' must be between ' . $min . ' and ' . $max;
+            return null;
+        }
+        return $int;
     }
 }
