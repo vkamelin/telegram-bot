@@ -12,6 +12,20 @@ use Throwable;
 final class Scheduled
 {
     /**
+     * Checks if a column exists in the given table.
+     */
+    private static function columnExists(\PDO $db, string $table, string $column): bool
+    {
+        try {
+            $stmt = $db->prepare("SHOW COLUMNS FROM `{$table}` LIKE :col");
+            $stmt->execute(['col' => $column]);
+            return (bool)$stmt->fetchColumn();
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
      * Создает запись об отложенной рассылке и, при необходимости, связанные цели.
      * Ожидается, что БД имеет таблицу `telegram_scheduled_messages` с полями:
      *   id, method, type, data, priority, send_after, status, target_type, target_group_id, created_at
@@ -61,24 +75,51 @@ final class Scheduled
         try {
             $db->beginTransaction();
 
-            $stmt = $db->prepare(
-                'INSERT INTO `telegram_scheduled_messages` (`method`, `type`, `data`, `priority`, `send_after`, `status`, `target_type`, `target_group_id`, `created_at`) '
-                . 'VALUES (:method, :type, :data, :priority, :send_after, :status, :target_type, :target_group_id, NOW())'
-            );
-            $stmt->execute([
-                'method' => $method,
-                'type' => $type,
-                'data' => json_encode($payload, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-                'priority' => $priority,
-                'send_after' => $sendAfter,
-                'status' => 'pending',
-                'target_type' => $targetType,
-                'target_group_id' => $targetGroupId,
-            ]);
+            // Detect if targeting columns exist (for backward compatibility before migration)
+            $hasTargeting = self::columnExists($db, 'telegram_scheduled_messages', 'target_type')
+                && self::columnExists($db, 'telegram_scheduled_messages', 'target_group_id');
+
+            if ($hasTargeting) {
+                $stmt = $db->prepare(
+                    'INSERT INTO `telegram_scheduled_messages` (`method`, `type`, `data`, `priority`, `send_after`, `status`, `target_type`, `target_group_id`, `created_at`) '
+                    . 'VALUES (:method, :type, :data, :priority, :send_after, :status, :target_type, :target_group_id, NOW())'
+                );
+                $stmt->execute([
+                    'method' => $method,
+                    'type' => $type,
+                    'data' => json_encode($payload, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+                    'priority' => $priority,
+                    'send_after' => $sendAfter,
+                    'status' => 'pending',
+                    'target_type' => $targetType,
+                    'target_group_id' => $targetGroupId,
+                ]);
+            } else {
+                // Legacy schema: allow only broadcast to all users; no targeting columns yet
+                if ($targetType !== 'all') {
+                    Logger::error('Scheduled.createBatch: targeting not available until DB migration (only type=all allowed)', [
+                        'requested_type' => $targetType,
+                    ]);
+                    $db->rollBack();
+                    return false;
+                }
+                $stmt = $db->prepare(
+                    'INSERT INTO `telegram_scheduled_messages` (`method`, `type`, `data`, `priority`, `send_after`, `status`, `created_at`) '
+                    . 'VALUES (:method, :type, :data, :priority, :send_after, :status, NOW())'
+                );
+                $stmt->execute([
+                    'method' => $method,
+                    'type' => $type,
+                    'data' => json_encode($payload, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+                    'priority' => $priority,
+                    'send_after' => $sendAfter,
+                    'status' => 'pending',
+                ]);
+            }
 
             $scheduledId = (int)$db->lastInsertId();
 
-            if ($targetType === 'selected' && $fixedUserIds) {
+            if ($hasTargeting && $targetType === 'selected' && $fixedUserIds) {
                 $ins = $db->prepare('INSERT INTO `telegram_scheduled_targets` (`scheduled_id`, `target_user_id`) VALUES (:sid, :uid)');
                 foreach ($fixedUserIds as $uid) {
                     $ins->execute(['sid' => $scheduledId, 'uid' => $uid]);
@@ -98,4 +139,3 @@ final class Scheduled
         return false;
     }
 }
-

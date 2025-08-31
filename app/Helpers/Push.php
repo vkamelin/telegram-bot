@@ -19,6 +19,19 @@ use Throwable;
 class Push
 {
     /**
+     * Checks if a column exists in the given table.
+     */
+    private static function columnExists(\PDO $db, string $table, string $column): bool
+    {
+        try {
+            $stmt = $db->prepare("SHOW COLUMNS FROM `{$table}` LIKE :col");
+            $stmt->execute(['col' => $column]);
+            return (bool)$stmt->fetchColumn();
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+    /**
      * Метод добавляет в очередь текстовое сообщение в Телеграм
      *
      * @param int    $chatId   Id чата
@@ -419,12 +432,14 @@ class Push
                     }
                 } else {
                     try {
-                        if ($scheduledId !== null) {
+                        $hasScheduledId = self::columnExists($db, 'telegram_messages', 'scheduled_id');
+                        if ($scheduledId !== null && $hasScheduledId) {
                             $stmt = $db->prepare(
                                 'INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `scheduled_id`, `data`, `priority`) VALUES (:user_id, :method, :type, :scheduled_id, :data, :priority)'
                             );
                             $stmt->execute($insertData + ['scheduled_id' => $scheduledId]);
                         } else {
+                            // Fallback for legacy schema without scheduled_id column
                             $stmt = $db->prepare(
                                 'INSERT INTO `telegram_messages` (`user_id`, `method`, `type`, `data`, `priority`) VALUES (:user_id, :method, :type, :data, :priority)'
                             );
