@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api;
 
+use App\Helpers\RefreshTokenService;
 use App\Helpers\Response;
-use App\Services\RefreshTokenService;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;

@@ -82,12 +82,13 @@ namespace Longman\TelegramBot {
 }
 
 namespace Tests\Unit {
+    
     use App\Helpers\Database;
-    use App\Services\FileService;
+    use App\Helpers\FileService;
     use PDO;
     use PHPUnit\Framework\TestCase;
     use ReflectionClass;
-
+    
     final class FileServiceTest extends TestCase
     {
         private PDO $db;

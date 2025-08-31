@@ -7,7 +7,7 @@ namespace App\Console\Commands;
 use App\Console\Command;
 use App\Console\Kernel;
 use App\Helpers\Database;
-use App\Services\RefreshTokenService;
+use App\Helpers\RefreshTokenService;
 
 class RefreshTokenPurgeCommand extends Command
 {

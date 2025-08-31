@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace App\Controllers\Dashboard;
 
+use App\Helpers\HealthService;
 use App\Helpers\RedisHelper;
 use App\Helpers\View;
-use App\Services\HealthService;
 use App\Telemetry;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Res;

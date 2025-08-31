@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api;
 
+use App\Helpers\HealthService;
 use App\Helpers\Response;
-use App\Services\HealthService;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
 

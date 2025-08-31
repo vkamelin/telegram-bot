@@ -2,13 +2,13 @@
 declare(strict_types=1);
 
 use App\Helpers\Database;
-use Slim\Factory\AppFactory;
-use Psr\Http\Message\ServerRequestInterface as Req;
-use Psr\Http\Message\ResponseInterface as Res;
-use Dotenv\Dotenv;
 use App\Middleware\RequestIdMiddleware;
 use App\Middleware\RequestSizeLimitMiddleware;
 use App\Middleware\SecurityHeadersMiddleware;
+use Dotenv\Dotenv;
+use Psr\Http\Message\ResponseInterface as Res;
+use Psr\Http\Message\ServerRequestInterface as Req;
+use Slim\Factory\AppFactory;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -54,11 +54,11 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/messages/send', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\MessagesController($db))->send($req, $res));
         $auth->post('/messages/{id}/resend', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\MessagesController($db))->resend($req, $res, $args));
         $auth->get('/messages/{id}/response', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\MessagesController($db))->download($req, $res, $args));
-        $auth->get('/files', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Services\FileService($db)))->index($req, $res));
-        $auth->post('/files/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Services\FileService($db)))->data($req, $res));
-        $auth->get('/files/create', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Services\FileService($db)))->create($req, $res));
-        $auth->post('/files', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Services\FileService($db)))->store($req, $res));
-        $auth->get('/files/{id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Services\FileService($db)))->show($req, $res, $args));
+        $auth->get('/files', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Helpers\FileService($db)))->index($req, $res));
+        $auth->post('/files/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Helpers\FileService($db)))->data($req, $res));
+        $auth->get('/files/create', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Helpers\FileService($db)))->create($req, $res));
+        $auth->post('/files', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Helpers\FileService($db)))->store($req, $res));
+        $auth->get('/files/{id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\FilesController($db, new \App\Helpers\FileService($db)))->show($req, $res, $args));
         $auth->get('/pre-checkout', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PreCheckoutController($db))->index($req, $res));
         $auth->post('/pre-checkout/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PreCheckoutController($db))->data($req, $res));
         $auth->get('/shipping', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ShippingQueriesController($db))->index($req, $res));

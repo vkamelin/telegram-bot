@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace App\Controllers\Dashboard;
 
 use App\Helpers\Database;
+use App\Helpers\HealthService;
 use App\Helpers\RedisHelper;
 use App\Helpers\View;
-use App\Services\HealthService;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
 
