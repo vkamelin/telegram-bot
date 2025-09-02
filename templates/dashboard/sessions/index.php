@@ -21,7 +21,7 @@
 <table id="sessionsTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
-        <th>User ID</th>
+        <th>ID пользователя</th>
         <th>Состояние</th>
         <th>Создана</th>
         <th>Обновлена</th>
@@ -30,7 +30,7 @@
     <tbody></tbody>
     <tfoot>
     <tr>
-        <th>User ID</th>
+        <th>ID пользователя</th>
         <th>Состояние</th>
         <th>Создана</th>
         <th>Обновлена</th>

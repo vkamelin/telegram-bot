@@ -2,20 +2,20 @@
 /** @var array $request */
 /** @var string $csrfToken */
 ?>
-<h1>Join Request <?= htmlspecialchars((string)$request['user_id']) ?></h1>
+<h1>Запрос на вступление <?= htmlspecialchars((string)$request['user_id']) ?></h1>
 
 <div class="card mb-4">
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-sm-3">Chat ID</dt>
+            <dt class="col-sm-3">ID чата</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$request['chat_id']) ?></dd>
-            <dt class="col-sm-3">User ID</dt>
+            <dt class="col-sm-3">ID пользователя</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$request['user_id']) ?></dd>
-            <dt class="col-sm-3">Username</dt>
+            <dt class="col-sm-3">Логин</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$request['username']) ?></dd>
-            <dt class="col-sm-3">First name</dt>
+            <dt class="col-sm-3">Имя</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$request['first_name']) ?></dd>
-            <dt class="col-sm-3">Last name</dt>
+            <dt class="col-sm-3">Фамилия</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$request['last_name']) ?></dd>
             <dt class="col-sm-3">Био</dt>
             <dd class="col-sm-9"><pre class="mb-0"><?= htmlspecialchars((string)$request['bio']) ?></pre></dd>

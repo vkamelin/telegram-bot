@@ -53,7 +53,7 @@
   <div class="col-md-3">
     <div class="card h-100">
       <div class="card-body">
-        <div class="text-secondary small">Request ID</div>
+        <div class="text-secondary small">ID запроса</div>
         <div class="fw-bold"><?= htmlspecialchars((string)($item['request_id'] ?? '')) ?></div>
       </div>
     </div>
@@ -74,7 +74,7 @@
   </div>
 
 <div class="card">
-  <div class="card-header">Raw</div>
+  <div class="card-header">Исходные данные</div>
   <div class="card-body">
     <pre class="mb-0"><?php
       $raw = (string)($item['raw'] ?? '');

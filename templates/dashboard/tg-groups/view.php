@@ -3,7 +3,7 @@
 /** @var array $members */
 /** @var string $csrfToken */
 ?>
-<h1 class="mb-3">Group <?= htmlspecialchars($group['name']) ?></h1>
+<h1 class="mb-3">Группа <?= htmlspecialchars($group['name']) ?></h1>
 
 <form method="post" class="mb-4" action="<?= url('/dashboard/tg-groups/' . $group['id']) ?>">
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
@@ -20,14 +20,14 @@
     <ul class="list-group" id="userSearchResults"></ul>
 </div>
 
-<h2 class="h5">Members</h2>
+<h2 class="h5">Участники</h2>
 <p id="noMembers" class="<?= empty($members) ? '' : 'd-none' ?>">Нет пользователей</p>
 <table class="table table-striped <?= empty($members) ? 'd-none' : '' ?>" id="membersTable">
     <thead>
     <tr>
         <th>ID</th>
-        <th>Telegram ID</th>
-        <th>Username</th>
+        <th>ID Telegram</th>
+        <th>Логин</th>
         <th></th>
     </tr>
     </thead>

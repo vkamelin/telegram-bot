@@ -10,7 +10,7 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>User ID</th>
+        <th>ID пользователя</th>
         <th>Метод</th>
         <th>Тип</th>
         <th>Статус</th>
@@ -26,7 +26,7 @@
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>User ID</th>
+        <th>ID пользователя</th>
         <th>Метод</th>
         <th>Тип</th>
         <th>Статус</th>

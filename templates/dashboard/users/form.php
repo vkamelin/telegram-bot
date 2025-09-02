@@ -19,11 +19,11 @@ $isNew = empty($user['id']);
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
 
     <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label">Почта</label>
         <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>">
     </div>
     <div class="mb-3">
-        <label for="telegram_user_id" class="form-label">Telegram User ID</label>
+        <label for="telegram_user_id" class="form-label">ID пользователя Telegram</label>
         <input type="text" class="form-control" id="telegram_user_id" name="telegram_user_id" value="<?= htmlspecialchars($user['telegram_user_id'] ?? '') ?>">
     </div>
     <button type="submit" class="btn btn-outline-success"><?= $isNew ? 'Создать' : 'Обновить' ?></button>

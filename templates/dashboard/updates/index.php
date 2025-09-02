@@ -10,9 +10,9 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Update ID</th>
-        <th>User ID</th>
-        <th>Message ID</th>
+        <th>ID обновления</th>
+        <th>ID пользователя</th>
+        <th>ID сообщения</th>
         <th>Тип</th>
         <th>Отправлено</th>
         <th>Создано</th>
@@ -23,9 +23,9 @@
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>Update ID</th>
-        <th>User ID</th>
-        <th>Message ID</th>
+        <th>ID обновления</th>
+        <th>ID пользователя</th>
+        <th>ID сообщения</th>
         <th>Тип</th>
         <th>Отправлено</th>
         <th>Создано</th>

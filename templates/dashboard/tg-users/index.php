@@ -63,8 +63,8 @@
 <table id="tgUsersTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
-        <th>User ID</th>
-        <th>Username</th>
+        <th>ID пользователя</th>
+        <th>Логин</th>
         <th>Язык</th>
         <th>Премиум</th>
         <th>Подписан</th>
@@ -76,8 +76,8 @@
     <tbody></tbody>
     <tfoot>
     <tr>
-        <th>User ID</th>
-        <th>Username</th>
+        <th>ID пользователя</th>
+        <th>Логин</th>
         <th>Язык</th>
         <th>Премиум</th>
         <th>Подписан</th>

@@ -30,9 +30,9 @@
 <table id="chatMembersTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
-        <th>Chat ID</th>
-        <th>User ID</th>
-        <th>Username</th>
+        <th>ID чата</th>
+        <th>ID пользователя</th>
+        <th>Логин</th>
         <th>Роль</th>
         <th>Состояние</th>
     </tr>
@@ -40,9 +40,9 @@
     <tbody></tbody>
     <tfoot>
     <tr>
-        <th>Chat ID</th>
-        <th>User ID</th>
-        <th>Username</th>
+        <th>ID чата</th>
+        <th>ID пользователя</th>
+        <th>Логин</th>
         <th>Роль</th>
         <th>Состояние</th>
     </tr>

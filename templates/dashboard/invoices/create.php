@@ -16,7 +16,7 @@
 <form method="post" action="<?= url('/dashboard/invoices') ?>">
     <input type="hidden" name="<?= $_ENV['CSRF_TOKEN_NAME'] ?? '_csrf_token' ?>" value="<?= $csrfToken ?>">
     <div class="mb-3">
-        <label for="chat_id" class="form-label">Chat ID</label>
+        <label for="chat_id" class="form-label">ID чата</label>
         <input type="text" class="form-control" id="chat_id" name="chat_id" value="<?= htmlspecialchars($invoice['chat_id'] ?? ($_ENV['DEFAULT_CHAT_ID'] ?? '')) ?>">
         <div class="form-text">По умолчанию используется значение из .env: DEFAULT_CHAT_ID</div>
     </div>
@@ -62,7 +62,7 @@
     </div>
     <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" value="1" id="is_flexible" name="is_flexible" <?= !empty($invoice['is_flexible']) ? 'checked' : '' ?>>
-        <label class="form-check-label" for="is_flexible">Is flexible</label>
+        <label class="form-check-label" for="is_flexible">Гибкая цена</label>
     </div>
     <button type="submit" class="btn btn-primary">Отправить</button>
 </form>

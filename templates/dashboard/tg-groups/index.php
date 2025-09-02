@@ -30,7 +30,7 @@
             <td><?= $g['members'] ?></td>
             <td>
                 <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dashboard/tg-groups/' . $g['id']) ?>">
-                    View
+                    Открыть
                 </a>
             </td>
         </tr>

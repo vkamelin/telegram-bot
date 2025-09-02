@@ -1,11 +1,11 @@
-<h1>User <?= htmlspecialchars($user['username'] ?? $user['user_id']) ?></h1>
+<h1>Пользователь <?= htmlspecialchars($user['username'] ?? $user['user_id']) ?></h1>
 
 <div class="card mb-4">
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-sm-3">User ID</dt>
+            <dt class="col-sm-3">ID пользователя</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['user_id']) ?></dd>
-            <dt class="col-sm-3">Username</dt>
+            <dt class="col-sm-3">Логин</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['username']) ?></dd>
             <dt class="col-sm-3">Имя</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['first_name']) ?></dd>
@@ -58,7 +58,7 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Update ID</th>
+        <th>ID обновления</th>
         <th>Тип</th>
         <th>Создано</th>
     </tr>

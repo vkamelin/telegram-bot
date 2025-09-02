@@ -10,7 +10,7 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>От User ID</th>
+        <th>От ID пользователя</th>
         <th>Валюта</th>
         <th>Сумма</th>
         <th>Опция доставки ID</th>
@@ -21,7 +21,7 @@
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>От User ID</th>
+        <th>От ID пользователя</th>
         <th>Валюта</th>
         <th>Сумма</th>
         <th>Опция доставки ID</th>

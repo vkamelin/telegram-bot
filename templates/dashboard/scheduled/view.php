@@ -76,12 +76,12 @@
   <thead>
     <tr>
       <th>ID</th>
-      <th>User ID</th>
+      <th>ID пользователя</th>
       <th>Метод</th>
       <th>Статус</th>
       <th>Ошибка</th>
       <th>Код</th>
-      <th>Msg ID</th>
+      <th>ID сообщения</th>
       <th>Обработано</th>
     </tr>
   </thead>
@@ -89,12 +89,12 @@
   <tfoot>
     <tr>
       <th>ID</th>
-      <th>User ID</th>
+      <th>ID пользователя</th>
       <th>Метод</th>
       <th>Статус</th>
       <th>Ошибка</th>
       <th>Код</th>
-      <th>Msg ID</th>
+      <th>ID сообщения</th>
       <th>Обработано</th>
     </tr>
   </tfoot>
@@ -125,4 +125,3 @@
     ]);
   });
 </script>
-

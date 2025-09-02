@@ -14,8 +14,8 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Email</th>
-        <th>Telegram ID</th>
+        <th>Почта</th>
+        <th>ID Telegram</th>
         <th>Создан</th>
         <th>Обновлен</th>
         <th class="text-end">Действия</th>
@@ -25,8 +25,8 @@
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>Email</th>
-        <th>Telegram ID</th>
+        <th>Почта</th>
+        <th>ID Telegram</th>
         <th>Создан</th>
         <th>Обновлен</th>
         <th class="text-end">Действия</th>

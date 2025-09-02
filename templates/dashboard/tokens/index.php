@@ -16,7 +16,7 @@
                placeholder="YYYY-MM-DD,YYYY-MM-DD">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">Фильтр</button>
     </div>
 </form>
 
@@ -24,7 +24,7 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>User ID</th>
+        <th>ID пользователя</th>
         <th>JTI</th>
         <th>Истекает</th>
         <th>Аннулирован</th>
@@ -37,7 +37,7 @@
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>User ID</th>
+        <th>ID пользователя</th>
         <th>JTI</th>
         <th>Истекает</th>
         <th>Аннулирован</th>

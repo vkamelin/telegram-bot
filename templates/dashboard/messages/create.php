@@ -243,7 +243,7 @@
         </div>
     </div>
     <div id="singleUserSection" class="mb-3 d-none">
-        <input type="text" class="form-control" name="user" id="singleUserInput" placeholder="User ID or username" value="<?= htmlspecialchars($data['user'] ?? '') ?>">
+        <input type="text" class="form-control" name="user" id="singleUserInput" placeholder="ID пользователя или логин" value="<?= htmlspecialchars($data['user'] ?? '') ?>">
     </div>
     <div id="selectedUsersSection" class="mb-3 d-none">
         <input type="text" class="form-control mb-2" id="userSearchInput" placeholder="Поиск пользователя">

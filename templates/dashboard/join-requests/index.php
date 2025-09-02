@@ -4,7 +4,7 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Chat Join Requests</h1>
+<h1>Запросы на вступление</h1>
 
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
@@ -32,9 +32,9 @@
 <table id="joinRequestsTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
-        <th>Chat ID</th>
-        <th>User ID</th>
-        <th>Username</th>
+        <th>ID чата</th>
+        <th>ID пользователя</th>
+        <th>Логин</th>
         <th>Био</th>
         <th>Пригласительная ссылка</th>
         <th>Дата запроса</th>
@@ -47,9 +47,9 @@
     <tbody></tbody>
     <tfoot>
     <tr>
-        <th>Chat ID</th>
-        <th>User ID</th>
-        <th>Username</th>
+        <th>ID чата</th>
+        <th>ID пользователя</th>
+        <th>Логин</th>
         <th>Био</th>
         <th>Ссылка</th>
         <th>Дата запроса</th>

@@ -48,11 +48,11 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-            <h4>Health</h4>
+            <h4>Состояние</h4>
             <p class="lead">
-                <?= $health['db'] ? 'DB OK' : 'DB FAIL' ?>,
-                <?= $health['redis'] ? 'Redis OK' : 'Redis FAIL' ?>,
-                <?= $health['worker'] ? 'Worker OK' : 'Worker FAIL' ?>
+                <?= $health['db'] ? 'БД ОК' : 'БД СБОЙ' ?>,
+                <?= $health['redis'] ? 'Redis ОК' : 'Redis СБОЙ' ?>,
+                <?= $health['worker'] ? 'Воркер ОК' : 'Воркер СБОЙ' ?>
             </p>
         </div></div>
     </div>

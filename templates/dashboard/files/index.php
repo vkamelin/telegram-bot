@@ -4,28 +4,28 @@
 <!-- Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
 
-<h1>Files</h1>
+<h1>Файлы</h1>
 
 <table id="filesTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
         <th>ID</th>
-        <th>Name</th>
-        <th>Type</th>
-        <th>File ID</th>
-        <th>Created</th>
-        <th class="text-end">Actions</th>
+        <th>Название</th>
+        <th>Тип</th>
+        <th>ID файла</th>
+        <th>Создано</th>
+        <th class="text-end">Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
     <tfoot>
     <tr>
         <th>ID</th>
-        <th>Name</th>
-        <th>Type</th>
-        <th>File ID</th>
-        <th>Created</th>
-        <th class="text-end">Actions</th>
+        <th>Название</th>
+        <th>Тип</th>
+        <th>ID файла</th>
+        <th>Создано</th>
+        <th class="text-end">Действия</th>
     </tr>
     </tfoot>
 </table>
