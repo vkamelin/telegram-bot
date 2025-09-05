@@ -84,6 +84,9 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = 'html';
+        }
         $data = MediaBuilder::prepareMediaData($chatId, 'photo', $photo, $caption, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
 
@@ -111,6 +114,9 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = 'html';
+        }
         $data = MediaBuilder::prepareMediaData($chatId, 'audio', $audio, $caption, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
 
@@ -139,6 +145,9 @@ class Push
         ?string $sendAfter = null
     ): bool {
         $options = array_merge(['disable_content_type_detection' => true], $options);
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = 'html';
+        }
 
         $data = MediaBuilder::prepareMediaData($chatId, 'document', $document, $caption, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
@@ -167,6 +176,9 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = 'html';
+        }
         $data = MediaBuilder::prepareMediaData($chatId, 'video', $video, $caption, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
 
@@ -193,7 +205,15 @@ class Push
         array $options = [],
         ?string $sendAfter = null
     ): bool {
-        $media = array_map(static fn ($item) => array_filter($item, static fn ($value) => $value !== null), $media);
+        $media = array_map(static function ($item) {
+            if (is_array($item)) {
+                if (!isset($item['parse_mode']) && !empty($item['caption'])) {
+                    $item['parse_mode'] = 'html';
+                }
+                return array_filter($item, static fn ($value) => $value !== null);
+            }
+            return $item;
+        }, $media);
 
         $data = [
             'chat_id' => $chatId,
@@ -268,6 +288,9 @@ class Push
             $data['caption'] = $caption;
         }
 
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = 'html';
+        }
         $data = array_merge($data, $options);
         $data = array_filter($data, static fn ($value) => $value !== null);
 
@@ -299,6 +322,9 @@ class Push
             'voice' => $voice,
         ];
 
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = 'html';
+        }
         $data = array_merge($data, $options);
 
         return self::push($chatId, 'sendVoice', $data, $type, $priority, $sendAfter);
@@ -329,6 +355,9 @@ class Push
             'video_note' => $videoNote,
         ];
 
+        if (!isset($options['parse_mode'])) {
+            $options['parse_mode'] = 'html';
+        }
         $data = array_merge($data, $options);
 
         return self::push($chatId, 'sendVideoNote', $data, $type, $priority, $sendAfter);
@@ -379,6 +408,9 @@ class Push
         ?string $sendAfter = null,
         ?int $scheduledId = null
     ): bool {
+        if (!isset($data['parse_mode']) && (isset($data['text']) || isset($data['caption']))) {
+            $data['parse_mode'] = 'html';
+        }
         return self::push($chatId, $method, $data, $type, $priority, $sendAfter, $scheduledId);
     }
 
