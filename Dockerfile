@@ -24,7 +24,7 @@ COPY docker/supervisor/conf.d/       /etc/supervisor/conf.d/
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-RUN mkdir -p /var/www/html/runtime/logs /var/www/html/storage/logs && \
+RUN mkdir -p /var/www/html/runtime/logs /var/www/html/storage/logs /usr/local/etc/php/conf.d && \
     chown -R www-data:www-data /var/www/html/runtime/logs /var/www/html/storage/logs
 
 # convert line endings
@@ -36,6 +36,9 @@ WORKDIR /var/www/html
 # copy application sources
 COPY . /var/www/html
 RUN chown -R www-data:www-data /var/www/html/runtime/logs /var/www/html/storage/logs
+
+# PHP upload limits (100 MB)
+COPY docker/php/conf.d/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 # install PHP dependencies without dev packages
 RUN composer install --no-dev --optimize-autoloader
