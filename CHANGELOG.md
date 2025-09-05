@@ -5,6 +5,7 @@
 ## [Unreleased]
 
 ### Added
+- Dashboard: UTM report at `/dashboard/utm` with date filters, sums per UTM and grand total (aggregated from `tg_pre_checkout` joined to `telegram_users.utm`).
 - Единый слой валидации: `App/Helpers/Validator` + ошибки `ValidationException` → 422 (problem+json).
 - Валидация в `AuthController::login` и `AuthController::refresh`.
 - Юнит‑тесты на валидатор и обработчик ошибок для валидации.

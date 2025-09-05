@@ -40,3 +40,9 @@
     <?php endforeach; ?>
     </tbody>
 </table>
+
+<div class="mt-3">
+    <strong>Итого:</strong> <?= (int)($grandTotal ?? 0) ?>
+    <small class="text-muted">(в минимальных единицах валюты)</small>
+    
+</div>

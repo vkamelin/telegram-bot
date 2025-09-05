@@ -110,6 +110,10 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/logs/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->data($req, $res));
         $auth->get('/logs/view', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->show($req, $res));
         // добавляйте страницы админки здесь
+        // UTM report
+        $auth->get('/utm', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\UtmController($db))->index($req, $res));
+        $auth->post('/utm', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\UtmController($db))->index($req, $res));
+
         // Promo codes dashboard
         $auth->get('/promo-codes', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->index($req, $res));
         $auth->get('/promo-codes/upload', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->upload($req, $res));

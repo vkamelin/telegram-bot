@@ -130,4 +130,11 @@ if (is_dir(__DIR__ . '/dashboard/metrics') || file_exists(__DIR__ . '/dashboard/
     unset($item);
 }
 
+// Add UTM report shortcut
+$menu[] = [
+    'url'   => '/dashboard/utm',
+    'title' => 'UTM',
+    'icon'  => 'bi bi-graph-up',
+];
+
 return $menu;
