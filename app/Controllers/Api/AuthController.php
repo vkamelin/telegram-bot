@@ -39,15 +39,14 @@ final class AuthController
     public function login(Req $req, Res $res): Res
     {
         $data = (array)$req->getParsedBody();
-        $validated = \App\Helpers\Validator::validate($data, [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|length:1,200',
-        ]);
-        if (!($validated['ok'] ?? false)) {
-            throw new \App\Exceptions\ValidationException($validated['errors'] ?? [], 'Invalid payload');
+        $schema = \App\Helpers\SchemaLoader::load('auth_login');
+        $resSchema = \App\Helpers\JsonSchemaValidator::validate($data, $schema);
+        if (!($resSchema['ok'] ?? false)) {
+            throw new \App\Exceptions\ValidationException($resSchema['errors'] ?? [], 'Invalid payload');
         }
-        $email = (string)$validated['data']['email'];
-        $pass = (string)$validated['data']['password'];
+        // normalization
+        $email = isset($data['email']) && is_string($data['email']) ? trim($data['email']) : '';
+        $pass = isset($data['password']) && is_string($data['password']) ? (string)$data['password'] : '';
 
         $stmt = $this->db->prepare('SELECT id, password FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);
@@ -78,13 +77,12 @@ final class AuthController
     public function refresh(Req $req, Res $res): Res
     {
         $data = (array)$req->getParsedBody();
-        $validated = \App\Helpers\Validator::validate($data, [
-            'refresh_token' => 'required|string|length:10,2048',
-        ]);
-        if (!($validated['ok'] ?? false)) {
-            throw new \App\Exceptions\ValidationException($validated['errors'] ?? [], 'Invalid payload');
+        $schema = \App\Helpers\SchemaLoader::load('auth_refresh');
+        $resSchema = \App\Helpers\JsonSchemaValidator::validate($data, $schema);
+        if (!($resSchema['ok'] ?? false)) {
+            throw new \App\Exceptions\ValidationException($resSchema['errors'] ?? [], 'Invalid payload');
         }
-        $refresh = (string)$validated['data']['refresh_token'];
+        $refresh = isset($data['refresh_token']) && is_string($data['refresh_token']) ? (string)$data['refresh_token'] : '';
 
         $svc = new RefreshTokenService($this->db, $this->jwtCfg['refresh_ttl'] ?? 2592000);
         $row = $svc->validate($refresh);
