@@ -8,13 +8,20 @@ use App\Console\Command;
 use App\Console\Kernel;
 use App\Helpers\Logger;
 
+/**
+ * Команда фоновой обработки входящих обновлений.
+ */
 final class WorkerHandlerCommand extends Command
 {
     public string $signature = 'worker:handler';
     public string $description = 'Handle update payload in background';
 
     /**
-     * @param array<int, string> $arguments
+     * Принимает base64-пейлоад и передаёт его воркеру-обработчику.
+     *
+     * @param array<int,string> $arguments [payload] — base64-строка
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

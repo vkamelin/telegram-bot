@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App;
 
 /**
- * Simple configuration loader providing access to values
- * from the application config array and environment variables.
+ * Класс конфигурации приложения.
+ *
+ * Позволяет получать значения из конфигурационного массива и переменных
+ * окружения. Значения из окружения имеют приоритет над значениями из
+ * конфигурационного файла.
  */
 final class Config
 {
@@ -15,8 +18,14 @@ final class Config
      *
      * @var array<string, mixed>
      */
+    /**
+     * Загруженные настройки приложения.
+     *
+     * @var array<string,mixed>
+     */
     private array $data;
 
+    /** Единственный инстанс (Singleton). */
     private static ?self $instance = null;
 
     /**
@@ -29,21 +38,23 @@ final class Config
         $this->data = $config;
     }
 
+    /**
+     * Возвращает singleton-инстанс конфигурации.
+     */
     public static function getInstance(): self
     {
         return self::$instance ??= new self();
     }
 
     /**
-     * Retrieve a configuration value.
+     * Возвращает значение конфигурации по ключу.
      *
-     * Environment variables take precedence over values from the
-     * configuration array. If the key is not found, the provided default
-     * value is returned.
+     * Переменные окружения имеют приоритет над значениями из файла
+     * конфигурации. Если ключ отсутствует, возвращается значение по умолчанию.
      *
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
+     * @param string $key Ключ параметра
+     * @param mixed $default Значение по умолчанию
+     * @return mixed Найденное значение или $default
      */
     public function get(string $key, mixed $default = null): mixed
     {

@@ -11,13 +11,20 @@ use Phinx\Console\PhinxApplication;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+/**
+ * Команда отката последних миграций.
+ */
 class MigrateRollbackCommand extends Command
 {
     public string $signature = 'migrate:rollback';
     public string $description = 'Откатить миграции';
 
     /**
-     * @param array<int, string> $arguments
+     * Откатывает миграции до предыдущей версии.
+     *
+     * @param array<int,string> $arguments Аргументы команды (не используются)
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода Phinx
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

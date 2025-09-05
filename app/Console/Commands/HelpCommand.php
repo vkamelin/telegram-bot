@@ -5,12 +5,19 @@ namespace App\Console\Commands;
 use App\Console\Command;
 use App\Console\Kernel;
 
+/**
+ * Команда справки по другим командам.
+ */
 class HelpCommand extends Command
 {
     public string $signature = 'help';
 
     /**
-     * @param array<int, string> $arguments
+     * Показывает описание указанной команды.
+     *
+     * @param array<int,string> $arguments Аргументы команды (имя целевой команды)
+     * @param Kernel $kernel Ядро для доступа к списку команд
+     * @return int Код выхода
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

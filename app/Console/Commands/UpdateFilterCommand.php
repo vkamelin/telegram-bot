@@ -7,13 +7,20 @@ use App\Console\Kernel;
 use App\Helpers\RedisHelper;
 use RedisException;
 
+/**
+ * Команда управления фильтрами обновлений в Redis.
+ */
 class UpdateFilterCommand extends Command
 {
     public string $signature = 'filter:update';
     public string $description = 'Manage update filter lists in Redis';
 
     /**
-     * @param array<int, string> $arguments
+     * Добавляет или удаляет значение в выбранном списке фильтров.
+     *
+     * @param array<int,string> $arguments Параметры команды (подсказка --help)
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

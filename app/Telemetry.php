@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App;
 
 /**
- * Minimal telemetry facade.
+ * Минимальная фасад-обёртка для телеметрии.
  *
- * All methods become no-ops when telemetry is disabled or when
- * required libraries are missing. Enable telemetry via
- * `TELEMETRY_ENABLED=true` and installing the necessary packages.
+ * Все методы становятся no-op, если телеметрия отключена или отсутствуют
+ * необходимые библиотеки. Включение: переменная окружения `TELEMETRY_ENABLED=true`
+ * и установка соответствующих пакетов.
  */
 class Telemetry
 {
     private static ?bool $enabled = null;
 
     /**
-     * Checks if telemetry is enabled and libraries are available.
+     * Проверяет, включена ли телеметрия и доступны ли библиотеки.
      */
     public static function enabled(): bool
     {
@@ -33,6 +33,9 @@ class Telemetry
         return self::$enabled;
     }
 
+    /**
+     * Инкрементирует счётчик успешно отправленных сообщений Telegram.
+     */
     public static function incrementTelegramSent(): void
     {
         if (!self::enabled()) {
@@ -41,6 +44,11 @@ class Telemetry
         // integrate with metrics backend
     }
 
+    /**
+     * Регистрирует неуспешную отправку в Telegram.
+     *
+     * @param string $reason Причина неудачи
+     */
     public static function recordTelegramSendFailure(string $reason): void
     {
         if (!self::enabled()) {
@@ -49,6 +57,11 @@ class Telemetry
         // integrate with metrics backend
     }
 
+    /**
+     * Обновляет метрику размера очереди Telegram.
+     *
+     * @param int $size Текущий размер очереди
+     */
     public static function setTelegramQueueSize(int $size): void
     {
         if (!self::enabled()) {
@@ -57,6 +70,11 @@ class Telemetry
         // gauge update
     }
 
+    /**
+     * Обновляет метрику размера очереди DLQ.
+     *
+     * @param int $size Текущий размер очереди DLQ
+     */
     public static function setDlqSize(int $size): void
     {
         if (!self::enabled()) {
@@ -65,6 +83,11 @@ class Telemetry
         // gauge update
     }
 
+    /**
+     * Устанавливает состояние circuit breaker для GPT.
+     *
+     * @param string $state Текущее состояние
+     */
     public static function setGptBreakerState(string $state): void
     {
         if (!self::enabled()) {
@@ -73,6 +96,11 @@ class Telemetry
         // gauge update
     }
 
+    /**
+     * Наблюдает время ответа GPT.
+     *
+     * @param float $seconds Длительность в секундах
+     */
     public static function observeGptResponseTime(float $seconds): void
     {
         if (!self::enabled()) {

@@ -11,13 +11,20 @@ use Phinx\Console\PhinxApplication;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+/**
+ * Команда запуска миграций базы данных.
+ */
 class MigrateRunCommand extends Command
 {
     public string $signature = 'migrate:run';
     public string $description = 'Запустить миграции';
 
     /**
-     * @param array<int, string> $arguments
+     * Выполняет миграции через Phinx.
+     *
+     * @param array<int,string> $arguments Аргументы команды (не используются)
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода Phinx
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

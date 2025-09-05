@@ -6,13 +6,20 @@ use App\Console\Command;
 use App\Console\Kernel;
 use App\Support\Path;
 
+/**
+ * Команда очистки кеша приложения.
+ */
 class CacheClearCommand extends Command
 {
     public string $signature = 'cache:clear';
     public string $description = 'Очистить кеш приложения';
 
     /**
-     * @param array<int, string> $arguments
+     * Удаляет файлы кеша в каталоге storage/cache.
+     *
+     * @param array<int,string> $arguments Аргументы команды (не используются)
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

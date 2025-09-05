@@ -2,6 +2,11 @@
 
 namespace App\Console;
 
+/**
+ * Ядро консольного приложения.
+ *
+ * Хранит список доступных команд и отвечает за их запуск.
+ */
 class Kernel
 {
     /**
@@ -23,9 +28,9 @@ class Kernel
     ];
 
     /**
-     * Instantiate commands.
+     * Инстанцирует доступные команды.
      *
-     * @return array<Command>
+     * @return array<Command> Список подготовленных к исполнению команд
      */
     public function commands(): array
     {
@@ -33,7 +38,10 @@ class Kernel
     }
 
     /**
-     * @param array<int, string> $argv
+     * Обрабатывает входные аргументы и запускает нужную команду.
+     *
+     * @param array<int,string> $argv Аргументы командной строки
+     * @return int Код выхода (0 — успех)
      */
     public function handle(array $argv): int
     {

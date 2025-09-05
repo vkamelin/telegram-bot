@@ -10,6 +10,11 @@ use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 use PDO;
 
+/**
+ * Базовый обработчик CallbackQuery из Telegram.
+ *
+ * Содержит подключение к БД и контракт метода handle().
+ */
 abstract class AbstractCallbackQueryHandler
 {
     protected PDO $db;

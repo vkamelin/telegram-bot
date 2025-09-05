@@ -13,7 +13,7 @@ use PDO;
 use Throwable;
 
 /**
- * Dispatch due scheduled batches into the Redis queue via Push helper.
+ * Диспетчер отложенных сообщений: переносит готовые партии в очередь Redis.
  */
 final class ScheduledDispatchCommand extends Command
 {
@@ -21,7 +21,14 @@ final class ScheduledDispatchCommand extends Command
     public string $description = 'Move due scheduled messages to the queue; supports legacy and targeted batches.';
 
     /**
-     * @param array<int, string> $arguments
+     * Обрабатывает готовые к отправке партии и кладёт сообщения в очередь.
+     *
+     * Поддерживаются «наследованные» и таргетированные рассылки, предусмотрен
+     * механизм разблокировки зависших партий со статусом processing.
+     *
+     * @param array<int,string> $arguments Параметры (например, --limit=100)
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

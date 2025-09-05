@@ -59,7 +59,14 @@ final class AuthController
     }
 
     /**
-     * Issue new JWT using provided refresh token.
+     * Обновляет JWT по предоставленному refresh-токену.
+     *
+     * Проверяет валидность refresh-токена, отзывает его и выдаёт новую
+     * пару: access-токен и refresh-токен.
+     *
+     * @param Req $req HTTP-запрос
+     * @param Res $res HTTP-ответ
+     * @return Res JSON с новой парой токенов или ошибкой
      */
     public function refresh(Req $req, Res $res): Res
     {

@@ -11,7 +11,7 @@ use App\Helpers\Push;
 use PDO;
 
 /**
- * Команда для отправки push-сообщений пользователям Telegram.
+ * Команда отправки push-сообщений пользователям Telegram.
  */
 final class PushSendCommand extends Command
 {
@@ -19,7 +19,13 @@ final class PushSendCommand extends Command
     public string $description = 'Отправить push-сообщение выбранным пользователям Telegram';
 
     /**
-     * @param array<int, string> $arguments
+     * Формирует список получателей и ставит текстовые сообщения в очередь.
+     *
+     * Доступные опции: --all | --user=1,2 | --username=name1,name2 | --group=1,devs
+     *
+     * @param array<int,string> $arguments Текст сообщения и опции выбора аудитории
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

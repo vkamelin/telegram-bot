@@ -6,13 +6,20 @@ use App\Console\Command;
 use App\Console\Kernel;
 use App\Helpers\Database;
 
+/**
+ * Команда создания администратора панели.
+ */
 class CreateAdminCommand extends Command
 {
     public string $signature = 'admin:create';
     public string $description = 'Create dashboard administrator';
 
     /**
-     * @param array<int, string> $arguments
+     * Создаёт пользователя-администратора с указанными email и паролем.
+     *
+     * @param array<int,string> $arguments [email, password]
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода
      */
     public function handle(array $arguments, Kernel $kernel): int
     {

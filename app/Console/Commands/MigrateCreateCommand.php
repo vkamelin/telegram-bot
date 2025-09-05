@@ -11,13 +11,20 @@ use Phinx\Console\PhinxApplication;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+/**
+ * Команда создания файла миграции.
+ */
 class MigrateCreateCommand extends Command
 {
     public string $signature = 'migrate:create';
     public string $description = 'Создать новую миграцию';
 
     /**
-     * @param array<int, string> $arguments
+     * Создаёт новый файл миграции через Phinx.
+     *
+     * @param array<int,string> $arguments [name] — имя миграции
+     * @param Kernel $kernel Ядро (не используется)
+     * @return int Код выхода Phinx
      */
     public function handle(array $arguments, Kernel $kernel): int
     {
