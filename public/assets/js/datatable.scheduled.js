@@ -13,8 +13,9 @@ $(document).ready(function() {
     { data: 'failed_count', render: function(v){ return v ?? 0; } },
     { data: 'status', render: function(data){
       if (data === 'pending') return '<span class="badge bg-warning text-dark">ожидает</span>';
-      if (data === 'processing') return '<span class="badge bg-info text-dark">отправляется</span>';
+      if (data === 'processing') return '<span class="badge bg-info text-dark">в процессе</span>';
       if (data === 'canceled') return '<span class="badge bg-secondary">отменено</span>';
+      if (data === 'completed') return '<span class="badge bg-success">завершено</span>';
       return data;
     }},
     { data: 'created_at' },
@@ -23,9 +24,9 @@ $(document).ready(function() {
       className: 'text-end',
       render: function(data, type, row) {
         const isPending = row.status === 'pending';
-        const detailsLink = '<a href="/dashboard/scheduled/' + row.id + '" class="btn btn-sm btn-outline-secondary" title="Подробнее">' +
-          '<i class="bi bi-bar-chart"></i>'+
-          '</a>';
+        const detailsLink = '<a href="/dashboard/scheduled/' + row.id + '" class="btn btn-sm btn-outline-secondary" title="Подробнее">'
+          + '<i class="bi bi-bar-chart"></i>'
+          + '</a>';
         const sendForm = isPending ? ('<form method="post" action="/dashboard/scheduled/' + row.id + '/send-now" class="d-inline">'
           + '<input type="hidden" name="_csrf_token" value="' + csrfToken + '">'
           + '<button type="submit" class="btn btn-sm btn-outline-secondary" title="Отправить сейчас">'

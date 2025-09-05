@@ -26,6 +26,7 @@ final class ScheduledDispatchCommand extends Command
     public function handle(array $arguments, Kernel $kernel): int
     {
         $limit = 100;
+        $staleTtl = (int)($_ENV['SCHEDULED_PROCESSING_TTL'] ?? 600); // seconds to unlock stale "processing"
         foreach ($arguments as $arg) {
             if (str_starts_with($arg, '--limit=')) {
                 $v = (int)substr($arg, 8);
@@ -49,6 +50,32 @@ final class ScheduledDispatchCommand extends Command
         };
 
         try {
+            // 1) Unlock stale processing batches so they can be retried
+            if ($staleTtl > 0) {
+                try {
+                    $hasCounters = $columnExists($db, 'telegram_scheduled_messages', 'selected_count')
+                        && $columnExists($db, 'telegram_scheduled_messages', 'success_count')
+                        && $columnExists($db, 'telegram_scheduled_messages', 'failed_count');
+
+                    $cutoff = date('Y-m-d H:i:s', time() - $staleTtl);
+                    if ($hasCounters) {
+                        // Unlock only if the batch has not fully completed yet
+                        $sql = 'UPDATE telegram_scheduled_messages SET status = "pending" '
+                            . 'WHERE status = "processing" '
+                            . 'AND started_at IS NOT NULL '
+                            . 'AND started_at < :cutoff '
+                            . 'AND (success_count + failed_count) < selected_count';
+                        $db->prepare($sql)->execute(['cutoff' => $cutoff]);
+                    } else {
+                        // Legacy schema: conservative unlock
+                        $db->prepare('UPDATE telegram_scheduled_messages SET status = "pending" WHERE status = "processing" AND started_at IS NOT NULL AND started_at < :cutoff')
+                            ->execute(['cutoff' => $cutoff]);
+                    }
+                } catch (\Throwable $e) {
+                    Logger::error('Failed to unlock stale scheduled batches', ['exception' => $e]);
+                }
+            }
+
             // Fetch due, pending scheduled records up to the limit
             $stmt = $db->prepare(
                 "SELECT id FROM telegram_scheduled_messages WHERE send_after <= NOW() AND status = 'pending' ORDER BY priority DESC, id ASC LIMIT :lim"
@@ -158,10 +185,15 @@ final class ScheduledDispatchCommand extends Command
                     $method = (string)$row['method'];
                     $type = (string)($row['type'] ?? 'push');
                     $priority = (int)$row['priority'];
+                    $effectiveType = sprintf('scheduled:%s:%d', $type !== '' ? $type : 'push', (int)$id);
 
                     $okAll = true;
                     foreach ($recipients as $uid) {
-                        $ok = Push::custom($method, is_array($payload) ? $payload : [], (int)$uid, $type, $priority, null, $id);
+                        $pay = is_array($payload) ? $payload : [];
+                        if (!isset($pay['chat_id']) || empty($pay['chat_id'])) {
+                            $pay['chat_id'] = (int)$uid;
+                        }
+                        $ok = Push::custom($method, $pay, (int)$uid, $effectiveType, $priority, null, $id);
                         $okAll = $okAll && $ok;
                         if ($ok) {
                             $dispatchedMessages++;
@@ -195,4 +227,3 @@ final class ScheduledDispatchCommand extends Command
         }
     }
 }
-

@@ -279,9 +279,9 @@ function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
     
     Logger::debug("Saving update: id={$id}, status={$status}, code={$errorCode}, error=" . ($error ?? 'none'));
     
-    try {
-        $stmt = $db->prepare(
-            "UPDATE `telegram_messages`
+        try {
+            $stmt = $db->prepare(
+                "UPDATE `telegram_messages`
                SET message_id   = :message_id,
                    status       = :status,
                    response     = :response,
@@ -301,9 +301,16 @@ function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
 
         // If this message belongs to a scheduled batch, increment its counters
         try {
-            $sidStmt = $db->prepare('SELECT scheduled_id FROM telegram_messages WHERE id = :id');
+            $sidStmt = $db->prepare('SELECT scheduled_id, `type` FROM telegram_messages WHERE id = :id');
             $sidStmt->execute(['id' => $id]);
-            $scheduledId = $sidStmt->fetchColumn();
+            $row = $sidStmt->fetch();
+            $scheduledId = $row['scheduled_id'] ?? null;
+            if (($scheduledId === false || $scheduledId === null) && isset($row['type'])) {
+                $typeVal = (string)$row['type'];
+                if (preg_match('~^scheduled:[^:]*:(\d+)$~', $typeVal, $m) === 1) {
+                    $scheduledId = (int)$m[1];
+                }
+            }
             if ($scheduledId !== false && $scheduledId !== null) {
                 if ($status === 'success') {
                     $db->prepare('UPDATE `telegram_scheduled_messages` SET `success_count` = `success_count` + 1 WHERE id = :sid')
@@ -311,6 +318,47 @@ function saveUpdate(int $id, ServerResponse $response, string $queueKey): void
                 } elseif ($status === 'failed') {
                     $db->prepare('UPDATE `telegram_scheduled_messages` SET `failed_count` = `failed_count` + 1 WHERE id = :sid')
                         ->execute(['sid' => (int)$scheduledId]);
+                }
+
+                // If counters reached the selected total, mark batch as completed
+                try {
+                    $db->prepare(
+                        "UPDATE `telegram_scheduled_messages`
+                           SET `status` = 'completed', `completed_at` = IFNULL(`completed_at`, NOW())
+                         WHERE id = :sid
+                           AND `status` = 'processing'
+                           AND `selected_count` > 0
+                           AND (`success_count` + `failed_count`) >= `selected_count`"
+                    )->execute(['sid' => (int)$scheduledId]);
+
+                    // Fallback path: if selected_count is not set, derive it from messages table
+                    $meta = $db->prepare('SELECT selected_count, success_count, failed_count FROM telegram_scheduled_messages WHERE id = :sid');
+                    $meta->execute(['sid' => (int)$scheduledId]);
+                    $m = $meta->fetch();
+                    $sel = (int)($m['selected_count'] ?? 0);
+                    $sent = (int)($m['success_count'] ?? 0) + (int)($m['failed_count'] ?? 0);
+                    if ($sel <= 0) {
+                        $planned = 0;
+                        try {
+                            $c1 = $db->prepare('SELECT COUNT(*) FROM telegram_messages WHERE scheduled_id = :sid');
+                            $c1->execute(['sid' => (int)$scheduledId]);
+                            $planned = (int)$c1->fetchColumn();
+                            if ($planned === 0) {
+                                $like = 'scheduled:%:' . (int)$scheduledId;
+                                $c2 = $db->prepare('SELECT COUNT(*) FROM telegram_messages WHERE `type` LIKE :t');
+                                $c2->execute(['t' => $like]);
+                                $planned = (int)$c2->fetchColumn();
+                            }
+                        } catch (\Throwable) {
+                            $planned = 0;
+                        }
+                        if ($planned > 0 && $sent >= $planned) {
+                            $db->prepare('UPDATE telegram_scheduled_messages SET selected_count = :sel, status = \"completed\", completed_at = IFNULL(completed_at, NOW()) WHERE id = :sid AND status = \"processing\"')
+                                ->execute(['sel' => $planned, 'sid' => (int)$scheduledId]);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // ignore if column not exists or DB doesn't support expression
                 }
             }
         } catch (Throwable $e) {

@@ -147,11 +147,11 @@ final class ScheduledController
     {
         $id = (int)($args['id'] ?? 0);
         try {
-            $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
+            $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, data, priority, send_after, status, selected_count, success_count, failed_count, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
             $stmt->execute(['id' => $id]);
             $row = $stmt->fetch();
         } catch (\Throwable $e) {
-            $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, priority, send_after, status, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
+            $stmt = $this->db->prepare('SELECT id, user_id, method, `type`, data, priority, send_after, status, created_at, started_at FROM telegram_scheduled_messages WHERE id = :id');
             $stmt->execute(['id' => $id]);
             $row = $stmt->fetch();
             if ($row) {
@@ -164,9 +164,20 @@ final class ScheduledController
             return $res->withStatus(404);
         }
 
+        // Decode payload JSON for rendering in the view
+        $payload = [];
+        try {
+            if (isset($row['data']) && $row['data'] !== null && $row['data'] !== '') {
+                $payload = json_decode((string)$row['data'], true, 512, JSON_THROW_ON_ERROR) ?: [];
+            }
+        } catch (\Throwable) {
+            $payload = [];
+        }
+
         return View::render($res, 'dashboard/scheduled/view.php', [
             'title' => 'Scheduled details',
             'item' => $row,
+            'payload' => $payload,
         ], 'layouts/main.php');
     }
 
@@ -184,8 +195,28 @@ final class ScheduledController
             $start = 0;
         }
 
-        $conds = ['scheduled_id = :sid'];
-        $params = ['sid' => $id];
+        // Support both schemas: prefer exact effective type, else fallback to LIKE for legacy batches with empty scheduled type
+        $scheduledType = null;
+        try {
+            $tstmt = $this->db->prepare('SELECT `type` FROM telegram_scheduled_messages WHERE id = :id');
+            $tstmt->execute(['id' => $id]);
+            $val = $tstmt->fetchColumn();
+            $scheduledType = $val === false ? null : (string)$val;
+        } catch (\Throwable) {
+            $scheduledType = null;
+        }
+
+        $conds = [];
+        $params = [];
+        if ($scheduledType !== null && $scheduledType !== '') {
+            $effectiveType = sprintf('scheduled:%s:%d', $scheduledType, $id);
+            $conds[] = '(scheduled_id = :sid OR `type` = :type_exact)';
+            $params = ['sid' => $id, 'type_exact' => $effectiveType];
+        } else {
+            // Legacy fallback: no scheduled type stored; match by suffix only
+            $conds[] = '(scheduled_id = :sid OR `type` LIKE :type_like)';
+            $params = ['sid' => $id, 'type_like' => 'scheduled:%:' . $id];
+        }
 
         if (($p['status'] ?? '') !== '') {
             $conds[] = 'status = :status';
@@ -216,8 +247,13 @@ final class ScheduledController
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
 
-        $recordsTotalStmt = $this->db->prepare('SELECT COUNT(*) FROM telegram_messages WHERE scheduled_id = :sid');
-        $recordsTotalStmt->execute(['sid' => $id]);
+        if (array_key_exists('type_exact', $params)) {
+            $recordsTotalStmt = $this->db->prepare('SELECT COUNT(*) FROM telegram_messages WHERE scheduled_id = :sid OR `type` = :type_exact');
+            $recordsTotalStmt->execute(['sid' => $id, 'type_exact' => $params['type_exact']]);
+        } else {
+            $recordsTotalStmt = $this->db->prepare('SELECT COUNT(*) FROM telegram_messages WHERE scheduled_id = :sid OR `type` LIKE :type_like');
+            $recordsTotalStmt->execute(['sid' => $id, 'type_like' => $params['type_like']]);
+        }
         $recordsTotal = (int)$recordsTotalStmt->fetchColumn();
 
         return Response::json($res, 200, [
@@ -375,8 +411,21 @@ final class ScheduledController
         $method = (string)$msg['method'];
         $type = (string)$msg['type'];
         $priority = (int)$msg['priority'];
+        $effectiveType = sprintf('scheduled:%s:%d', $type !== '' ? $type : 'push', (int)$id);
+
+        // Store selected_count if column exists
+        try {
+            $this->db->prepare('UPDATE telegram_scheduled_messages SET selected_count = :cnt WHERE id = :id')
+                ->execute(['cnt' => count($recipients), 'id' => $id]);
+        } catch (\Throwable) {
+            // ignore if column not present
+        }
         foreach ($recipients as $uid) {
-            $ok = \App\Helpers\Push::custom($method, is_array($payload) ? $payload : [], (int)$uid, $type, $priority, null, $id);
+            $pay = is_array($payload) ? $payload : [];
+            if (!isset($pay['chat_id']) || empty($pay['chat_id'])) {
+                $pay['chat_id'] = (int)$uid;
+            }
+            $ok = \App\Helpers\Push::custom($method, $pay, (int)$uid, $effectiveType, $priority, null, $id);
             $okAll = $okAll && $ok;
         }
 

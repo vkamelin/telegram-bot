@@ -701,10 +701,13 @@ final class MessagesController
                 }
 
                 if (!$errors) {
+                    // Allow user-provided analytics type (optional). If not provided, fall back to msgType
+                    $userType = trim((string)($p['custom_type'] ?? ($p['analytics_type'] ?? '')));
+                    $statsType = $userType !== '' ? $userType : $msgType;
                     $ok = \App\Helpers\Scheduled::createBatch(
                         $method,
                         $payload,
-                        $msgType,
+                        $statsType,
                         $priority,
                         (string)$sendAfter,
                         $target
