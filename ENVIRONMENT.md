@@ -1,85 +1,85 @@
-# Конфигурация окружения (.env)
+# Переменные окружения (.env)
 
-Проект использует файл `.env` для хранения чувствительных параметров и конфигурации.  
-Все переменные окружения читаются в `app/Config/config.php`.
+Ниже перечислены ключевые переменные окружения с пояснениями и типичными значениями. Большая часть считывается в `app/Config/config.php`.
 
-## Правила
-- `.env` всегда в `.gitignore` — не коммитить секреты.
-- Для новых переменных добавляй их в `.env.example` с комментарием.
-- В коде использовать только `$_ENV` или обёртку в `config.php`.
-- Значения хранятся в **строковом формате**, при необходимости кастуются в PHP.
-- Перед запуском контейнеров убедись, что задан `DB_DSN`.
+## Общие
+- `APP_NAME`: имя приложения, например `telegram-bot`.
+- `APP_ENV`: режим (`dev` или `prod`).
+- `APP_URL`: базовый URL приложения.
+- `WEB_APP_URL`: URL Telegram WebApp, если используется.
 
-## Пример `.env.example` с комментариями
-```ini
-# === Общие настройки ===
-APP_ENV=dev            # окружение: dev, prod
-APP_DEBUG=true         # включить подробные ошибки (true/false)
+## Логи
+- `LOG_CHANNEL`: канал логирования (например, `app`).
+- `LOG_LEVEL`: уровень логирования (`DEBUG|INFO|NOTICE|WARNING|ERROR|CRITICAL|ALERT|EMERGENCY`).
 
-# === База данных ===
-DB_DSN="mysql:host=db;dbname=app;charset=utf8mb4"
-DB_NAME="app"
-DB_USER="app"
-DB_PASS="secret"
+## База данных (PDO)
+- `DB_CONNECTION_TYPE`: `tcp` или `socket`.
+- `DB_HOST`: хост БД (например, `127.0.0.1` или `db` в Docker).
+- `DB_PORT`: порт БД (обычно `3306`).
+- `DB_CHARSET`: кодировка, например `utf8mb4`.
+- `DB_NAME`: имя базы, например `app`.
+- `DB_USER`: пользователь БД.
+- `DB_PASS`: пароль пользователя БД.
 
-# === JWT токены ===
-JWT_SECRET="change_me" # секретный ключ (init.sh генерирует автоматически, если пусто)
-JWT_TTL=3600           # срок жизни токена в секундах
-JWT_ALG=HS256          # алгоритм (обычно HS256)
+Пример DSN для MySQL: `mysql:host=127.0.0.1;dbname=app;charset=utf8mb4` (в коде собирается из переменных).
 
-# === CORS ===
-CORS_ORIGINS="*"       # список разрешённых origin через запятую
+## Redis (опционально)
+- `REDIS_HOST`: хост Redis (`127.0.0.1` или `redis`).
+- `REDIS_PORT`: порт Redis (`6379`).
+- `REDIS_DB`: номер БД Redis (`0`).
+- `REDIS_PREFIX`: префикс ключей (например, `app:`).
 
-# === Telegram ===
-BOT_TOKEN="0000000000:AA..." # токен Telegram-бота для проверки initData
+## JWT
+- `JWT_SECRET`: секрет подписи JWT. В проде должен быть длинным и случайным.
+- `JWT_TTL`: время жизни JWT в секундах (умолчание 3600 в коде).
+- `JWT_ALG`: алгоритм подписи (обычно `HS256`).
 
-# === Rate limit ===
-RATE_LIMIT_BUCKET=ip   # тип лимита: ip или user
-RATE_LIMIT=60          # запросов в минуту
+## CORS и CSP
+- `CORS_ORIGINS`: список разрешённых origin через запятую (например, `https://example.com,https://app.example.com`). `*` для разработки.
+- `CSP_SCRIPT_SRC`, `CSP_STYLE_SRC`, `CSP_FONT_SRC`: источники для CSP (по умолчанию разрешены популярные CDN, можно ужесточать).
 
-# === Redis (опционально) ===
-REDIS_DSN="tcp://127.0.0.1:6379"
-# === Telemetry (опционально) ===
-TELEMETRY_ENABLED=false  # включить метрики и трассировку
+## Rate‑limit и размер запроса
+- `RATE_LIMIT_BUCKET`: `ip` или `user` — по чему лимитировать.
+- `RATE_LIMIT`: число запросов за окно (подробности в реализации middleware).
+- `REQUEST_SIZE_LIMIT`: максимальный размер тела запроса в байтах (по умолчанию 1048576).
 
-# === Workers ===
-WORKERS_GPT_PROCS=1       # число процессов GPT
-WORKERS_TELEGRAM_PROCS=1  # число процессов Telegram
-WORKERS_SCHEDULED_PROCS=1 # число процессов воркера отложенных сообщений
-SCHEDULED_DISPATCH_LIMIT=100 # сколько отложенных записей обрабатывать за проход
-````
+## Telegram
+- `BOT_API_SERVER`: `remote` или `local` — куда отправлять Bot API.
+- `BOT_TOKEN`: токен Telegram‑бота.
+- `BOT_NAME`: username бота (без `@`).
+- `DEFAULT_CHAT_ID`: дефолтный чат для тестов/отправок по умолчанию (опционально).
+- `BOT_MAX_RPS`: желаемое ограничение RPS (мягкая настройка клиента).
+- `BOT_LOCAL_API_HOST`, `BOT_LOCAL_API_PORT`: параметры локального Bot API при `BOT_API_SERVER=local`.
 
-`TELEMETRY_ENABLED=true` включает отправку метрик и трассировку (при наличии зависимостей). При `false` вызовы `App\\Telemetry` становятся no-op.
+## Фильтр апдейтов Telegram
+- `TG_FILTERS_FROM_REDIS`: `true/false` — источник правил: Redis или `.env`.
+- `TG_FILTERS_REDIS_PREFIX`: префикс ключей в Redis для списков (по умолчанию `tg:filters`).
+- `TG_ALLOW_TYPES`, `TG_DENY_TYPES`: списки разрешённых/запрещённых типов апдейтов (через запятую).
+- `TG_ALLOW_CHATS`, `TG_DENY_CHATS`: списки ID чатов (разрешить/запретить).
+- `TG_ALLOW_COMMANDS`, `TG_DENY_COMMANDS`: списки команд бота (разрешить/запретить).
 
-`WORKERS_GPT_PROCS`, `WORKERS_TELEGRAM_PROCS` и `WORKERS_SCHEDULED_PROCS` задают количество процессов для GPT, Telegram и отложенных сообщений (по умолчанию 1).
-`SCHEDULED_DISPATCH_LIMIT` управляет батч-размером одного прохода командой `scheduled:dispatch` и воркером `scheduled_dispatcher.php`.
+## Идемпотентность
+- `IDEMPOTENCY_KEY_TTL`: TTL для ключей идемпотентности (секунды), по умолчанию 60.
 
-## Использование
+## Телеметрия
+- `TELEMETRY_ENABLED`: `true/false` — включает трейсинг/метрики (реализация заглушена, оставлена точка расширения).
 
-В `app/Config/config.php`:
+## Воркеры
+- `WORKERS_TELEGRAM_PROCS`: число процессов воркера Telegram.
+- `WORKERS_GPT_PROCS`: число процессов воркера GPT.
+- `WORKERS_SCHEDULED_PROCS`: число процессов планировщика.
+- `SCHEDULED_DISPATCH_LIMIT`: лимит батча для отправки отложенных сообщений.
 
-```php
-'bot_token' => $_ENV['BOT_TOKEN'] ?? null,
+## Интеграции
+- `AITUNNEL_API_KEY`: ключ для AITunnel (если используется).
 
-'db' => [
-    'dsn'  => $_ENV['DB_DSN'] ?? null,
-    'user' => $_ENV['DB_USER'] ?? null,
-    'pass' => $_ENV['DB_PASS'] ?? null,
-],
-```
-
-## Проверка initData
-
-`TelegramInitDataMiddleware` валидирует подпись `initData` с помощью `BOT_TOKEN` из `.env`. Передавать данные можно тремя способами:
-
-1. Заголовок `Authorization: tma <initData>`
-2. Заголовок `X-Telegram-Init-Data: <initData>`
-3. Параметр `initData` в query или body
+## Передача initData (Telegram Mini App)
+`TelegramInitDataMiddleware` валидирует подпись `initData` на основе `BOT_TOKEN`. В `Authorization: tma <initData>`, `X-Telegram-Init-Data` или параметром `initData` — любой из способов допустим.
 
 Примеры:
-
 ```bash
 curl http://localhost:8080/api/health -H "Authorization: tma <initData>"
 curl http://localhost:8080/api/health -H "X-Telegram-Init-Data: <initData>"
 curl "http://localhost:8080/api/health?initData=<initData>"
 ```
+

@@ -1,67 +1,63 @@
-# API — Общее описание
+# API: краткий справочник
 
-## Назначение
-Краткое описание, для чего предназначен API.
+## Аутентификация и контекст Telegram
+- Для защищённых эндпоинтов используйте `Authorization: Bearer <jwt>`.
+- Для привязки контекста Mini App добавляйте `X-Telegram-Init-Data: <initData>` (или `Authorization: tma <initData>`/параметр `initData`).
 
-## Основные эндпоинты
-- `GET /api/health` — проверка состояния сервиса
-- `POST /api/auth/login` — выдача JWT-токена по email и паролю
-- `GET /api/me` — данные текущего пользователя
-- `GET /api/users` — список пользователей
-- `POST /api/users` — создание пользователя
+## Эндпоинты
+- `GET /api/health` — проверка состояния.
+- `POST /api/auth/login` — вход по email/паролю, выдаёт JWT и refresh (если реализовано в контроллере).
+- `POST /api/auth/refresh` — обновление JWT по refresh‑токену.
+- `GET /api/me` — профиль текущего пользователя (JWT).
+- `GET /api/users` — список пользователей (JWT).
+- `POST /api/users` — создать пользователя (JWT).
 
-## Форматы данных
-API использует JSON для всех запросов и ответов.
-
-- тело запросов отправляйте в формате JSON и указывайте заголовок `Content-Type: application/json`;
-- ответы возвращаются с заголовком `Content-Type: application/json`.
-
-## Примеры запросов
-### `GET /api/health`
+## Примеры
+### Health
 ```bash
 curl http://localhost:8080/api/health \
   -H "X-Telegram-Init-Data: <initData>"
 ```
-**Ответ:**
+Ответ:
 ```json
 {"status":"ok"}
 ```
 
-### `POST /api/auth/login`
+### Вход
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -H "X-Telegram-Init-Data: <initData>" \
   -d '{"email":"user@example.com","password":"secret"}'
 ```
-**Ответ:**
+Ответ:
 ```json
 {"token":"<jwt>"}
 ```
 
-### `GET /api/me`
+### Профиль
 ```bash
 curl http://localhost:8080/api/me \
   -H "Authorization: Bearer <jwt>" \
   -H "X-Telegram-Init-Data: <initData>"
 ```
-**Ответ:**
+Пример ответа:
 ```json
 {"user":{"id":1,"email":"a@b.c","created_at":"2025-01-01"}}
 ```
 
-### `GET /api/users`
+### Пользователи: список
 ```bash
 curl http://localhost:8080/api/users \
   -H "Authorization: Bearer <jwt>" \
   -H "X-Telegram-Init-Data: <initData>"
 ```
-**Ответ:**
+Ответ:
 ```json
 {"items":[{"id":1,"email":"user@example.com","created_at":"2025-01-01"}]}
 ```
 
-### `POST /api/users`
+### Пользователи: создание
 ```bash
 curl -X POST http://localhost:8080/api/users \
   -H "Content-Type: application/json" \
@@ -69,14 +65,13 @@ curl -X POST http://localhost:8080/api/users \
   -H "X-Telegram-Init-Data: <initData>" \
   -d '{"email":"new@example.com"}'
 ```
-**Ответ:**
+Ответ:
 ```json
 {"id":2}
 ```
 
-## Ограничения и квоты
-- RateLimit: не более 60 запросов в минуту на IP
-- Максимальный размер тела запроса — 1&nbsp;МБ
-- Все запросы должны содержать init data в заголовке `Authorization: tma <initData>`,
-  `X-Telegram-Init-Data` или параметре `initData`
-- Для защищённых эндпоинтов требуется заголовок `Authorization: Bearer <jwt>`
+## Лимиты и защита
+- Rate‑limit по IP/пользователю (по умолчанию ~60 запросов/мин).
+- Лимит размера тела запроса `REQUEST_SIZE_LIMIT` (по умолчанию 1 МБ).
+- Все ошибки в формате RFC 7807 (`application/problem+json`).
+

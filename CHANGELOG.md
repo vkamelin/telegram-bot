@@ -1,28 +1,32 @@
-Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/)
+# Changelog
 
-## [Unreleased]
+Формат основан на Keep a Changelog и Семантическом версионировании.
+
+## [0.2.0] — 2025-09-05
 
 ### Added
-- Добавлены инструкции по запуску health-эндпойнта, `TelegramInitDataMiddleware` и мини-приложению Telegram.
-- Описана переменная `BOT_TOKEN`, сценарии проверки `initData` и примеры запросов.
-- Страница `/dashboard/system` с env-переменными и командами воркеров.
-- Миграция: добавлен индекс `idx_chat_join_requests_status` на `chat_join_requests.status`.
+- Полная переработка и расширение документации на русском языке: `README.md`, `ARCHITECTURE.md`, `ENVIRONMENT.md`, `DEPLOYMENT.md`, `CONTRIBUTING.md`, `CODESTYLE.md`.
+- Обновлён раздел API: `docs/api.md` и пользовательское руководство `docs/user_manual.md`.
+- Описаны воркеры и примеры конфигурации Supervisor.
 
 ### Changed
-- Заменены упоминания `/admin` на `/dashboard` в документации.
+- Исправлены проблемы с кодировкой и несоответствия в старых документах.
+- README переписан: уточнены стек, структура, безопасность, запуск и консоль.
+- Уточнены пути и форматы заголовков для передачи `initData`.
 
 ## [0.1.1] — 2025-08-22
 
 ### Added
-- Добавлены PHPDoc.
-- Добавлен класс `Config`.
+- Дополнительные PHPDoc‑комментарии.
+- Расширение конфигурации.
 
 ### Changed
-- Обновлены middleware.
-- Заменён `logMessage` на вызовы `logger`.
+- Уточнена иерархия middleware.
+- Перенос логирования в общий хелпер `Logger`.
 
 ## [0.1.0] — 2025-08-22
 
 ### Added
-- Базовая структура каталогов.
-- Документация (ARCHITECTURE, README, CONTRIBUTING, CHANGELOG).
+- Базовая структура проекта: API + Dashboard.
+- Стартовая документация (ARCHITECTURE, README, CONTRIBUTING, CHANGELOG).
+
