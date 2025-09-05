@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Helpers;
@@ -47,8 +48,12 @@ final class JsonSchemaValidator
                 $errors[$path ?: '$'] = 'type:' . (string)$type;
                 return;
             }
-            if ($type === 'integer') { $value = (int)$value; }
-            if ($type === 'number' && is_string($value)) { $value = (float)$value; }
+            if ($type === 'integer') {
+                $value = (int)$value;
+            }
+            if ($type === 'number' && is_string($value)) {
+                $value = (float)$value;
+            }
         }
 
         // enums
@@ -96,10 +101,16 @@ final class JsonSchemaValidator
         // numeric constraints
         if (is_int($value) || is_float($value)) {
             if (isset($schema['minimum']) && is_numeric($schema['minimum'])) {
-                if ($value < (float)$schema['minimum']) { $errors[$path ?: '$'] = 'minimum:' . $schema['minimum']; return; }
+                if ($value < (float)$schema['minimum']) {
+                    $errors[$path ?: '$'] = 'minimum:' . $schema['minimum'];
+                    return;
+                }
             }
             if (isset($schema['maximum']) && is_numeric($schema['maximum'])) {
-                if ($value > (float)$schema['maximum']) { $errors[$path ?: '$'] = 'maximum:' . $schema['maximum']; return; }
+                if ($value > (float)$schema['maximum']) {
+                    $errors[$path ?: '$'] = 'maximum:' . $schema['maximum'];
+                    return;
+                }
             }
         }
 
@@ -157,4 +168,3 @@ final class JsonSchemaValidator
         return function_exists('mb_strlen') ? mb_strlen($s) : strlen($s);
     }
 }
-

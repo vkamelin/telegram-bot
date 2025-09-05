@@ -70,7 +70,9 @@ final class ReferralsController
             $sql .= ' LIMIT :limit OFFSET :offset';
         }
         $stmt = $this->db->prepare($sql);
-        foreach ($params as $k => $v) { $stmt->bindValue(':' . $k, $v); }
+        foreach ($params as $k => $v) {
+            $stmt->bindValue(':' . $k, $v);
+        }
         if ($length > 0) {
             $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
@@ -83,7 +85,9 @@ final class ReferralsController
             LEFT JOIN telegram_users inv ON inv.user_id = r.inviter_user_id
             LEFT JOIN telegram_users ine ON ine.user_id = r.invitee_user_id
             {$whereSql}");
-        foreach ($params as $k => $v) { $countStmt->bindValue(':' . $k, $v); }
+        foreach ($params as $k => $v) {
+            $countStmt->bindValue(':' . $k, $v);
+        }
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
         $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM referrals')->fetchColumn();
@@ -96,4 +100,3 @@ final class ReferralsController
         ]);
     }
 }
-

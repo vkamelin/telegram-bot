@@ -211,4 +211,3 @@ final class PromoCodeController
         return Response::json($res, 200, ['items' => $stmt->fetchAll()]);
     }
 }
-

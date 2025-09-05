@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Helpers;
 
 use PDO;
-use RuntimeException;
 use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 
 final class PromoCodeHelper
 {
@@ -39,7 +39,7 @@ final class PromoCodeHelper
             }
             // Определяем заголовок: ищем колонку `code`
             if ($header === null) {
-                $maybeHeader = array_map(static fn($v) => strtolower(trim((string)$v)), $row);
+                $maybeHeader = array_map(static fn ($v) => strtolower(trim((string)$v)), $row);
                 $idx = array_search('code', $maybeHeader, true);
                 if ($idx !== false) {
                     $header = $maybeHeader;
@@ -82,7 +82,7 @@ final class PromoCodeHelper
     public static function insertCodes(PDO $db, int $batchId, array $codes): int
     {
         // Нормализация и проверка на дубликаты в самом CSV
-        $codes = array_values(array_filter(array_map(static fn($c) => trim((string)$c), $codes), static fn($c) => $c !== ''));
+        $codes = array_values(array_filter(array_map(static fn ($c) => trim((string)$c), $codes), static fn ($c) => $c !== ''));
         if ($codes === []) {
             return 0;
         }
@@ -120,4 +120,3 @@ final class PromoCodeHelper
         return $inserted;
     }
 }
-

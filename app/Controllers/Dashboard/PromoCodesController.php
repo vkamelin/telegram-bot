@@ -29,21 +29,34 @@ final class PromoCodesController
 
         $conds = [];
         $args = [];
-        if ($status !== null) { $conds[] = 'status = ?'; $args[] = $status; }
-        if ($batchId !== null) { $conds[] = 'batch_id = ?'; $args[] = $batchId; }
-        if ($q !== '') { $conds[] = 'code LIKE ?'; $args[] = '%' . $q . '%'; }
+        if ($status !== null) {
+            $conds[] = 'status = ?';
+            $args[] = $status;
+        }
+        if ($batchId !== null) {
+            $conds[] = 'batch_id = ?';
+            $args[] = $batchId;
+        }
+        if ($q !== '') {
+            $conds[] = 'code LIKE ?';
+            $args[] = '%' . $q . '%';
+        }
         $where = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT id, batch_id, code, status, expires_at, issued_at FROM promo_codes {$where} ORDER BY id DESC LIMIT :limit OFFSET :offset";
         $stmt = $this->db->prepare($sql);
-        foreach ($args as $i => $val) { $stmt->bindValue($i + 1, $val); }
+        foreach ($args as $i => $val) {
+            $stmt->bindValue($i + 1, $val);
+        }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         $items = $stmt->fetchAll();
 
         $cnt = $this->db->prepare("SELECT COUNT(*) FROM promo_codes {$where}");
-        foreach ($args as $i => $val) { $cnt->bindValue($i + 1, $val); }
+        foreach ($args as $i => $val) {
+            $cnt->bindValue($i + 1, $val);
+        }
         $cnt->execute();
         $total = (int)$cnt->fetchColumn();
 
@@ -95,12 +108,16 @@ final class PromoCodesController
             $batchId = (int)$this->db->lastInsertId();
 
             // parse + insert IGNORE
-            $insCount = 0; $allCount = 0; $chunk = [];
+            $insCount = 0;
+            $allCount = 0;
+            $chunk = [];
             $stream = $file->getStream()->detach();
             foreach ($this->parseCsv($stream) as $row) {
                 $allCount++;
                 $code = trim((string)($row['code'] ?? ''));
-                if ($code === '') { continue; }
+                if ($code === '') {
+                    continue;
+                }
                 $expiresAt = isset($row['expires_at']) && $row['expires_at'] !== '' ? (string)$row['expires_at'] : null;
                 $chunk[] = [$batchId, $code, $expiresAt];
                 if (count($chunk) >= 500) {
@@ -108,7 +125,9 @@ final class PromoCodesController
                     $chunk = [];
                 }
             }
-            if ($chunk) { $insCount += $this->bulkInsertIgnore($chunk); }
+            if ($chunk) {
+                $insCount += $this->bulkInsertIgnore($chunk);
+            }
 
             // update batch total
             $u = $this->db->prepare('UPDATE promo_code_batches SET total = ? WHERE id = ?');
@@ -145,7 +164,7 @@ final class PromoCodesController
 
         $this->db->beginTransaction();
         try {
-            $stmt = $this->db->prepare("SELECT id, status, expires_at FROM promo_codes WHERE id = ? FOR UPDATE");
+            $stmt = $this->db->prepare('SELECT id, status, expires_at FROM promo_codes WHERE id = ? FOR UPDATE');
             $stmt->execute([$codeId]);
             $row = $stmt->fetch();
             if (!$row) {
@@ -191,9 +210,18 @@ final class PromoCodesController
 
         $conds = [];
         $args = [];
-        if ($from !== '') { $conds[] = 'i.issued_at >= ?'; $args[] = $from; }
-        if ($to !== '') { $conds[] = 'i.issued_at <= ?'; $args[] = $to; }
-        if ($tgUserId !== null) { $conds[] = 'i.telegram_user_id = ?'; $args[] = $tgUserId; }
+        if ($from !== '') {
+            $conds[] = 'i.issued_at >= ?';
+            $args[] = $from;
+        }
+        if ($to !== '') {
+            $conds[] = 'i.issued_at <= ?';
+            $args[] = $to;
+        }
+        if ($tgUserId !== null) {
+            $conds[] = 'i.telegram_user_id = ?';
+            $args[] = $tgUserId;
+        }
         $where = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $sql = "SELECT i.id, i.issued_at, i.telegram_user_id, i.issued_by, c.code
@@ -203,14 +231,18 @@ final class PromoCodesController
                 ORDER BY i.id DESC
                 LIMIT :limit OFFSET :offset";
         $stmt = $this->db->prepare($sql);
-        foreach ($args as $i => $v) { $stmt->bindValue($i + 1, $v); }
+        foreach ($args as $i => $v) {
+            $stmt->bindValue($i + 1, $v);
+        }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         $items = $stmt->fetchAll();
 
         $cnt = $this->db->prepare("SELECT COUNT(*) FROM promo_code_issues i JOIN promo_codes c ON c.id = i.code_id {$where}");
-        foreach ($args as $i => $v) { $cnt->bindValue($i + 1, $v); }
+        foreach ($args as $i => $v) {
+            $cnt->bindValue($i + 1, $v);
+        }
         $cnt->execute();
         $total = (int)$cnt->fetchColumn();
 
@@ -254,9 +286,18 @@ final class PromoCodesController
 
         $conds = [];
         $args = [];
-        if ($from !== '') { $conds[] = 'i.issued_at >= ?'; $args[] = $from; }
-        if ($to !== '') { $conds[] = 'i.issued_at <= ?'; $args[] = $to; }
-        if ($tgUserId !== null) { $conds[] = 'i.telegram_user_id = ?'; $args[] = $tgUserId; }
+        if ($from !== '') {
+            $conds[] = 'i.issued_at >= ?';
+            $args[] = $from;
+        }
+        if ($to !== '') {
+            $conds[] = 'i.issued_at <= ?';
+            $args[] = $to;
+        }
+        if ($tgUserId !== null) {
+            $conds[] = 'i.telegram_user_id = ?';
+            $args[] = $tgUserId;
+        }
         $where = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
         $stmt = $this->db->prepare("SELECT i.issued_at, c.code, i.telegram_user_id, i.issued_by
@@ -315,25 +356,36 @@ final class PromoCodesController
      */
     private function parseCsv($stream): iterable
     {
-        if (!is_resource($stream)) { throw new \RuntimeException('Invalid stream'); }
-        $header = null; $map = [];
+        if (!is_resource($stream)) {
+            throw new \RuntimeException('Invalid stream');
+        }
+        $header = null;
+        $map = [];
         while (($row = fgetcsv($stream)) !== false) {
-            if ($row === [null] || $row === false) { continue; }
+            if ($row === [null] || $row === false) {
+                continue;
+            }
             if ($header === null) {
-                $header = array_map(static fn($v) => strtolower(trim((string)$v)), $row);
-                foreach ($header as $i => $name) { $map[$name] = $i; }
+                $header = array_map(static fn ($v) => strtolower(trim((string)$v)), $row);
+                foreach ($header as $i => $name) {
+                    $map[$name] = $i;
+                }
                 if (!array_key_exists('code', $map)) {
                     throw new \RuntimeException('Нет колонки code в заголовке');
                 }
                 continue;
             }
-            $get = static function(string $name) use ($row, $map): ?string {
-                if (!array_key_exists($name, $map)) { return null; }
+            $get = static function (string $name) use ($row, $map): ?string {
+                if (!array_key_exists($name, $map)) {
+                    return null;
+                }
                 $val = $row[$map[$name]] ?? null;
                 return $val !== null ? trim((string)$val) : null;
             };
             $code = (string)($get('code') ?? '');
-            if ($code === '') { continue; }
+            if ($code === '') {
+                continue;
+            }
             yield [
                 'code' => $code,
                 'expires_at' => $get('expires_at') ?? '',
@@ -345,12 +397,16 @@ final class PromoCodesController
     private function bulkInsertIgnore(array $chunk): int
     {
         // chunk: [ [batch_id, code, expires_at], ... ]
-        if ($chunk === []) { return 0; }
+        if ($chunk === []) {
+            return 0;
+        }
         $vals = [];
         $args = [];
         foreach ($chunk as [$batchId, $code, $expiresAt]) {
             $vals[] = '(?, ?, "available", ?)';
-            $args[] = (int)$batchId; $args[] = (string)$code; $args[] = $expiresAt !== null && $expiresAt !== '' ? $expiresAt : null;
+            $args[] = (int)$batchId;
+            $args[] = (string)$code;
+            $args[] = $expiresAt !== null && $expiresAt !== '' ? $expiresAt : null;
         }
         $sql = 'INSERT IGNORE INTO promo_codes(batch_id, code, status, expires_at) VALUES ' . implode(',', $vals);
         $stmt = $this->db->prepare($sql);
@@ -363,4 +419,3 @@ final class PromoCodesController
         Flash::add($type, $message);
     }
 }
-

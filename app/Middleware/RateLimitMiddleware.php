@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use App\Helpers\Response;
 use App\Helpers\RedisHelper;
+use App\Helpers\Response;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
 use Psr\Http\Server\MiddlewareInterface;

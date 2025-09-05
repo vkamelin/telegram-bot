@@ -66,4 +66,3 @@ final class ValidatorTest extends TestCase
         $this->assertSame('length:1,5', $res['errors']['name'] ?? null);
     }
 }
-

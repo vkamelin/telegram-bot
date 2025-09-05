@@ -48,7 +48,9 @@ final class UtmController
                 GROUP BY utm
                 ORDER BY total DESC";
         $stmt = $this->db->prepare($sql);
-        foreach ($params as $k => $v) { $stmt->bindValue(':' . $k, $v); }
+        foreach ($params as $k => $v) {
+            $stmt->bindValue(':' . $k, $v);
+        }
         $stmt->execute();
         $utms = $stmt->fetchAll() ?: [];
 
@@ -56,7 +58,9 @@ final class UtmController
                      FROM tg_pre_checkout pc
                      {$whereSql}";
         $tStmt = $this->db->prepare($totalSql);
-        foreach ($params as $k => $v) { $tStmt->bindValue(':' . $k, $v); }
+        foreach ($params as $k => $v) {
+            $tStmt->bindValue(':' . $k, $v);
+        }
         $tStmt->execute();
         $grandTotal = (int)($tStmt->fetchColumn() ?: 0);
 
@@ -69,4 +73,3 @@ final class UtmController
         ], 'layouts/main.php');
     }
 }
-

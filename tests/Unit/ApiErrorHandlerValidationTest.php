@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Handlers\ApiErrorHandler;
 use App\Exceptions\ValidationException;
+use App\Handlers\ApiErrorHandler;
 use PHPUnit\Framework\TestCase;
 
 final class ApiErrorHandlerValidationTest extends TestCase
@@ -22,4 +22,3 @@ final class ApiErrorHandlerValidationTest extends TestCase
         $this->assertSame('required', $body['errors']['email'] ?? null);
     }
 }
-

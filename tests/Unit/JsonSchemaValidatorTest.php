@@ -51,4 +51,3 @@ final class JsonSchemaValidatorTest extends TestCase
         $this->assertSame('additionalProperties', $res['errors']['b'] ?? null);
     }
 }
-

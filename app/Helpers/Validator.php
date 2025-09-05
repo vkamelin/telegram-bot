@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Helpers;
@@ -85,31 +86,45 @@ final class Validator
 
             // numeric min/max
             foreach ($rulesArr as $r) {
-                if ($val === null) { break; }
+                if ($val === null) {
+                    break;
+                }
                 if (str_starts_with($r, 'min:')) {
                     $min = (int)substr($r, 4);
                     if (is_int($val)) {
-                        if ($val < $min) { $errors[$field] = "min:$min"; continue 3; }
+                        if ($val < $min) {
+                            $errors[$field] = "min:$min";
+                            continue 3;
+                        }
                     }
                 }
                 if (str_starts_with($r, 'max:')) {
                     $max = (int)substr($r, 4);
                     if (is_int($val)) {
-                        if ($val > $max) { $errors[$field] = "max:$max"; continue 3; }
+                        if ($val > $max) {
+                            $errors[$field] = "max:$max";
+                            continue 3;
+                        }
                     }
                 }
             }
 
             // length
             foreach ($rulesArr as $r) {
-                if (!is_string($val)) { continue; }
-                if ($r === 'trim') { $val = trim($val); continue; }
+                if (!is_string($val)) {
+                    continue;
+                }
+                if ($r === 'trim') {
+                    $val = trim($val);
+                    continue;
+                }
                 if (str_starts_with($r, 'length:')) {
                     $arg = substr($r, 7);
                     $len = function_exists('mb_strlen') ? mb_strlen($val) : strlen($val);
                     if ($arg !== '' && str_contains($arg, ',')) {
                         [$minS, $maxS] = array_map('trim', explode(',', $arg, 2));
-                        $min = (int)$minS; $max = (int)$maxS;
+                        $min = (int)$minS;
+                        $max = (int)$maxS;
                         if ($len < $min || $len > $max) {
                             $errors[$field] = "length:$min,$max";
                             continue 3;
@@ -126,7 +141,10 @@ final class Validator
                     // для строк: max — как максимальная длина
                     $max = (int)substr($r, 4);
                     $len = function_exists('mb_strlen') ? mb_strlen($val) : strlen($val);
-                    if ($len > $max) { $errors[$field] = "max:$max"; continue 3; }
+                    if ($len > $max) {
+                        $errors[$field] = "max:$max";
+                        continue 3;
+                    }
                 }
             }
 
@@ -155,4 +173,3 @@ final class Validator
         return empty($errors) ? ['ok' => true, 'data' => $out] : ['ok' => false, 'errors' => $errors];
     }
 }
-
