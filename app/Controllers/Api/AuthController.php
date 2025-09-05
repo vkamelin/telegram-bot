@@ -39,8 +39,15 @@ final class AuthController
     public function login(Req $req, Res $res): Res
     {
         $data = (array)$req->getParsedBody();
-        $email = (string)($data['email'] ?? '');
-        $pass = (string)($data['password'] ?? '');
+        $validated = \App\Helpers\Validator::validate($data, [
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|length:1,200',
+        ]);
+        if (!($validated['ok'] ?? false)) {
+            throw new \App\Exceptions\ValidationException($validated['errors'] ?? [], 'Invalid payload');
+        }
+        $email = (string)$validated['data']['email'];
+        $pass = (string)$validated['data']['password'];
 
         $stmt = $this->db->prepare('SELECT id, password FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);
@@ -71,10 +78,13 @@ final class AuthController
     public function refresh(Req $req, Res $res): Res
     {
         $data = (array)$req->getParsedBody();
-        $refresh = (string)($data['refresh_token'] ?? '');
-        if ($refresh === '') {
-            return Response::problem($res, 400, 'Refresh token required');
+        $validated = \App\Helpers\Validator::validate($data, [
+            'refresh_token' => 'required|string|length:10,2048',
+        ]);
+        if (!($validated['ok'] ?? false)) {
+            throw new \App\Exceptions\ValidationException($validated['errors'] ?? [], 'Invalid payload');
         }
+        $refresh = (string)$validated['data']['refresh_token'];
 
         $svc = new RefreshTokenService($this->db, $this->jwtCfg['refresh_ttl'] ?? 2592000);
         $row = $svc->validate($refresh);

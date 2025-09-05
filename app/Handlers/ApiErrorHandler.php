@@ -37,15 +37,15 @@ final class ApiErrorHandler
         if ($e instanceof ValidationException) {
             $payload = json_encode([
                 'type' => 'https://example.com/validation-error',
-                'title' => 'Validation Error',
-                'status' => 400,
+                'title' => 'Unprocessable Entity',
+                'status' => 422,
                 'detail' => $e->getMessage(),
                 'errors' => $e->getErrors(),
             ], JSON_UNESCAPED_UNICODE);
             if (!is_string($payload)) {
-                $payload = '{"type":"https://example.com/validation-error","title":"Validation Error","status":400,"detail":"Validation failed","errors":[]}' ;
+                $payload = '{"type":"https://example.com/validation-error","title":"Unprocessable Entity","status":422,"detail":"Validation failed","errors":[]}' ;
             }
-            $response = $this->responseFactory->createResponse(400);
+            $response = $this->responseFactory->createResponse(422);
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/problem+json');
         }

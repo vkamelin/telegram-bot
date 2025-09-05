@@ -2,6 +2,16 @@
 
 Формат основан на Keep a Changelog и Семантическом версионировании.
 
+## [Unreleased]
+
+### Added
+- Единый слой валидации: `App/Helpers/Validator` + ошибки `ValidationException` → 422 (problem+json).
+- Валидация в `AuthController::login` и `AuthController::refresh`.
+- Юнит‑тесты на валидатор и обработчик ошибок для валидации.
+
+### Changed
+- `ApiErrorHandler` мапит `ValidationException` в 422 Unprocessable Entity.
+
 ## [0.2.0] — 2025-09-05
 
 ### Added
@@ -29,4 +39,3 @@
 ### Added
 - Базовая структура проекта: API + Dashboard.
 - Стартовая документация (ARCHITECTURE, README, CONTRIBUTING, CHANGELOG).
-
