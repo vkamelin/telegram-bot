@@ -87,7 +87,7 @@ final class Scheduled
                 $stmt->execute([
                     'method' => $method,
                     'type' => $type,
-                    'data' => json_encode($payload, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+                    'data' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     'priority' => $priority,
                     'send_after' => $sendAfter,
                     'status' => 'pending',
@@ -110,7 +110,7 @@ final class Scheduled
                 $stmt->execute([
                     'method' => $method,
                     'type' => $type,
-                    'data' => json_encode($payload, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+                    'data' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     'priority' => $priority,
                     'send_after' => $sendAfter,
                     'status' => 'pending',
@@ -129,7 +129,10 @@ final class Scheduled
             $db->commit();
             return true;
         } catch (Throwable $e) {
-            try { $db->rollBack(); } catch (Throwable) {}
+            try {
+                $db->rollBack();
+            } catch (Throwable) {
+            }
             Logger::error('Failed to create scheduled batch', [
                 'exception' => $e,
                 'target' => $target,

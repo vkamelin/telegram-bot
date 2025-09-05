@@ -19,7 +19,7 @@ final class ScheduledDispatchCommand extends Command
 {
     public string $signature = 'scheduled:dispatch';
     public string $description = 'Move due scheduled messages to the queue; supports legacy and targeted batches.';
-    
+
     /**
      * @param array<int, string> $arguments
      */
@@ -35,9 +35,9 @@ final class ScheduledDispatchCommand extends Command
                 }
             }
         }
-        
+
         $db = Database::getInstance();
-        
+
         // Helper to check column existence (for backward compatibility)
         $columnExists = static function (PDO $pdo, string $table, string $column): bool {
             try {

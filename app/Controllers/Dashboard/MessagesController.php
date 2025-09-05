@@ -27,7 +27,7 @@ final class MessagesController
     public function __construct(private PDO $db)
     {
     }
-    
+
     /**
      * Отображает таблицу сообщений.
      */
@@ -749,7 +749,7 @@ final class MessagesController
         ];
         return View::render($res, 'dashboard/messages/create.php', $params, 'layouts/main.php');
     }
-    
+
     /**
      * Сохраняет загруженный файл в постоянном хранилище.
      *
@@ -765,27 +765,27 @@ final class MessagesController
         if ($tmp === '' || $err !== UPLOAD_ERR_OK) {
             return null;
         }
-        
+
         $ext = pathinfo($file['name'] ?? '', PATHINFO_EXTENSION);
         $dir = Path::base('storage/messages');
         if (!is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
             return null;
         }
-        
+
         $name = bin2hex(random_bytes(16));
         if ($ext !== '') {
             $name .= '.' . $ext;
         }
         $dest = $dir . '/' . $name;
-        
+
         // move_uploaded_file works only for HTTP uploads; fall back to rename for tests
         if (!@move_uploaded_file($tmp, $dest) && !@rename($tmp, $dest)) {
             return null;
         }
-        
+
         return $dest;
     }
-    
+
     /**
      * Валидирует целое поле с возможностью диапазона.
      */

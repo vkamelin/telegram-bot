@@ -37,7 +37,7 @@ final class LogsController
             ];
         }
         // Sort by name desc (dates newer first)
-        usort($files, static fn($a, $b) => strcmp($b['name'], $a['name']));
+        usort($files, static fn ($a, $b) => strcmp($b['name'], $a['name']));
 
         return Response::json($res, 200, ['files' => $files]);
     }
@@ -60,7 +60,7 @@ final class LogsController
             // As a last resort, pick the newest app-*.log
             $candidates = glob($this->logsDir . '/app-*.log') ?: [];
             if ($candidates !== []) {
-                usort($candidates, static fn($a, $b) => strcmp(basename($b), basename($a)));
+                usort($candidates, static fn ($a, $b) => strcmp(basename($b), basename($a)));
                 $file = basename($candidates[0]);
             }
         }
