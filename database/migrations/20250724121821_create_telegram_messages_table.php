@@ -9,7 +9,7 @@ final class CreateTelegramMessagesTable extends AbstractMigration
     {
         $this->execute("CREATE TABLE IF NOT EXISTS `telegram_messages` (
             `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Уникальный идентификатор записи',
-            `user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT 'Идентификатор чата',
+            `user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT 'Идентификатор чата (chat_id)',
             `method` VARCHAR(255) NOT NULL COMMENT 'Метод, вызываемый в Telegram Bot API',
             `type` VARCHAR(255) DEFAULT NULL COMMENT 'Тип запроса. Для распознавания отдельных рассылок, запросов и т.д.',
             `data` JSON NOT NULL COMMENT 'Данные, передаваемые в Telegram Bot API',

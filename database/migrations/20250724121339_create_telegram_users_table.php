@@ -9,7 +9,7 @@ final class CreateTelegramUsersTable extends AbstractMigration
     {
         $this->execute("CREATE TABLE IF NOT EXISTS `telegram_users` (
             `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Уникальный идентификатор пользователя',
-            `user_id` BIGINT UNSIGNED NOT NULL COMMENT 'Идентификатор пользователя в Телеграм',
+            `user_id` BIGINT UNSIGNED NOT NULL COMMENT 'Идентификатор пользователя в Телеграм (chat_id)',
             `username` VARCHAR(32) COMMENT 'Имя пользователя/логин пользователя Телеграм',
             `first_name` VARCHAR(64) COMMENT 'Имя',
             `last_name` VARCHAR(64) COMMENT 'Фамилия',
