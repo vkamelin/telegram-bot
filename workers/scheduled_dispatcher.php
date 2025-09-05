@@ -39,9 +39,8 @@ while (true) {
         $stmt->execute();
         $ids = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN) ?: []);
 
-        if ($ids === []) {
-            echo 'No due scheduled messages.' . PHP_EOL;
-        }
+        // Intentionally avoid noisy logging when there are no due messages
+        // to keep logs focused on errors and important events.
 
         foreach ($ids as $id) {
             // 2) Lock row (idempotent)
