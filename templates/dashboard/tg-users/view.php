@@ -23,6 +23,15 @@
             <dd class="col-sm-9"><?= (int)$user['is_subscribed'] == 0 ? 'Нет' : 'Да' ?></dd>
             <dt class="col-sm-3">Реферальный код</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['referral_code']) ?></dd>
+            <dt class="col-sm-3">Реферальная ссылка</dt>
+            <dd class="col-sm-9">
+                <?php $bot = $_ENV['BOT_NAME'] ?? ''; $code = (string)($user['referral_code'] ?? ''); $link = $bot ? ('https://t.me/' . $bot . '?start=' . urlencode('code___' . $code)) : ''; ?>
+                <?php if ($link): ?>
+                    <a href="<?= htmlspecialchars($link) ?>" target="_blank"><?= htmlspecialchars($link) ?></a>
+                <?php else: ?>
+                    —
+                <?php endif; ?>
+            </dd>
             <dt class="col-sm-3">UTM</dt>
             <dd class="col-sm-9"><?= htmlspecialchars((string)$user['utm']) ?></dd>
         </dl>
@@ -74,3 +83,27 @@
     <?php endforeach; ?>
     </tbody>
 </table>
+
+<h2>Рефералы</h2>
+<table class="table table-center table-striped table-hover mb-4">
+    <thead>
+    <tr>
+        <th>ID приглашённого</th>
+        <th>Логин</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Создано</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach (($referrals ?? []) as $ref): ?>
+        <tr>
+            <td><?= htmlspecialchars((string)$ref['invitee_user_id']) ?></td>
+            <td><?= htmlspecialchars((string)($ref['username'] ?? '')) ?></td>
+            <td><?= htmlspecialchars((string)($ref['first_name'] ?? '')) ?></td>
+            <td><?= htmlspecialchars((string)($ref['last_name'] ?? '')) ?></td>
+            <td><?= htmlspecialchars((string)$ref['created_at']) ?></td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+ </table>

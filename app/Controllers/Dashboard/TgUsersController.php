@@ -167,11 +167,22 @@ final class TgUsersController
         $updStmt->execute(['uid' => $user['user_id']]);
         $updates = $updStmt->fetchAll();
 
+        // Последние приглашенные рефералы
+        $refStmt = $this->db->prepare('SELECT r.invitee_user_id, r.created_at, tu.username, tu.first_name, tu.last_name
+            FROM referrals r
+            LEFT JOIN telegram_users tu ON tu.user_id = r.invitee_user_id
+            WHERE r.inviter_user_id = :uid
+            ORDER BY r.id DESC
+            LIMIT 50');
+        $refStmt->execute(['uid' => $user['user_id']]);
+        $referrals = $refStmt->fetchAll();
+
         $data = [
             'title' => 'User ' . ($user['username'] ?: $user['user_id']),
             'user' => $user,
             'messages' => $messages,
             'updates' => $updates,
+            'referrals' => $referrals,
         ];
 
         return View::render($res, 'dashboard/tg-users/view.php', $data, 'layouts/main.php');

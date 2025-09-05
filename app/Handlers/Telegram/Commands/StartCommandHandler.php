@@ -43,7 +43,9 @@ class StartCommandHandler extends AbstractCommandHandler
             return;
         }
 
-        $invitedUserId = $this->checkReferralCode($messageText);
+        $ref = $this->checkReferralCode($messageText);
+        $invitedUserId = $ref['user_id'] ?? null;
+        $viaCode = $ref['code'] ?? null;
 
         if ($invitedUserId === null) {
             $utmString = $this->convertUtmStringToUrlFormat($messageText) ?? '';
@@ -57,8 +59,8 @@ class StartCommandHandler extends AbstractCommandHandler
         $userExists = $stmt->fetch();
 
         if (!$userExists) {
-            // Создаем уникальный реферальный код
-            $referralCode = uniqid('REF', true);
+            // Создаём уникальный реферальный код (URL-safe)
+            $referralCode = $this->generateReferralCode();
 
             $stmt = $this->db->prepare(
                 'INSERT INTO telegram_users (user_id, username, first_name, last_name, language_code, utm, is_premium, referral_code, invited_user_id) VALUES (:user_id, :username, :first_name, :last_name, :language_code, :utm, :is_premium, :referral_code, :invited_user_id)'
@@ -74,6 +76,16 @@ class StartCommandHandler extends AbstractCommandHandler
                 'referral_code' => $referralCode,
                 'invited_user_id' => $invitedUserId,
             ]);
+
+            // Зафиксируем реферала в таблице referrals (если пришли по коду)
+            if ($invitedUserId !== null && $invitedUserId !== $chatId) {
+                try {
+                    $insRef = $this->db->prepare('INSERT IGNORE INTO referrals(inviter_user_id, invitee_user_id, via_code, created_at) VALUES(?, ?, ?, NOW())');
+                    $insRef->execute([$invitedUserId, $chatId, $viaCode]);
+                } catch (\Throwable) {
+                    // ignore
+                }
+            }
         } else {
             $stmt = $this->db->prepare(
                 'UPDATE telegram_users SET username = :username, first_name = :first_name, last_name = :last_name, language_code = :language_code, utm = :utm, is_premium = :is_premium, is_user_banned = 0 WHERE user_id = :user_id'
@@ -157,30 +169,39 @@ class StartCommandHandler extends AbstractCommandHandler
      * Проверяет есть ли реферальный код и находит пользователя с этим кодом
      *
      * @param string $messageText Текст сообщения
-     *
-     * @return int|null id пользователя или null
+     * @return array{user_id:int,code:string}|null Информация о реферальном коде
      */
-    public function checkReferralCode(string $messageText): ?int
+    public function checkReferralCode(string $messageText): ?array
     {
         if (preg_match('/^\/start\s+(.+)/', $messageText, $matches)) {
             $string = trim($matches[1]);
 
-            if (str_contains($string, 'code___')) {
-                $referralCode = str_replace('code___', '', $string);
+            if (str_starts_with($string, 'code___')) {
+                $referralCode = substr($string, strlen('code___'));
 
                 // Проверяем, существует ли реферальный код в базе данных
                 $stmt = $this->db->prepare('SELECT `user_id` FROM telegram_users WHERE referral_code = :referral_code LIMIT 1');
                 $stmt->execute(['referral_code' => $referralCode]);
                 $result = $stmt->fetch();
 
-                if ($result) {
-                    // Если реферальный код существует, возвращаем id пользователя
-                    return $result['user_id'];
+                if ($result && isset($result['user_id'])) {
+                    return ['user_id' => (int)$result['user_id'], 'code' => $referralCode];
                 }
             }
-
         }
 
         return null; // Если реферальный код не найден
+    }
+
+    /**
+     * Генерация безопасного реферального кода
+     */
+    private function generateReferralCode(): string
+    {
+        try {
+            return bin2hex(random_bytes(6)); // 12 символов [0-9a-f]
+        } catch (\Exception) {
+            return substr(sha1((string)mt_rand()), 0, 12);
+        }
     }
 }
