@@ -13,6 +13,12 @@ use RuntimeException;
  *
  * @package App\Classes
  */
+/**
+ * Класс-обёртка для подключения к базе данных (PDO) с ретраями.
+ *
+ * Отвечает за хранение singleton-инстанса PDO, проверку живости соединения
+ * и корректную инициализацию параметров подключения.
+ */
 class Database
 {
     /**
@@ -35,6 +41,12 @@ class Database
      * @return PDO
      * @throws RuntimeException
      */
+    /**
+     * Возвращает singleton PDO. Переподключается, если соединение умерло.
+     *
+     * @return PDO Подготовленный инстанс PDO
+     * @throws RuntimeException При невозможности подключиться
+     */
     public static function getInstance(): PDO
     {
         // Если ещё нет инстанса или предыдущее соединение «мертвое» — обновляем
@@ -55,6 +67,12 @@ class Database
      * @param PDO $pdo Инстанс PDO
      *
      * @return bool true если соединение живо
+     */
+    /**
+     * Пингует соединение лёгким запросом SELECT 1 (не чаще раза в минуту).
+     *
+     * @param PDO $pdo Активное соединение
+     * @return bool true если соединение живо, иначе false
      */
     private static function isConnectionAlive(PDO $pdo): bool
     {
@@ -77,6 +95,13 @@ class Database
      * @param array{dsn:string, user:string, password:string, options:array} $config
      * @return PDO
      * @throws RuntimeException
+     */
+    /**
+     * Подключается к БД с несколькими попытками (MAX_TRIES) и задержкой между ними.
+     *
+     * @param array{dsn:string,user:string,password:string,options:array} $config Параметры подключения
+     * @return PDO Активное соединение
+     * @throws RuntimeException Если исчерпаны попытки
      */
     private static function connectWithRetry(array $config): PDO
     {
@@ -120,6 +145,11 @@ class Database
      * Загружает параметры подключения из окружения.
      *
      * @return array{dsn:string, user:string, password:string, options:array}
+     */
+    /**
+     * Формирует конфигурацию подключения из переменных окружения.
+     *
+     * @return array{dsn:string,user:string,password:string,options:array} Параметры подключения
      */
     private static function loadConfig(): array
     {

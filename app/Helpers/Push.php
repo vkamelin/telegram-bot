@@ -16,6 +16,12 @@ use Throwable;
  * @copyright Copyright (c) 2024, Vitaliy Kamelin
  * @license   proprietary
  */
+/**
+ * Помощник для постановки задач на отправку сообщений в Telegram через очередь.
+ *
+ * Предоставляет методы для разных типов сообщений (текст, фото, видео и т.д.)
+ * и единый внутренний механизм планирования/приоритезации отправки.
+ */
 class Push
 {
     /**
@@ -41,6 +47,17 @@ class Push
      * @param array  $options  Дополнительные параметры из API https://core.telegram.org/bots/api#sendmessage
      *
      * @return bool Удалось ли добавить в очередь на отправку. True - удалось, False - не удалось
+     */
+    /**
+     * Ставит в очередь отправку текстового сообщения.
+     *
+     * @param int $chatId Идентификатор чата
+     * @param string $text Текст сообщения (HTML)
+     * @param string $type Тип сообщения для аналитики
+     * @param int $priority Приоритет в очереди (2 — высокий)
+     * @param array $options Дополнительные опции Telegram API
+     * @param string|null $sendAfter Отложенная отправка (ISO8601 или Y-m-d H:i:s)
+     * @return bool Успешно ли поставлено в очередь
      */
     public static function text(
         int $chatId,
@@ -74,6 +91,18 @@ class Push
      * @param string|null $sendAfter Время после которого отправлять сообщение в Телеграм
      *
      * @return bool Удалось ли добавить в очередь на отправку. True - удалось, False - не удалось
+     */
+    /**
+     * Ставит в очередь отправку фото.
+     *
+     * @param int $chatId Идентификатор чата
+     * @param array|string $photo URL/файл/file_id или структура из MediaBuilder
+     * @param string $caption Подпись (HTML)
+     * @param string $type Тип сообщения для аналитики
+     * @param int $priority Приоритет в очереди (2 — высокий)
+     * @param array $options Дополнительные опции Telegram API
+     * @param string|null $sendAfter Отложенная отправка
+     * @return bool Успешно ли поставлено в очередь
      */
     public static function photo(
         int $chatId,
@@ -197,6 +226,17 @@ class Push
      *
      * @return bool Удалось ли добавить в очередь на отправку. True - удалось, False - не удалось
      */
+    /**
+     * Ставит в очередь отправку медиагруппы (альбом).
+     *
+     * @param int $chatId Идентификатор чата
+     * @param array $media Массив элементов InputMedia*
+     * @param string $type Тип сообщения для аналитики
+     * @param int $priority Приоритет в очереди (2 — высокий)
+     * @param array $options Дополнительные опции Telegram API
+     * @param string|null $sendAfter Отложенная отправка
+     * @return bool Успешно ли поставлено в очередь
+     */
     public static function mediaGroup(
         int $chatId,
         array $media,
@@ -237,6 +277,17 @@ class Push
      * @param string|null $sendAfter Дата и время, после которой отправляется запрос
      *
      * @return bool Удалось ли добавить в очередь на отправку. True - удалось, False - не удалось
+     */
+    /**
+     * Ставит в очередь отправку стикера.
+     *
+     * @param int $chatId Идентификатор чата
+     * @param string $sticker FileID/URL стикера
+     * @param string $type Тип сообщения для аналитики
+     * @param int $priority Приоритет в очереди (2 — высокий)
+     * @param array $options Дополнительные опции Telegram API
+     * @param string|null $sendAfter Отложенная отправка
+     * @return bool Успешно ли поставлено в очередь
      */
     public static function sticker(
         int $chatId,
@@ -547,3 +598,4 @@ class Push
         return false;
     }
 }
+

@@ -13,6 +13,9 @@ use Psr\Http\Message\ResponseInterface as Res;
 /**
  * Вспомогательные методы для формирования HTTP-ответов.
  */
+/**
+ * Утилиты для формирования HTTP-ответов.
+ */
 final class Response
 {
     /**
@@ -22,6 +25,14 @@ final class Response
      * @param int $status HTTP-статус
      * @param array $data Данные для сериализации
      * @return Res JSON-ответ
+     */
+    /**
+     * Возвращает JSON-ответ.
+     *
+     * @param Res $res Объект ответа
+     * @param int $status HTTP-статус
+     * @param array $data Данные для сериализации в JSON
+     * @return Res Ответ с заголовком application/json
      */
     public static function json(Res $res, int $status, array $data): Res
     {
@@ -37,6 +48,15 @@ final class Response
      * @param string $title Заголовок ошибки
      * @param array $extra Дополнительные поля
      * @return Res Ответ с описанием проблемы
+     */
+    /**
+     * Возвращает ответ формата application/problem+json.
+     *
+     * @param Res $res Объект ответа
+     * @param int $status HTTP-статус
+     * @param string $title Краткое описание проблемы
+     * @param array $extra Дополнительные поля для тела ответа
+     * @return Res Ответ с заголовком application/problem+json
      */
     public static function problem(Res $res, int $status, string $title, array $extra = []): Res
     {

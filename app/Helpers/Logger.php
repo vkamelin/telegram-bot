@@ -13,6 +13,12 @@ use RuntimeException;
 /**
  * Обёртка над Monolog для централизованного логирования.
  */
+/**
+ * Обёртка над Monolog для единообразного и безопасного логирования.
+ *
+ * Инициализирует логгер, задаёт JSON-формат и ротацию файлов,
+ * обогащает записи trace_id/request_id и маскирует PII-данные.
+ */
 class Logger
 {
     private static ?MonologLogger $instance = null;
@@ -24,6 +30,12 @@ class Logger
      * @param string|null $id Идентификатор запроса
      * @return void
      */
+    /**
+     * Устанавливает идентификатор запроса (request_id) для логов текущего контекста.
+     *
+     * @param string|null $id Идентификатор запроса (например, UUID)
+     * @return void
+     */
     public static function setRequestId(?string $id): void
     {
         self::$requestId = $id;
@@ -32,6 +44,12 @@ class Logger
     /**
      * @param array<string, mixed> $data
      * @return array<string, mixed>
+     */
+    /**
+     * Маскирует потенциально чувствительные данные в массиве контекста.
+     *
+     * @param array<string, mixed> $data Входной контекст
+     * @return array<string, mixed> Очищенный контекст с маскированными значениями
      */
     private static function redactPII(array $data): array
     {
@@ -52,6 +70,14 @@ class Logger
 
     /**
      * Возвращает экземпляр логгера.
+     *
+     * @return MonologLogger Экземпляр Monolog
+     */
+    /**
+     * Возвращает настроенный экземпляр Monolog.
+     *
+     * Создаёт логгер при первом обращении, настраивает ротацию файлов,
+     * JSON-формат и процессоры (UID, request_id, маскировка PII).
      *
      * @return MonologLogger Экземпляр Monolog
      */
@@ -121,6 +147,13 @@ class Logger
      * @param array<string, mixed> $context Дополнительный контекст
      * @return void
      */
+    /**
+     * Пишет сообщение уровня info.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string,mixed> $context Дополнительный контекст
+     * @return void
+     */
     public static function info(string $message, array $context = []): void
     {
         self::get()->info($message, $context);
@@ -131,6 +164,13 @@ class Logger
      *
      * @param string $message Текст сообщения
      * @param array<string, mixed> $context Дополнительный контекст
+     * @return void
+     */
+    /**
+     * Пишет сообщение уровня error. Если не передан trace — добавляет бэктрейс автоматически.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string,mixed> $context Дополнительный контекст
      * @return void
      */
     public static function error(string $message, array $context = []): void
@@ -150,6 +190,13 @@ class Logger
      * @param array<string, mixed> $context Дополнительный контекст
      * @return void
      */
+    /**
+     * Пишет сообщение уровня debug. Если не передан trace — добавляет бэктрейс автоматически.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string,mixed> $context Дополнительный контекст
+     * @return void
+     */
     public static function debug(string $message, array $context = []): void
     {
         if (empty($context['trace'])) {
@@ -167,6 +214,13 @@ class Logger
      * @param array<string, mixed> $context Дополнительный контекст
      * @return void
      */
+    /**
+     * Пишет сообщение уровня warning.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string,mixed> $context Дополнительный контекст
+     * @return void
+     */
     public static function warning(string $message, array $context = []): void
     {
         self::get()->warning($message, $context);
@@ -177,6 +231,13 @@ class Logger
      *
      * @param string $message Текст сообщения
      * @param array<string, mixed> $context Дополнительный контекст
+     * @return void
+     */
+    /**
+     * Пишет сообщение уровня critical. Если не передан trace — добавляет бэктрейс автоматически.
+     *
+     * @param string $message Текст сообщения
+     * @param array<string,mixed> $context Дополнительный контекст
      * @return void
      */
     public static function critical(string $message, array $context = []): void

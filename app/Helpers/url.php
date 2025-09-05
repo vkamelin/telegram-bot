@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 if (!function_exists('url')) {
     /**
-     * Prepends base path to given URI.
-     * Accepts null and returns base path in that case.
+     * Добавляет базовый путь к переданному URI.
+     * Если передан null — возвращает только базовый путь.
      */
     function url(?string $path): string
     {
