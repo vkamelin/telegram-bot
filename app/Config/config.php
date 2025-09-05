@@ -46,8 +46,14 @@ return [
     ],
 
     'rate_limit' => [
-        'bucket' => 'ip',   // 'ip' или 'user'
-        'limit' => 60,     // запросов в минуту
+        // По чему лимитировать: 'ip' или 'user'
+        'bucket' => $_ENV['RATE_LIMIT_BUCKET'] ?? 'ip',
+        // Кол-во запросов за окно
+        'limit' => (int)($_ENV['RATE_LIMIT'] ?? 60),
+        // Размер окна в секундах (fixed-window)
+        'window_sec' => (int)($_ENV['RATE_LIMIT_WINDOW_SEC'] ?? 60),
+        // Префикс ключей в Redis
+        'redis_prefix' => $_ENV['RATE_LIMIT_REDIS_PREFIX'] ?? 'rl:',
     ],
 
     'request_size_limit' => (int)($_ENV['REQUEST_SIZE_LIMIT'] ?? 1048576),

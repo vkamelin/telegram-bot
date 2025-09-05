@@ -40,7 +40,9 @@
 
 ## Rate‑limit и размер запроса
 - `RATE_LIMIT_BUCKET`: `ip` или `user` — по чему лимитировать.
-- `RATE_LIMIT`: число запросов за окно (подробности в реализации middleware).
+- `RATE_LIMIT`: число запросов за окно.
+- `RATE_LIMIT_WINDOW_SEC`: длительность окна (секунды, по умолчанию 60).
+- `RATE_LIMIT_REDIS_PREFIX`: префикс ключей в Redis для rate-limit (по умолчанию `rl:`).
 - `REQUEST_SIZE_LIMIT`: максимальный размер тела запроса в байтах (по умолчанию 1048576).
 
 ## Telegram
@@ -82,4 +84,3 @@ curl http://localhost:8080/api/health -H "Authorization: tma <initData>"
 curl http://localhost:8080/api/health -H "X-Telegram-Init-Data: <initData>"
 curl "http://localhost:8080/api/health?initData=<initData>"
 ```
-
