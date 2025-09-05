@@ -90,6 +90,13 @@ docker compose exec supervisor supervisorctl status
 - `GET /api/users` — список пользователей
 - `POST /api/users` — создать пользователя
 
+Раздел промокодов (JWT):
+- `POST /api/promo-codes/upload` — загрузка CSV (multipart/form-data, поле `file`). Первая строка — заголовок с колонкой `code` (опц. `expires_at`, `meta`). При дублях возвращает 409.
+- `GET /api/promo-codes` — список кодов, фильтры: `status`, `batch_id`, `q`, `page`, `per_page`.
+- `POST /api/promo-codes/issue` — выдача кода пользователю: `{ "user_id": <telegram_user_id>, "batch_id"?: <id> }`.
+- `GET /api/promo-code-issues` — последние выдачи (limit).
+- `GET /api/promo-code-batches` — список батчей.
+
 Пример аутентификации:
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
@@ -121,6 +128,22 @@ Push::mediaGroup(123456789, $media);
 
 Ограничения Telegram: общий запрос с медиа должен укладываться в лимиты API; контролируйте размер через `REQUEST_SIZE_LIMIT` и учитывайте лимиты Telegram Bot API.
 
+## Dashboard: промокоды
+- Маршруты:
+  - `GET /dashboard/promo-codes` — список с фильтрами и выдачей.
+  - `GET /dashboard/promo-codes/upload` — форма загрузки CSV.
+  - `POST /dashboard/promo-codes/upload` — обработчик загрузки CSV.
+  - `POST /dashboard/promo-codes/{id}/issue` — выдача конкретного кода пользователю.
+  - `GET /dashboard/promo-codes/issues` — отчёт по выдачам (фильтры по дате и пользователю).
+  - `GET /dashboard/promo-codes/issues/export` — экспорт отчёта в CSV.
+  - `GET /dashboard/promo-codes/batches` — список батчей с агрегатами.
+
+Особенности и ограничения:
+- Все формы защищены CSRF, файл проверяется по размеру (<= min(`REQUEST_SIZE_LIMIT`, 5MB)) и типу (`text/csv`, `text/plain`, `application/vnd.ms-excel`).
+- CSV: первая строка — заголовок. Обязательная колонка: `code`. Допустимы `expires_at`, `meta`.
+- Импорт выполняется в новый батч; дубликаты `code` пропускаются (INSERT IGNORE), показываются счётчики «импортировано/пропущено».
+- Выдача выполняется в транзакции с `SELECT ... FOR UPDATE`, проверяются статус и срок действия. Лог пишется в `promo_code_issues` с `issued_by` из сессии.
+
 ## Воркеры и Supervisor
 - `workers/longpolling.php` — читает обновления через getUpdates (при желании можно перейти на webhooks)
 - `workers/handler.php` — обрабатывает конкретные апдейты (запускается форком из longpolling)
@@ -150,4 +173,3 @@ Push::mediaGroup(123456789, $media);
 
 ## Лицензия
 См. `LICENSE.txt`.
-

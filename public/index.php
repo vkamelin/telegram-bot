@@ -110,6 +110,14 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/logs/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->data($req, $res));
         $auth->get('/logs/view', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\LogsController())->show($req, $res));
         // добавляйте страницы админки здесь
+        // Promo codes dashboard
+        $auth->get('/promo-codes', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->index($req, $res));
+        $auth->get('/promo-codes/upload', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->upload($req, $res));
+        $auth->post('/promo-codes/upload', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->uploadHandle($req, $res));
+        $auth->post('/promo-codes/{id}/issue', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\PromoCodesController($db))->issue($req, $res, $args));
+        $auth->get('/promo-codes/issues', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->issues($req, $res));
+        $auth->get('/promo-codes/batches', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->batches($req, $res));
+        $auth->get('/promo-codes/issues/export', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PromoCodesController($db))->exportIssuesCsv($req, $res));
     })->add(new \App\Middleware\AuthMiddleware());
 })->add(new \App\Middleware\CsrfMiddleware())
   ->add(new \App\Middleware\SessionMiddleware());
@@ -127,6 +135,13 @@ $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db, $c
 
         $auth->get('/users', fn(Req $req, Res $res) => (new \App\Controllers\Api\UsersController($db))->list($req, $res));
         $auth->post('/users', fn(Req $req, Res $res) => (new \App\Controllers\Api\UsersController($db))->create($req, $res));
+
+        // Promo codes
+        $auth->post('/promo-codes/upload', fn(Req $req, Res $res) => (new \App\Controllers\Api\PromoCodeController($db))->upload($req, $res));
+        $auth->get('/promo-codes', fn(Req $req, Res $res) => (new \App\Controllers\Api\PromoCodeController($db))->listCodes($req, $res));
+        $auth->post('/promo-codes/issue', fn(Req $req, Res $res) => (new \App\Controllers\Api\PromoCodeController($db))->issue($req, $res));
+        $auth->get('/promo-code-issues', fn(Req $req, Res $res) => (new \App\Controllers\Api\PromoCodeController($db))->issues($req, $res));
+        $auth->get('/promo-code-batches', fn(Req $req, Res $res) => (new \App\Controllers\Api\PromoCodeController($db))->batches($req, $res));
     })->add(new \App\Middleware\RateLimitMiddleware($config['rate_limit']))
       ->add(new \App\Middleware\JwtMiddleware($config['jwt']));
 })->add(new \App\Middleware\TelegramInitDataMiddleware($config['bot_token'] ?: ''));

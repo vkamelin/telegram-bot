@@ -12,6 +12,13 @@
 - `GET /api/users` — список пользователей (JWT).
 - `POST /api/users` — создать пользователя (JWT).
 
+### Промокоды (JWT)
+- `POST /api/promo-codes/upload` — загрузка CSV (multipart/form-data, поле `file`). Первая строка — заголовок, обязательная колонка `code` (опц. `expires_at`, `meta`). При наличии дублей — 409 Conflict.
+- `GET /api/promo-codes` — список кодов. Параметры: `status`, `batch_id`, `q`, `page`, `per_page`.
+- `POST /api/promo-codes/issue` — выдача промокода пользователю: JSON `{ "user_id": <telegram_user_id>, "batch_id"?: <id> }`.
+- `GET /api/promo-code-issues` — последние выдачи (параметр `limit`).
+- `GET /api/promo-code-batches` — список батчей.
+
 ## Примеры
 ### Health
 ```bash
@@ -33,6 +40,28 @@ curl -X POST http://localhost:8080/api/auth/login \
 Ответ:
 ```json
 {"token":"<jwt>"}
+```
+
+### Промокоды: список
+```bash
+curl "http://localhost:8080/api/promo-codes?status=available&per_page=20" \
+  -H "Authorization: Bearer <jwt>"
+```
+Ответ:
+```json
+{"items":[{"id":1,"batch_id":1,"code":"ABC","status":"available","expires_at":null,"issued_at":null}],"total":1,"page":1,"per_page":20}
+```
+
+### Промокоды: выдача
+```bash
+curl -X POST http://localhost:8080/api/promo-codes/issue \
+  -H "Authorization: Bearer <jwt>" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":123456789}'
+```
+Ответ:
+```json
+{"code_id":10,"code":"ABCD-1234"}
 ```
 
 ### Профиль
@@ -74,4 +103,3 @@ curl -X POST http://localhost:8080/api/users \
 - Rate‑limit по IP/пользователю (по умолчанию ~60 запросов/мин).
 - Лимит размера тела запроса `REQUEST_SIZE_LIMIT` (по умолчанию 1 МБ).
 - Все ошибки в формате RFC 7807 (`application/problem+json`).
-

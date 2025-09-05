@@ -8,6 +8,9 @@
 - Единый слой валидации: `App/Helpers/Validator` + ошибки `ValidationException` → 422 (problem+json).
 - Валидация в `AuthController::login` и `AuthController::refresh`.
 - Юнит‑тесты на валидатор и обработчик ошибок для валидации.
+- Базовый функционал промокодов:
+  - API эндпоинты: загрузка CSV батча, список кодов с фильтрами, выдача кода пользователю, отчёт по выдачам, список батчей.
+  - Dashboard: страницы загрузки CSV, список и выдача, отчёт с экспортом в CSV, список батчей с агрегатами.
 
 ### Changed
 - `ApiErrorHandler` мапит `ValidationException` в 422 Unprocessable Entity.
