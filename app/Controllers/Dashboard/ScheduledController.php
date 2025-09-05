@@ -302,10 +302,16 @@ final class ScheduledController
             return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
         }
 
-        // Load scheduled record
-        $select = $this->db->prepare('SELECT user_id, method, `type`, data, priority FROM telegram_scheduled_messages WHERE id = :id');
-        $select->execute(['id' => $id]);
-        $msg = $select->fetch();
+        // Load scheduled record (try with targeting columns, fallback to legacy)
+        try {
+            $select = $this->db->prepare('SELECT user_id, method, `type`, data, priority, target_type, target_group_id FROM telegram_scheduled_messages WHERE id = :id');
+            $select->execute(['id' => $id]);
+            $msg = $select->fetch();
+        } catch (\Throwable) {
+            $select = $this->db->prepare('SELECT user_id, method, `type`, data, priority FROM telegram_scheduled_messages WHERE id = :id');
+            $select->execute(['id' => $id]);
+            $msg = $select->fetch();
+        }
         if (!$msg) {
             return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
         }
@@ -321,17 +327,60 @@ final class ScheduledController
             return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
         }
 
-        $ok = \App\Helpers\Push::custom(
-            (string)$msg['method'],
-            is_array($payload) ? $payload : [],
-            isset($msg['user_id']) ? (int)$msg['user_id'] : null,
-            (string)$msg['type'],
-            (int)$msg['priority'],
-            null
-        );
+        // Determine recipients: all | group | selected | single | all (legacy)
+        $recipients = [];
+        try {
+            if (isset($msg['target_type']) && $msg['target_type']) {
+                $t = (string)$msg['target_type'];
+                if ($t === 'all') {
+                    $q = $this->db->query('SELECT user_id FROM telegram_users WHERE is_user_banned = 0 AND is_bot_banned = 0');
+                    $recipients = array_map('intval', $q->fetchAll(PDO::FETCH_COLUMN) ?: []);
+                } elseif ($t === 'group') {
+                    $gid = (int)($msg['target_group_id'] ?? 0);
+                    if ($gid > 0) {
+                        $sql = 'SELECT tu.user_id FROM telegram_user_groups g '
+                            . 'JOIN telegram_user_group_user ugu ON g.id = ugu.group_id '
+                            . 'JOIN telegram_users tu ON tu.id = ugu.user_id '
+                            . 'WHERE g.id = :gid';
+                        $s = $this->db->prepare($sql);
+                        $s->execute(['gid' => $gid]);
+                        $recipients = array_map('intval', $s->fetchAll(PDO::FETCH_COLUMN) ?: []);
+                    }
+                } elseif ($t === 'selected') {
+                    $s = $this->db->prepare('SELECT target_user_id FROM telegram_scheduled_targets WHERE scheduled_id = :sid');
+                    $s->execute(['sid' => $id]);
+                    $recipients = array_map('intval', $s->fetchAll(PDO::FETCH_COLUMN) ?: []);
+                }
+            } else {
+                $uid = $msg['user_id'] ?? null;
+                if ($uid !== null) {
+                    $recipients = [(int)$uid];
+                } else {
+                    $q = $this->db->query('SELECT user_id FROM telegram_users WHERE is_user_banned = 0 AND is_bot_banned = 0');
+                    $recipients = array_map('intval', $q->fetchAll(PDO::FETCH_COLUMN) ?: []);
+                }
+            }
+        } catch (\Throwable $e) {
+            \App\Helpers\Logger::error('Failed to resolve recipients for sendNow', ['id' => $id, 'exception' => $e]);
+        }
 
-        if (!$ok) {
-            // Return to pending so a user can retry later
+        $recipients = array_values(array_unique(array_map('intval', $recipients)));
+        if ($recipients === []) {
+            $this->db->prepare("UPDATE telegram_scheduled_messages SET status = 'pending' WHERE id = :id")
+                ->execute(['id' => $id]);
+            return $res->withHeader('Location', '/dashboard/scheduled')->withStatus(302);
+        }
+
+        $okAll = true;
+        $method = (string)$msg['method'];
+        $type = (string)$msg['type'];
+        $priority = (int)$msg['priority'];
+        foreach ($recipients as $uid) {
+            $ok = \App\Helpers\Push::custom($method, is_array($payload) ? $payload : [], (int)$uid, $type, $priority, null, $id);
+            $okAll = $okAll && $ok;
+        }
+
+        if (!$okAll) {
             $this->db->prepare("UPDATE telegram_scheduled_messages SET status = 'pending' WHERE id = :id")
                 ->execute(['id' => $id]);
         }
