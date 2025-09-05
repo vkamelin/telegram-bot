@@ -28,7 +28,7 @@ class DefaultPreCheckoutQueryHandler extends AbstractPreCheckoutQueryHandler
         }
 
         $stmt = $this->db->prepare(
-            'INSERT INTO precheckout_queries '
+            'INSERT INTO tg_pre_checkout '
             . '(pre_checkout_query_id, from_user_id, currency, total_amount, invoice_payload, shipping_option_id, order_info, received_at) '
             . 'VALUES (:pre_checkout_query_id, :from_user_id, :currency, :total_amount, :invoice_payload, :shipping_option_id, :order_info, NOW())'
         );

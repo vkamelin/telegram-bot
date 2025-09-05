@@ -32,7 +32,33 @@
 - Просмотр последних апдейтов, типов и статусов обработки.
 
 ## Оплаты (Payments)
-- Разделы Pre‑checkout / Shipping — наблюдение и отладка платежных событий (если включены в боте).
+- Встроенная поддержка Telegram Payments: отправка инвойсов и наблюдение событий.
+- Разделы Dashboard:
+  - `/dashboard/invoices/create` — отправка инвойса (`sendInvoice`).
+  - `/dashboard/pre-checkout` — список pre-checkout событий.
+  - `/dashboard/shipping` — список shipping-запросов.
+
+### Как отправить инвойс (sendInvoice)
+1. Откройте `/dashboard/invoices/create`.
+2. Заполните поля:
+   - `chat_id` — ID получателя (можно задать по умолчанию `DEFAULT_CHAT_ID` в .env).
+   - `title`, `description` — заголовок и описание заказа.
+   - `payload` — ваш служебный идентификатор заказа/корзины.
+   - `provider_token` — токен платежного провайдера (из @BotFather).
+   - `currency` — валюта (например, `USD`, `EUR`, `RUB`).
+   - `prices` — JSON массив `LabeledPrice` из Bot API (в минимальных единицах):
+     Пример: `[{"label":"Item","amount":1990}]`.
+3. Опционально включите:
+   - `need_name`, `need_phone_number`, `need_email` — запросить у пользователя данные.
+   - `need_shipping_address` — запросить адрес доставки.
+   - `is_flexible` — гибкая цена (вызовет shipping query, требуется ответ с вариантами доставки).
+4. Отправьте форму — инвойс попадет в очередь и будет отправлен ботом.
+
+После подтверждения оплаты пользователем бот получит `pre_checkout_query` и ответит на него автоматически (ок = true). Эти события пишутся в таблицу `tg_pre_checkout` и видны в `/dashboard/pre-checkout`.
+
+Если включена доставка (`need_shipping_address`/`is_flexible`), при вводе адреса Telegram пришлет `shipping_query`. Базовый обработчик отвечает `ok=true` без вариантов доставки. Для реальной доставки задайте варианты в `app/Handlers/Telegram/ShippingQueries/DefaultShippingQueryHandler.php` (метод `answerShippingQuery(...)`).
+
+Примечание: Дашборды используют таблицы `tg_pre_checkout` и `tg_shipping_queries`. Все поступающие события автоматически сохраняются туда.
 
 ## Сессии и логи
 - Просмотр активных сессий для панели.

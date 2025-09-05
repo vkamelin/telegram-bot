@@ -26,7 +26,7 @@ class DefaultShippingQueryHandler extends AbstractShippingQueryHandler
         }
 
         $stmt = $this->db->prepare(
-            'INSERT INTO shipping_queries '
+            'INSERT INTO tg_shipping_queries '
             . '(shipping_query_id, from_user_id, invoice_payload, shipping_address, received_at) '
             . 'VALUES (:shipping_query_id, :from_user_id, :invoice_payload, :shipping_address, NOW())'
         );
