@@ -18,8 +18,20 @@ final class ReferralsController
 
     public function index(Req $req, Res $res): Res
     {
+        // Simple metrics for header cards
+        $total = (int)$this->db->query('SELECT COUNT(*) FROM referrals')->fetchColumn();
+        $inviters = (int)$this->db->query('SELECT COUNT(DISTINCT inviter_user_id) FROM referrals')->fetchColumn();
+        $invitees = (int)$this->db->query('SELECT COUNT(DISTINCT invitee_user_id) FROM referrals')->fetchColumn();
+        $avgPerInviter = $inviters > 0 ? round($total / $inviters, 2) : 0.0;
+
         return View::render($res, 'dashboard/referrals/index.php', [
             'title' => 'Рефералы',
+            'metrics' => [
+                'total' => $total,
+                'inviters' => $inviters,
+                'invitees' => $invitees,
+                'avg_per_inviter' => $avgPerInviter,
+            ],
         ], 'layouts/main.php');
     }
 
@@ -91,6 +103,78 @@ final class ReferralsController
         $countStmt->execute();
         $recordsFiltered = (int)$countStmt->fetchColumn();
         $recordsTotal = (int)$this->db->query('SELECT COUNT(*) FROM referrals')->fetchColumn();
+
+        return Response::json($res, 200, [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
+        ]);
+    }
+
+    /**
+     * Сводка по пригласившим (группировка по inviter_user_id)
+     */
+    public function grouped(Req $req, Res $res): Res
+    {
+        $p = (array)$req->getParsedBody();
+        $start = max(0, (int)($p['start'] ?? 0));
+        $length = (int)($p['length'] ?? 10);
+        $draw = (int)($p['draw'] ?? 0);
+        if ($length === -1) {
+            $start = 0;
+        }
+
+        $conds = ['r.inviter_user_id IS NOT NULL'];
+        $params = [];
+        $searchValue = $p['search']['value'] ?? '';
+        if ($searchValue !== '') {
+            $conds[] = '(
+                CAST(r.inviter_user_id AS CHAR) LIKE :search
+                OR inv.username LIKE :search
+            )';
+            $params['search'] = '%' . $searchValue . '%';
+        }
+        $whereSql = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
+
+        $sql = "SELECT r.inviter_user_id,
+                       inv.username AS inviter_username,
+                       COUNT(*) AS cnt,
+                       MIN(r.created_at) AS first_at,
+                       MAX(r.created_at) AS last_at
+                FROM referrals r
+                LEFT JOIN telegram_users inv ON inv.user_id = r.inviter_user_id
+                {$whereSql}
+                GROUP BY r.inviter_user_id, inv.username
+                ORDER BY cnt DESC, r.inviter_user_id DESC";
+        if ($length > 0) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $k => $v) {
+            $stmt->bindValue(':' . $k, $v);
+        }
+        if ($length > 0) {
+            $stmt->bindValue(':limit', $length, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM (
+            SELECT 1
+            FROM referrals r
+            LEFT JOIN telegram_users inv ON inv.user_id = r.inviter_user_id
+            {$whereSql}
+            GROUP BY r.inviter_user_id, inv.username
+        ) t");
+        foreach ($params as $k => $v) {
+            $countStmt->bindValue(':' . $k, $v);
+        }
+        $countStmt->execute();
+        $recordsFiltered = (int)$countStmt->fetchColumn();
+
+        $recordsTotal = (int)$this->db->query('SELECT COUNT(DISTINCT inviter_user_id) FROM referrals')->fetchColumn();
 
         return Response::json($res, 200, [
             'draw' => $draw,

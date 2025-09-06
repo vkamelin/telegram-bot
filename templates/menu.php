@@ -22,6 +22,11 @@ $menu = [
                 'icon'  => 'bi bi-send',
             ],
             [
+                'url'   => '/dashboard/referrals',
+                'title' => 'Рефералы',
+                'icon'  => 'bi bi-link-45deg',
+            ],
+            [
                 'url'   => '/dashboard/messages/create',
                 'title' => 'Отправить сообщение',
                 'icon'  => 'bi bi-envelope',

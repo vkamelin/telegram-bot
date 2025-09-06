@@ -6,6 +6,42 @@
 
 <h1>Рефералы</h1>
 
+<?php $m = $metrics ?? ['total'=>0,'inviters'=>0,'invitees'=>0,'avg_per_inviter'=>0]; ?>
+<div class="row g-2 mb-3">
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted">Всего переходов</div>
+        <div class="fs-4 fw-semibold"><?= (int)$m['total'] ?></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted">Активных пригласивших</div>
+        <div class="fs-4 fw-semibold"><?= (int)$m['inviters'] ?></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted">Всего приглашённых</div>
+        <div class="fs-4 fw-semibold"><?= (int)$m['invitees'] ?></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted">Сред. на пригласившего</div>
+        <div class="fs-4 fw-semibold"><?= htmlspecialchars((string)$m['avg_per_inviter']) ?></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
         <input type="text" name="inviter_user_id" value="<?= htmlspecialchars($_GET['inviter_user_id'] ?? '') ?>"
@@ -29,6 +65,30 @@
     </div>
   </form>
 
+<h2 class="h5 mt-3">ТОП пригласивших</h2>
+<table id="referralsGroupedTable" class="table table-center table-striped table-hover mb-4">
+  <thead>
+  <tr>
+    <th>Пригласивший</th>
+    <th>Переходов</th>
+    <th>Первый</th>
+    <th>Последний</th>
+    <th class="text-end">Действия</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+  <tfoot>
+  <tr>
+    <th>Пригласивший</th>
+    <th>Переходов</th>
+    <th>Первый</th>
+    <th>Последний</th>
+    <th class="text-end">Действия</th>
+  </tr>
+  </tfoot>
+</table>
+
+<h2 class="h5">Лог переходов</h2>
 <table id="referralsTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
@@ -64,4 +124,4 @@
 
 <script src="<?= url('/assets/js/datatable.common.js') ?>"></script>
 <script src="<?= url('/assets/js/datatable.referrals.js') ?>"></script>
-
+<script src="<?= url('/assets/js/datatable.referrals.grouped.js') ?>"></script>

@@ -129,6 +129,10 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
 // Дополнительные маршруты панели (добавленные отдельно)
 $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($db) {
     $g->post('/updates/{id}/reply', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\UpdatesController($db))->reply($req, $res, $args));
+    // Referrals report
+    $g->get('/referrals', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ReferralsController($db))->index($req, $res));
+    $g->post('/referrals/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ReferralsController($db))->data($req, $res));
+    $g->post('/referrals/grouped', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ReferralsController($db))->grouped($req, $res));
 })
   ->add(new \App\Middleware\AuthMiddleware())
   ->add(new \App\Middleware\CsrfMiddleware())
