@@ -16,7 +16,7 @@
                placeholder="YYYY-MM-DD,YYYY-MM-DD">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Фильтр</button>
+        <button type="submit" class="btn btn-outline-primary">Фильтр</button>
     </div>
 </form>
 

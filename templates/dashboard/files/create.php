@@ -26,5 +26,5 @@
         <label for="fileInput" class="form-label">Файл</label>
         <input class="form-control" type="file" name="file" id="fileInput">
     </div>
-    <button type="submit" class="btn btn-primary">Загрузить</button>
+    <button type="submit" class="btn btn-outline-primary">Загрузить</button>
 </form>

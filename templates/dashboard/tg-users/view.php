@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">Пользователь <?= htmlspecialchars($user['username'] ?? $user['user_id']) ?></h1>
     <div>
-        <a href="/dashboard/tg-users/<?= urlencode((string)($user['id'] ?? '')) ?>/chat" class="btn btn-primary">
+        <a href="/dashboard/tg-users/<?= urlencode((string)($user['id'] ?? '')) ?>/chat" class="btn btn-outline-primary">
             <i class="bi bi-chat-dots"></i> Чат
         </a>
     </div>

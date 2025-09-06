@@ -93,18 +93,15 @@ code, pre {
 .sidebar {
     width: 100%;
     min-height: 100vh;
-    background-color: var(--bs-body-bg);
+    background-color: transparent;
     color: var(--bs-body-color);
     padding: 0.5rem;
-    border-radius: 0.5rem 0.5rem 0 0;
+    border-right: 1px solid var(--bs-border-color);
+    border-radius: 0;
 }
 
 .sidebar .nav-link {
     color: var(--bs-body-color);
-}
-
-[data-bs-theme="light"] .sidebar {
-    background-color: #dddddd !important;
 }
 
 .main-content {
@@ -250,14 +247,42 @@ tg-spoiler.revealed {
     font-weight: 400 !important; /* Normalize weight for active item */
 }
 
-/* Dashboard polish */
-.kpi-card {
-    background: linear-gradient(
-        180deg,
-        rgba(var(--bs-primary-rgb, 13,110,253), .035) 0%,
-        rgba(var(--bs-primary-rgb, 13,110,253), .06) 100%
-    );
+/* Flat dashboard polish */
+.kpi-card { background: transparent !important; }
+
+/* Make cards flat and minimal */
+.card { box-shadow: none !important; border: 1px solid var(--bs-border-color) !important; }
+.card-header { background: transparent !important; }
+
+/* Nav pills in sidebar: outline active state */
+.nav-pills .nav-link { border: 1px solid transparent; border-radius: var(--bs-border-radius); }
+.nav-pills .nav-link:hover { background-color: rgba(var(--bs-primary-rgb, 13,110,253), .05); }
+.nav-pills .nav-link.active {
+    background: transparent !important;
+    color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
 }
+
+/* Dark theme: main menu (sidebar/offcanvas) links are white text with white outline when active/hover */
+[data-bs-theme="dark"] .sidebar .nav-link,
+[data-bs-theme="dark"] .offcanvas .nav-link {
+    color: #ffffff !important;
+}
+[data-bs-theme="dark"] .sidebar .nav-link:hover,
+[data-bs-theme="dark"] .offcanvas .nav-link:hover,
+[data-bs-theme="dark"] .sidebar .nav-link:focus,
+[data-bs-theme="dark"] .offcanvas .nav-link:focus {
+    border-color: #ffffff !important;
+}
+[data-bs-theme="dark"] .sidebar .nav-link.active,
+[data-bs-theme="dark"] .offcanvas .nav-link.active {
+    background: transparent !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* Flatten navbar */
+.navbar { box-shadow: none !important; }
 
 .kpi-icon {
     font-size: 2rem;

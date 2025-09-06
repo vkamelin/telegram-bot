@@ -5,7 +5,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4 m-0">Промокоды</h2>
     <div>
-        <a class="btn btn-sm btn-primary" href="<?= url('/dashboard/promo-codes/upload') ?>"><i class="bi bi-upload"></i> Загрузить CSV</a>
+        <a class="btn btn-sm btn-outline-primary" href="<?= url('/dashboard/promo-codes/upload') ?>"><i class="bi bi-upload"></i> Загрузить CSV</a>
         <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dashboard/promo-codes/batches') ?>">Батчи</a>
         <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dashboard/promo-codes/issues') ?>">Отчёт</a>
     </div>
@@ -40,7 +40,7 @@
             <input type="number" min="20" max="50" class="form-control" name="limit" value="<?= (int)$limit ?>">
         </div>
         <div class="col-6 col-md-1">
-            <button class="btn btn-primary w-100" type="submit">Фильтр</button>
+            <button class="btn btn-outline-primary w-100" type="submit">Фильтр</button>
         </div>
     </div>
     </form>
@@ -73,7 +73,7 @@
                         <form class="d-inline-flex gap-2" method="post" action="<?= url('/dashboard/promo-codes/' . (int)$row['id'] . '/issue') ?>">
                             <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES) ?>">
                             <input type="number" required class="form-control form-control-sm" name="telegram_user_id" placeholder="telegram_user_id">
-                            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check2"></i> Выдать</button>
+                            <button type="submit" class="btn btn-sm btn-outline-success"><i class="bi bi-check2"></i> Выдать</button>
                         </form>
                     <?php else: ?>
                         <span class="text-muted">—</span>

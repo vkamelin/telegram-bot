@@ -17,10 +17,9 @@
                 <div class="form-text">Первая строка — заголовок. Колонки: <code>code</code> (обязательно), <code>expires_at</code> (опц.), <code>meta</code> (опц.). Макс. 5MB.</div>
             </div>
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i> Импортировать</button>
+                <button type="submit" class="btn btn-outline-primary"><i class="bi bi-upload"></i> Импортировать</button>
                 <a class="btn btn-outline-secondary" href="<?= url('/dashboard/promo-codes') ?>">Отмена</a>
             </div>
         </form>
     </div>
 </div>
-

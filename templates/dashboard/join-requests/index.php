@@ -25,7 +25,7 @@
         <input type="text" name="chat_id" value="<?= htmlspecialchars($_GET['chat_id'] ?? '') ?>" class="form-control" placeholder="chat_id">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Фильтр</button>
+        <button type="submit" class="btn btn-outline-primary">Фильтр</button>
     </div>
 </form>
 

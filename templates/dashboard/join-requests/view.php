@@ -35,9 +35,9 @@
 
 <form method="post" action="/dashboard/join-requests/<?= urlencode((string)$request['chat_id']) ?>/<?= urlencode((string)$request['user_id']) ?>/approve" class="d-inline">
     <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
-    <button type="submit" class="btn btn-success">Одобрить</button>
+    <button type="submit" class="btn btn-outline-success">Одобрить</button>
 </form>
 <form method="post" action="/dashboard/join-requests/<?= urlencode((string)$request['chat_id']) ?>/<?= urlencode((string)$request['user_id']) ?>/decline" class="d-inline ms-2">
     <input type="hidden" name="<?= env('CSRF_TOKEN_NAME', '_csrf_token') ?>" value="<?= $csrfToken ?>">
-    <button type="submit" class="btn btn-danger">Отклонить</button>
+    <button type="submit" class="btn btn-outline-danger">Отклонить</button>
 </form>

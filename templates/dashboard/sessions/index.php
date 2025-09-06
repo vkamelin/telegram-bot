@@ -17,7 +17,7 @@
         <input type="date" name="updated_to" value="<?= htmlspecialchars($_GET['updated_to'] ?? '') ?>" class="form-control" placeholder="дата до">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Фильтр</button>
+        <button type="submit" class="btn btn-outline-primary">Фильтр</button>
     </div>
     <?php // сохраняем совместимость: если в URL всё ещё приходит period, разложим его на два скрытых поля для ссылки/перезагрузки ?>
     <?php if (!empty($_GET['period']) && (empty($_GET['updated_from']) && empty($_GET['updated_to']))) : ?>

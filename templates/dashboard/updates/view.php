@@ -83,7 +83,7 @@
                             <textarea id="reply-text" name="text" class="form-control" rows="3" required placeholder="Введите текст..."></textarea>
                             <div class="form-text">Отправляется как ответ (reply_to_message_id).</div>
                         </div>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-outline-primary">
                             <i class="bi bi-send"></i> Отправить ответ
                         </button>
                     </form>

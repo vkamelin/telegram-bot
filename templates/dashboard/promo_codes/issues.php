@@ -5,7 +5,7 @@
     <div>
         <?php $qs = http_build_query($_GET); ?>
         <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dashboard/promo-codes') ?>">К промокодам</a>
-        <a class="btn btn-sm btn-primary" href="<?= url('/dashboard/promo-codes/issues/export') . '?' . htmlspecialchars($qs, ENT_QUOTES) ?>"><i class="bi bi-download"></i> Экспорт CSV</a>
+        <a class="btn btn-sm btn-outline-primary" href="<?= url('/dashboard/promo-codes/issues/export') . '?' . htmlspecialchars($qs, ENT_QUOTES) ?>"><i class="bi bi-download"></i> Экспорт CSV</a>
     </div>
 </div>
 
@@ -28,7 +28,7 @@
             <input type="number" min="20" max="50" class="form-control" name="limit" value="<?= (int)$limit ?>">
         </div>
         <div class="col-6 col-md-1">
-            <button class="btn btn-primary w-100" type="submit">Фильтр</button>
+            <button class="btn btn-outline-primary w-100" type="submit">Фильтр</button>
         </div>
     </div>
 </form>

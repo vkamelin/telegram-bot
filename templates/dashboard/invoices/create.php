@@ -64,5 +64,5 @@
         <input class="form-check-input" type="checkbox" value="1" id="is_flexible" name="is_flexible" <?= !empty($invoice['is_flexible']) ? 'checked' : '' ?>>
         <label class="form-check-label" for="is_flexible">Гибкая цена</label>
     </div>
-    <button type="submit" class="btn btn-primary">Отправить</button>
+    <button type="submit" class="btn btn-outline-primary">Отправить</button>
 </form>

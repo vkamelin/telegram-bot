@@ -25,6 +25,6 @@
             <label for="password">Пароль</label>
         </div>
         
-        <button typeof="submit" class="btn btn-primary w-100 py-2" type="submit">Войти</button>
+        <button typeof="submit" class="btn btn-outline-primary w-100 py-2" type="submit">Войти</button>
     </form>
 </main>

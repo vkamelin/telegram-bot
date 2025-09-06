@@ -39,21 +39,21 @@ $messages = Flash::get();
 <body class="bg-body-tertiary">
 
 <header class="mb-3">
-    <nav class="navbar navbar-dark bg-dark" aria-label="Dark offcanvas navbar">
+    <nav class="navbar bg-body border-bottom" aria-label="Offcanvas navbar">
         <div class="container-fluid">
             <div class="d-flex align-items-center">
                 <!-- Левая половина шапки -->
-                <button class="btn btn-dark d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
+                <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
                     <i class="bi bi-list"></i>
                 </button>
                 <a class="navbar-brand mx-1" href="<?= url('/dashboard') ?>">Панель</a>
             </div>
             <div class="d-flex align-items-center">
                 <!-- Правая половина шапки -->
-                <button id="theme-toggle" class="btn btn-outline-light me-2">
+                <button id="theme-toggle" class="btn btn-outline-secondary me-2">
                     <i class="bi bi-sun"></i>
                 </button>
-                <a href="#" class="btn btn-outline-light">
+                <a href="#" class="btn btn-outline-secondary">
                     <i class="bi bi-box-arrow-right"></i>
                     <span class="d-none d-lg-inline">Выйти</span>
                 </a>
