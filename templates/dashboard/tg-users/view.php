@@ -1,4 +1,11 @@
-<h1>Пользователь <?= htmlspecialchars($user['username'] ?? $user['user_id']) ?></h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Пользователь <?= htmlspecialchars($user['username'] ?? $user['user_id']) ?></h1>
+    <div>
+        <a href="/dashboard/tg-users/<?= urlencode((string)($user['id'] ?? '')) ?>/chat" class="btn btn-primary">
+            <i class="bi bi-chat-dots"></i> Чат
+        </a>
+    </div>
+ </div>
 
 <div class="card mb-4">
     <div class="card-body">

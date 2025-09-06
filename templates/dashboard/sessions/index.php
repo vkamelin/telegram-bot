@@ -11,11 +11,20 @@
         <input type="text" name="state" value="<?= htmlspecialchars($_GET['state'] ?? '') ?>" class="form-control" placeholder="состояние">
     </div>
     <div class="col-auto">
-        <input type="text" name="period" value="<?= htmlspecialchars($_GET['period'] ?? '') ?>" class="form-control" placeholder="YYYY-MM-DD,YYYY-MM-DD">
+        <input type="date" name="updated_from" value="<?= htmlspecialchars($_GET['updated_from'] ?? '') ?>" class="form-control" placeholder="дата от">
+    </div>
+    <div class="col-auto">
+        <input type="date" name="updated_to" value="<?= htmlspecialchars($_GET['updated_to'] ?? '') ?>" class="form-control" placeholder="дата до">
     </div>
     <div class="col-auto">
         <button type="submit" class="btn btn-primary">Фильтр</button>
     </div>
+    <?php // сохраняем совместимость: если в URL всё ещё приходит period, разложим его на два скрытых поля для ссылки/перезагрузки ?>
+    <?php if (!empty($_GET['period']) && (empty($_GET['updated_from']) && empty($_GET['updated_to']))) : ?>
+        <?php [$pf, $pt] = array_pad(explode(',', (string)$_GET['period']), 2, ''); ?>
+        <input type="hidden" name="updated_from" value="<?= htmlspecialchars($pf) ?>">
+        <input type="hidden" name="updated_to" value="<?= htmlspecialchars($pt) ?>">
+    <?php endif; ?>
 </form>
 
 <div class="table-responsive">

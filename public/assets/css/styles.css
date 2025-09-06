@@ -206,6 +206,19 @@ tg-spoiler.revealed {
     }
 }
 
+/* Dark theme: outline buttons default to white border + text when inactive */
+[data-bs-theme="dark"] .btn-outline-primary:not(:hover):not(:active):not(.active):not(.show):not(:focus),
+[data-bs-theme="dark"] .btn-outline-secondary:not(:hover):not(:active):not(.active):not(.show):not(:focus),
+[data-bs-theme="dark"] .btn-outline-success:not(:hover):not(:active):not(.active):not(.show):not(:focus),
+[data-bs-theme="dark"] .btn-outline-info:not(:hover):not(:active):not(.show):not(:focus),
+[data-bs-theme="dark"] .btn-outline-warning:not(:hover):not(:active):not(.show):not(:focus),
+[data-bs-theme="dark"] .btn-outline-danger:not(:hover):not(:active):not(.show):not(:focus),
+[data-bs-theme="dark"] .btn-outline-light:not(:hover):not(:active):not(.show):not(:focus),
+[data-bs-theme="dark"] .btn-outline-dark:not(:hover):not(:active):not(.show):not(:focus) {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
 .select2-results__option--highlighted.select2-results__option--selectable {
     background-color: var(--bs-primary) !important;
     color: #fff !important;

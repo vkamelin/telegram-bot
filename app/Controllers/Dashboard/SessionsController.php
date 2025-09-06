@@ -55,11 +55,24 @@ final class SessionsController
             $conds[] = 'state = :state';
             $params['state'] = $p['state'];
         }
-        if (($p['period'] ?? '') !== '') {
+        // New separate date filters
+        if (($p['updated_from'] ?? '') !== '') {
+            $conds[] = 'updated_at >= :updated_from';
+            $params['updated_from'] = $p['updated_from'];
+        }
+        if (($p['updated_to'] ?? '') !== '') {
+            $conds[] = 'updated_at <= :updated_to';
+            $params['updated_to'] = $p['updated_to'];
+        }
+        // Backward compatibility for legacy 'period=YYYY-MM-DD,YYYY-MM-DD'
+        if (!isset($params['updated_from']) && !isset($params['updated_to']) && ($p['period'] ?? '') !== '') {
             $parts = explode(',', (string)$p['period']);
-            if (count($parts) === 2) {
-                $conds[] = 'updated_at BETWEEN :updated_from AND :updated_to';
+            if (!empty($parts[0])) {
+                $conds[] = 'updated_at >= :updated_from';
                 $params['updated_from'] = $parts[0];
+            }
+            if (!empty($parts[1])) {
+                $conds[] = 'updated_at <= :updated_to';
                 $params['updated_to'] = $parts[1];
             }
         }

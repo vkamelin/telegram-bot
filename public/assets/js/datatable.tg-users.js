@@ -13,9 +13,13 @@ $(document).ready(function() {
       data: null,
       class: 'text-end',
       render: function(data, type, row) {
-        return '<a href="/dashboard/tg-users/' + row.id + '" class="btn btn-sm btn-outline-secondary">' +
-        '<i class="bi bi-eye"></i>' +
-        '</a>';
+        const viewBtn = '<a href="/dashboard/tg-users/' + row.id + '" class="btn btn-sm btn-outline-secondary me-1" title="Просмотр">' +
+          '<i class="bi bi-eye"></i>' +
+          '</a>';
+        const chatBtn = '<a href="/dashboard/tg-users/' + row.id + '/chat" class="btn btn-sm btn-outline-primary" title="Чат">' +
+          '<i class="bi bi-chat-dots"></i>' +
+          '</a>';
+        return viewBtn + chatBtn;
       },
       orderable: false,
       searchable: false
