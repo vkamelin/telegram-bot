@@ -11,8 +11,11 @@ $(document).ready(function() {
     { data: 'is_bot_banned' },
     {
       data: null,
+      class: 'text-end',
       render: function(data, type, row) {
-        return '<a href="/dashboard/tg-users/' + row.id + '" class="btn btn-sm btn-outline-secondary">View</a>';
+        return '<a href="/dashboard/tg-users/' + row.id + '" class="btn btn-sm btn-outline-secondary">' +
+        '<i class="bi bi-eye"></i>' +
+        '</a>';
       },
       orderable: false,
       searchable: false

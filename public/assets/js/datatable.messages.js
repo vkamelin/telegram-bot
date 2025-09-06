@@ -6,7 +6,16 @@
     { data: 'user_id' },
     { data: 'method' },
     { data: 'type' },
-    { data: 'status' },
+    { data: 'status', render: function (data) {
+        var s = (data || '').toString().toLowerCase();
+        var cls = 'text-bg-secondary';
+        if (s === 'success') cls = 'text-bg-success';
+        else if (s === 'failed' || s === 'error') cls = 'text-bg-danger';
+        else if (s === 'processing') cls = 'text-bg-warning';
+        else if (s === 'pending') cls = 'text-bg-secondary';
+        return '<span class="badge ' + cls + '">' + (data || '') + '</span>';
+      }
+    },
     { data: 'priority' },
     { data: 'scheduled_id', render: function(v){
         if (!v) return '';

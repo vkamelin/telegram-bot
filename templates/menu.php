@@ -7,14 +7,41 @@ $menu = [
         'icon'  => 'bi bi-speedometer2',
     ],
     [
-        'url'      => '/dashboard/tg-users',
+        'url'      => '/dashboard/updates',
         'title'    => 'Telegram',
         'icon'     => 'bi bi-telegram',
         'children' => [
             [
+                'url'   => '/dashboard/updates',
+                'title' => 'Входящие',
+                'icon'  => 'bi bi-inbox',
+            ],
+            [
+                'url'   => '/dashboard/messages',
+                'title' => 'Исходящие',
+                'icon'  => 'bi bi-send',
+            ],
+            [
+                'url'   => '/dashboard/messages/create',
+                'title' => 'Отправить сообщение',
+                'icon'  => 'bi bi-envelope',
+            ],
+            [
+                'url'   => '/dashboard/scheduled',
+                'title' => 'Расписание сообщений',
+                'icon'  => 'bi bi-clock',
+            ],
+        ],
+    ],
+    [
+        'url'      => '/dashboard/tg-users',
+        'title'    => 'Пользователи',
+        'icon'     => 'bi bi-people',
+        'children' => [
+            [
                 'url'   => '/dashboard/tg-users',
                 'title' => 'Пользователи',
-                'icon'  => 'bi bi-people-fill',
+                'icon'  => 'bi bi-people',
             ],
             [
                 'url'   => '/dashboard/tg-groups',
@@ -30,26 +57,6 @@ $menu = [
                 'url'   => '/dashboard/chat-members',
                 'title' => 'Подписчики',
                 'icon'  => 'bi bi-people',
-            ],
-            [
-                'url'   => '/dashboard/updates',
-                'title' => 'Входящие',
-                'icon'  => 'bi bi-telegram',
-            ],
-            [
-                'url'   => '/dashboard/messages',
-                'title' => 'Исходящие',
-                'icon'  => 'bi bi-telegram',
-            ],
-            [
-                'url'   => '/dashboard/messages/create',
-                'title' => 'Отправить сообщение',
-                'icon'  => 'bi bi-envelope',
-            ],
-            [
-                'url'   => '/dashboard/scheduled',
-                'title' => 'Расписание сообщений',
-                'icon'  => 'bi bi-clock',
             ],
         ],
     ],

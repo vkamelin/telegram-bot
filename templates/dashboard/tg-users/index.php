@@ -70,7 +70,7 @@
         <th>Подписан</th>
         <th>Забанен</th>
         <th>Бот забанен</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -83,7 +83,7 @@
         <th>Подписан</th>
         <th>Забанен</th>
         <th>Бот забанен</th>
-        <th>Действия</th>
+        <th class="text-end">Действия</th>
     </tr>
     </tfoot>
 </table>
