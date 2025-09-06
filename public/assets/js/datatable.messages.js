@@ -26,10 +26,7 @@
             + '<i class="bi bi-repeat"></i>'
           + '</button>'
           + '</form>';
-        const responseLink = '<a href="/dashboard/messages/' + row.id + '/response" class="btn btn-sm btn-outline-secondary ms-1" title="Ответ">'
-          + '<i class="bi bi-send"></i>'
-          + '</a>';
-        return resendForm + ' ' + responseLink;
+        return resendForm;
       },
       orderable: false,
       searchable: false
