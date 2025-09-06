@@ -126,6 +126,14 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
 })->add(new \App\Middleware\CsrfMiddleware())
   ->add(new \App\Middleware\SessionMiddleware());
 
+// Дополнительные маршруты панели (добавленные отдельно)
+$app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($db) {
+    $g->post('/updates/{id}/reply', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\UpdatesController($db))->reply($req, $res, $args));
+})
+  ->add(new \App\Middleware\AuthMiddleware())
+  ->add(new \App\Middleware\CsrfMiddleware())
+  ->add(new \App\Middleware\SessionMiddleware());
+
 // API (/api/*)
 $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db, $config) {
     $g->get('/health', new \App\Controllers\Api\HealthController($db));
