@@ -1,4 +1,6 @@
-$(document).ready(function() {
+﻿$(document).ready(function() {
+  const csrfToken = window.csrfToken;
+
   createDatatable('#messagesTable', '/dashboard/messages/data', [
     { data: 'id' },
     { data: 'user_id' },
@@ -18,12 +20,16 @@ $(document).ready(function() {
       data: null,
       className: 'text-end',
       render: function(data, type, row) {
-        return '<a href="/dashboard/messages/' + row.id + '/resend" class="btn btn-sm btn-outline-secondary">' +
-            '<i class="bi bi-repeat" title="Отправит повторно"></i>' +
-            '</a> '
-          + '<a href="/dashboard/messages/' + row.id + '/response" class="btn btn-sm btn-outline-secondary ms-1">' +
-            '<i class="bi bi-send" title="Ответить"></i>' +
-            '</a>';
+        const resendForm = '<form method="post" action="/dashboard/messages/' + row.id + '/resend" class="d-inline">'
+          + '<input type="hidden" name="_csrf_token" value="' + csrfToken + '">'
+          + '<button type="submit" class="btn btn-sm btn-outline-secondary" title="Повторная отправка">'
+            + '<i class="bi bi-repeat"></i>'
+          + '</button>'
+          + '</form>';
+        const responseLink = '<a href="/dashboard/messages/' + row.id + '/response" class="btn btn-sm btn-outline-secondary ms-1" title="Ответ">'
+          + '<i class="bi bi-send"></i>'
+          + '</a>';
+        return resendForm + ' ' + responseLink;
       },
       orderable: false,
       searchable: false
