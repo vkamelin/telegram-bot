@@ -42,52 +42,36 @@ $(function () {
   $sendModeRadios.on('change', toggleSchedule);
   toggleSchedule();
 
-  const $searchInput = $('#userSearchInput');
-  const $searchResults = $('#userSearchResults');
-  const $selectedUsers = $('#selectedUsers');
-  let searchTimer;
-
-  $searchInput.on('input', function () {
-    const q = $(this).val().trim();
-    clearTimeout(searchTimer);
-    if (q.length < 2) {
-      $searchResults.empty();
-      return;
-    }
-    searchTimer = setTimeout(function () {
-      $.post(searchUrl, {
-        _csrf_token: csrfToken,
-        user_id: q,
-        username: q,
-        first_name: q,
-        last_name: q
-      }, function (data) {
-        $searchResults.empty();
-        data.forEach(function (u) {
-          const name = u.username ? '@' + u.username : ((u.first_name || '') + ' ' + (u.last_name || '')).trim();
-          $searchResults.append('<li class="list-group-item d-flex justify-content-between align-items-center">'
-            + '<span>' + name + ' (' + u.user_id + ')</span>'
-            + '<button type="button" class="btn btn-sm btn-secondary add-user-btn" data-user-id="' + u.user_id + '" data-name="' + (u.username ? '@' + u.username : u.user_id) + '">Add</button>'
-            + '</li>');
-        });
-      }, 'json');
-    }, 300);
-  });
-
-  $searchResults.on('click', '.add-user-btn', function () {
-    const id = $(this).data('user-id');
-    const name = $(this).data('name');
-    if ($selectedUsers.find('li[data-user-id="' + id + '"]').length) {
-      return;
-    }
-    $selectedUsers.append('<li class="list-group-item d-flex justify-content-between align-items-center" data-user-id="' + id + '">'
-      + '<span>' + name + '</span>'
-      + '<input type="hidden" name="users[]" value="' + id + '">'
-      + '<button type="button" class="btn btn-sm btn-outline-danger remove-user">Remove</button>'
-      + '</li>');
-  });
-
-  $selectedUsers.on('click', '.remove-user', function () {
-    $(this).closest('li').remove();
-  });
+  // Select2 for multi user selection (AJAX)
+  const $userSelect = $('#userSelect');
+  if ($userSelect.length && typeof $.fn.select2 === 'function') {
+    $userSelect.select2({
+      width: '100%',
+      placeholder: $userSelect.data('placeholder') || 'Начните ввод для поиска...',
+      allowClear: true,
+      ajax: {
+        url: searchUrl,
+        method: 'POST',
+        delay: 250,
+        dataType: 'json',
+        data: function (params) {
+          return {
+            _csrf_token: csrfToken,
+            q: params.term || '',
+            limit: 20
+          };
+        },
+        processResults: function (data) {
+          // data is an array of users: {user_id, username, first_name, last_name}
+          const results = (data || []).map(function (u) {
+            const title = u.username ? ('@' + u.username) : ((u.first_name || '') + ' ' + (u.last_name || '')).trim();
+            const text = title ? (title + ' (' + u.user_id + ')') : String(u.user_id);
+            return { id: String(u.user_id), text: text };
+          });
+          return { results: results };
+        },
+        cache: true
+      }
+    });
+  }
 });

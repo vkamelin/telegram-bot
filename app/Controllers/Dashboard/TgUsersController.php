@@ -118,11 +118,22 @@ final class TgUsersController
         $conds = [];
         $params = [];
 
-        foreach (['user_id', 'username', 'first_name', 'last_name'] as $field) {
-            if (($p[$field] ?? '') !== '') {
-                $conds[] = "$field LIKE :$field";
-                $params[$field] = '%' . $p[$field] . '%';
-            }
+        // Consolidated free-text search across fields
+        $q = trim((string)($p['q'] ?? ($p['username'] ?? ($p['first_name'] ?? ($p['last_name'] ?? ($p['user_id'] ?? ''))))));
+        if ($q !== '') {
+            // When PDO emulation is disabled, repeated named placeholders cause HY093.
+            // Use unique placeholders for each occurrence.
+            $conds[] = '(
+                CAST(user_id AS CHAR) LIKE :q1 OR
+                username LIKE :q2 OR
+                first_name LIKE :q3 OR
+                last_name LIKE :q4
+            )';
+            $qv = '%' . $q . '%';
+            $params['q1'] = $qv;
+            $params['q2'] = $qv;
+            $params['q3'] = $qv;
+            $params['q4'] = $qv;
         }
         if (($p['is_premium'] ?? '') !== '') {
             $conds[] = 'is_premium = :is_premium';

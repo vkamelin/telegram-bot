@@ -246,17 +246,13 @@
         <input type="text" class="form-control" name="user" id="singleUserInput" placeholder="ID пользователя или логин" value="<?= htmlspecialchars($data['user'] ?? '') ?>">
     </div>
     <div id="selectedUsersSection" class="mb-3 d-none">
-        <input type="text" class="form-control mb-2" id="userSearchInput" placeholder="Поиск пользователя">
-        <ul class="list-group mb-2" id="userSearchResults"></ul>
-        <ul class="list-group" id="selectedUsers">
+        <label for="userSelect" class="form-label">Выберите пользователей</label>
+        <select id="userSelect" name="users[]" class="form-select" multiple style="width: 100%" data-placeholder="Начните ввод для поиска...">
             <?php if (!empty($data['users']) && is_array($data['users'])): foreach ($data['users'] as $u): ?>
-                <li class="list-group-item d-flex justify-content-between align-items-center" data-user-id="<?= htmlspecialchars((string)$u) ?>">
-                    <span><?= htmlspecialchars((string)$u) ?></span>
-                    <input type="hidden" name="users[]" value="<?= htmlspecialchars((string)$u) ?>">
-                    <button type="button" class="btn btn-sm btn-outline-danger remove-user">Удалить</button>
-                </li>
+                <option value="<?= htmlspecialchars((string)$u) ?>" selected><?= htmlspecialchars((string)$u) ?></option>
             <?php endforeach; endif; ?>
-        </ul>
+        </select>
+        <div class="form-text">Ищите по ID, логину или имени.</div>
     </div>
     <div id="groupSection" class="mb-3 d-none">
         <select class="form-select" name="group_id" id="groupSelect">
