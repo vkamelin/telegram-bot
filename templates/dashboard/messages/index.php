@@ -6,6 +6,7 @@
 
 <h1>Сообщения</h1>
 
+<div class="table-responsive">
 <table id="messagesTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
@@ -39,6 +40,7 @@
     </tr>
     </tfoot>
 </table>
+</div>
 
 <!-- jQuery и DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

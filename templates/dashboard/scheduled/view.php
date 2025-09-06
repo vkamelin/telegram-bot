@@ -185,6 +185,7 @@
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
 
+<div class="table-responsive">
 <table id="scheduledMessagesTable" class="table table-center table-striped table-hover" data-scheduled-id="<?= (int)$item['id'] ?>">
   <thead>
     <tr>
@@ -211,7 +212,8 @@
       <th>Обработано</th>
     </tr>
   </tfoot>
-  </table>
+</table>
+</div>
 
 <!-- jQuery и DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

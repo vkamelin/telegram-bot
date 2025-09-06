@@ -110,6 +110,7 @@
 <div class="row mt-3">
     <div class="col-md-12">
         <h4>Последние ошибки</h4>
+        <div class="table-responsive">
         <table class="table table-dark table-striped">
             <thead>
             <tr>
@@ -134,6 +135,7 @@
             endforeach; ?>
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 

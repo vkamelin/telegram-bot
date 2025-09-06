@@ -26,6 +26,7 @@
 <div class="row mt-3">
     <div class="col-md-6">
         <h4>Env-переменные</h4>
+        <div class="table-responsive">
         <table class="table table-dark table-striped">
             <tbody>
             <?php foreach ($env as $name => $value): ?>
@@ -36,6 +37,7 @@
             <?php endforeach; ?>
             </tbody>
         </table>
+        </div>
     </div>
     <div class="col-md-6">
         <h4>Конфигурация</h4>

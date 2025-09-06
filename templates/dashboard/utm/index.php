@@ -24,6 +24,7 @@
     </div>
 </form>
 
+<div class="table-responsive">
 <table class="table table-center table-striped table-hover">
     <thead>
     <tr>
@@ -40,6 +41,7 @@
     <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 
 <div class="mt-3">
     <strong>Итого:</strong> <?= (int)($grandTotal ?? 0) ?>

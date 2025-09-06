@@ -39,7 +39,8 @@
 </div>
 
 <h2>Последние сообщения</h2>
-<table class="table table-center table-striped table-hover mb-4">
+<div class="table-responsive mb-4">
+<table class="table table-center table-striped table-hover mb-0">
     <thead>
     <tr>
         <th>ID</th>
@@ -63,7 +64,8 @@
 </table>
 
 <h2>Последние обновления</h2>
-<table class="table table-center table-striped table-hover">
+<div class="table-responsive">
+<table class="table table-center table-striped table-hover mb-0">
     <thead>
     <tr>
         <th>ID</th>
@@ -83,9 +85,12 @@
     <?php endforeach; ?>
     </tbody>
 </table>
+</div>
+</div>
 
 <h2>Рефералы</h2>
-<table class="table table-center table-striped table-hover mb-4">
+<div class="table-responsive mb-4">
+<table class="table table-center table-striped table-hover mb-0">
     <thead>
     <tr>
         <th>ID приглашённого</th>
@@ -107,3 +112,4 @@
     <?php endforeach; ?>
     </tbody>
  </table>
+ </div>

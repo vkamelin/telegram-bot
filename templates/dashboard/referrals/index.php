@@ -66,6 +66,7 @@
   </form>
 
 <h2 class="h5 mt-3">ТОП пригласивших</h2>
+<div class="table-responsive">
 <table id="referralsGroupedTable" class="table table-center table-striped table-hover mb-4">
   <thead>
   <tr>
@@ -87,8 +88,10 @@
   </tr>
   </tfoot>
 </table>
+</div>
 
 <h2 class="h5">Лог переходов</h2>
+<div class="table-responsive">
 <table id="referralsTable" class="table table-center table-striped table-hover">
     <thead>
     <tr>
@@ -109,7 +112,8 @@
         <th>Создано</th>
     </tr>
     </tfoot>
-  </table>
+</table>
+</div>
 
 <!-- jQuery и DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

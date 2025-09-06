@@ -8,6 +8,7 @@
 </div>
 
 <div class="table-responsive">
+    <div class="table-responsive">
     <table class="table table-sm table-striped align-middle">
         <thead>
         <tr>
@@ -37,4 +38,4 @@
         </tbody>
     </table>
     </div>
-
+    </div>

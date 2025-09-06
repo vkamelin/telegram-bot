@@ -22,7 +22,8 @@
 
 <h2 class="h5">Участники</h2>
 <p id="noMembers" class="<?= empty($members) ? '' : 'd-none' ?>">Нет пользователей</p>
-<table class="table table-striped <?= empty($members) ? 'd-none' : '' ?>" id="membersTable">
+<div class="table-responsive <?= empty($members) ? 'd-none' : '' ?>">
+<table class="table table-striped" id="membersTable">
     <thead>
     <tr>
         <th>ID</th>
@@ -42,6 +43,7 @@
     <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 
 <script>
     window.tgUserSearchUrl = '<?= url('/dashboard/tg-users/search') ?>';

@@ -34,6 +34,7 @@
 </form>
 
 <div class="table-responsive">
+    <div class="table-responsive">
     <table class="table table-sm table-striped align-middle">
         <thead>
         <tr>
@@ -54,6 +55,7 @@
         <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
     </div>
 
 <?php $pages = (int)ceil($total / max(1, $limit)); if ($pages < 1) { $pages = 1; } ?>
