@@ -10,6 +10,7 @@ namespace App\Controllers\Dashboard;
 
 use App\Helpers\Response;
 use App\Helpers\View;
+use Longman\TelegramBot\Request;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Res;
 use Psr\Http\Message\ServerRequestInterface as Req;
@@ -197,5 +198,254 @@ final class TgUsersController
         ];
 
         return View::render($res, 'dashboard/tg-users/view.php', $data, 'layouts/main.php');
+    }
+
+    /**
+     * Полная история переписки с пользователем в виде чата (только просмотр).
+     */
+    public function chat(Req $req, Res $res, array $args): Res
+    {
+        $id = (int)($args['id'] ?? 0);
+        $stmt = $this->db->prepare('SELECT * FROM telegram_users WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        $user = $stmt->fetch();
+        if (!$user) {
+            return $res->withStatus(404);
+        }
+
+        $uid = (int)$user['user_id'];
+
+        // Load incoming messages (updates)
+        $uStmt = $this->db->prepare(
+            "SELECT `type`, `data`, `sent_at`, `created_at` FROM telegram_updates WHERE user_id = :uid AND `type` IN ('message') ORDER BY id ASC"
+        );
+        $uStmt->execute(['uid' => $uid]);
+        $updates = $uStmt->fetchAll() ?: [];
+
+        // Load outgoing messages
+        $mStmt = $this->db->prepare(
+            "SELECT `method`, `type`, `data`, `response`, `status`, `processed_at`, `sent_at`, `created_at` FROM telegram_messages WHERE user_id = :uid ORDER BY id ASC"
+        );
+        $mStmt->execute(['uid' => $uid]);
+        $messages = $mStmt->fetchAll() ?: [];
+
+        // Build chat items
+        $fileUrlCache = [];
+        $items = [];
+
+        foreach ($updates as $row) {
+            $it = $this->buildItemFromUpdateRow($row, $fileUrlCache);
+            if ($it !== null) {
+                $items[] = $it;
+            }
+        }
+        foreach ($messages as $row) {
+            foreach ($this->buildItemsFromMessageRow($row, $fileUrlCache) as $it) {
+                $items[] = $it;
+            }
+        }
+
+        // Sort by timestamp
+        usort($items, static function (array $a, array $b): int {
+            return ($a['ts'] ?? 0) <=> ($b['ts'] ?? 0);
+        });
+
+        $data = [
+            'title' => 'Чат ' . ($user['username'] ?: $user['user_id']),
+            'user' => $user,
+            'items' => $items,
+        ];
+
+        return View::render($res, 'dashboard/tg-users/chat.php', $data, 'layouts/main.php');
+    }
+
+    /**
+     * Build chat item from incoming update row.
+     * @param array $row
+     * @param array<string,string> $cache
+     * @return array<string,mixed>|null
+     */
+    private function buildItemFromUpdateRow(array $row, array &$cache): ?array
+    {
+        $data = [];
+        try {
+            $data = json_decode((string)$row['data'], true, 512, JSON_THROW_ON_ERROR) ?: [];
+        } catch (\Throwable) {
+            $data = [];
+        }
+        $msg = $data['message'] ?? null;
+        if (!is_array($msg)) {
+            return null;
+        }
+
+        $base = [
+            'direction' => 'in',
+            'ts' => (int)($msg['date'] ?? strtotime((string)($row['sent_at'] ?? $row['created_at'] ?? 'now'))),
+        ];
+
+        // text
+        if (isset($msg['text'])) {
+            return $base + ['type' => 'text', 'text' => (string)$msg['text']];
+        }
+
+        // caption
+        $caption = isset($msg['caption']) ? (string)$msg['caption'] : null;
+
+        // photo
+        if (!empty($msg['photo']) && is_array($msg['photo'])) {
+            $photo = end($msg['photo']);
+            $fid = is_array($photo) ? ($photo['file_id'] ?? null) : null;
+            return $base + [
+                'type' => 'photo',
+                'file_url' => $fid ? $this->getFileUrl($fid, $cache) : null,
+                'caption' => $caption,
+            ];
+        }
+
+        // video / animation / video_note / sticker / document / audio / voice
+        foreach (['video', 'animation', 'video_note', 'sticker', 'document', 'audio', 'voice'] as $k) {
+            if (isset($msg[$k]) && is_array($msg[$k])) {
+                $fid = $msg[$k]['file_id'] ?? null;
+                $fileName = $msg[$k]['file_name'] ?? null;
+                return $base + [
+                    'type' => $k,
+                    'file_url' => $fid ? $this->getFileUrl($fid, $cache) : null,
+                    'file_name' => $fileName,
+                    'caption' => $caption,
+                ];
+            }
+        }
+
+        return $base + ['type' => (string)($row['type'] ?? 'unknown')];
+    }
+
+    /**
+     * Build one or more chat items from outgoing message row.
+     * @param array $row
+     * @param array<string,string> $cache
+     * @return array<int, array<string,mixed>>
+     */
+    private function buildItemsFromMessageRow(array $row, array &$cache): array
+    {
+        $items = [];
+        $type = (string)($row['type'] ?? '');
+        $ts = strtotime((string)($row['processed_at'] ?? $row['sent_at'] ?? $row['created_at'] ?? 'now'));
+
+        // text
+        if ($type === 'message' || ($row['method'] ?? '') === 'sendMessage') {
+            $data = [];
+            try {
+                $data = json_decode((string)$row['data'], true, 512, JSON_THROW_ON_ERROR) ?: [];
+            } catch (\Throwable) {
+                $data = [];
+            }
+            $text = (string)($data['text'] ?? '');
+            if ($text !== '') {
+                $items[] = [
+                    'direction' => 'out',
+                    'type' => 'text',
+                    'text' => $text,
+                    'ts' => $ts,
+                ];
+            }
+            return $items;
+        }
+
+        // For media and others try to resolve file_id from response
+        $resp = [];
+        try {
+            $resp = json_decode((string)$row['response'], true, 512, JSON_THROW_ON_ERROR) ?: [];
+        } catch (\Throwable) {
+            $resp = [];
+        }
+
+        $result = $resp['result'] ?? null;
+
+        // sendMediaGroup returns array of messages
+        if (is_array($result) && array_is_list($result)) {
+            foreach ($result as $m) {
+                if (!is_array($m)) { continue; }
+                $items[] = $this->buildOutMediaItemFromMessage($m, $ts, $cache);
+            }
+            return array_values(array_filter($items));
+        }
+
+        if (is_array($result)) {
+            $item = $this->buildOutMediaItemFromMessage($result, $ts, $cache);
+            if ($item !== null) {
+                $items[] = $item;
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * Build single outgoing media item from Telegram API message payload
+     * extracted from send response.
+     * @param array $msg
+     * @param int $ts
+     * @param array<string,string> $cache
+     * @return array<string,mixed>|null
+     */
+    private function buildOutMediaItemFromMessage(array $msg, int $ts, array &$cache): ?array
+    {
+        $base = [
+            'direction' => 'out',
+            'ts' => (int)($msg['date'] ?? $ts),
+        ];
+        $caption = isset($msg['caption']) ? (string)$msg['caption'] : null;
+
+        if (!empty($msg['photo']) && is_array($msg['photo'])) {
+            $photo = end($msg['photo']);
+            $fid = is_array($photo) ? ($photo['file_id'] ?? null) : null;
+            return $base + [
+                'type' => 'photo',
+                'file_url' => $fid ? $this->getFileUrl($fid, $cache) : null,
+                'caption' => $caption,
+            ];
+        }
+        foreach (['video', 'animation', 'video_note', 'sticker', 'document', 'audio', 'voice'] as $k) {
+            if (isset($msg[$k]) && is_array($msg[$k])) {
+                $fid = $msg[$k]['file_id'] ?? null;
+                $fileName = $msg[$k]['file_name'] ?? null;
+                return $base + [
+                    'type' => $k,
+                    'file_url' => $fid ? $this->getFileUrl($fid, $cache) : null,
+                    'file_name' => $fileName,
+                    'caption' => $caption,
+                ];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Resolve file URL via Telegram getFile. Uses in-memory cache for page build.
+     * @param string $fileId
+     * @param array<string,string> $cache
+     * @return string|null
+     */
+    private function getFileUrl(string $fileId, array &$cache): ?string
+    {
+        if (isset($cache[$fileId])) {
+            return $cache[$fileId];
+        }
+        $resp = Request::getFile(['file_id' => $fileId]);
+        $ok = method_exists($resp, 'isOk') ? $resp->isOk() : ($resp->ok ?? false);
+        $result = $ok ? (method_exists($resp, 'getResult') ? $resp->getResult() : ($resp->result ?? null)) : null;
+        $filePath = '';
+        if (is_object($result)) {
+            $filePath = method_exists($result, 'getFilePath') ? $result->getFilePath() : ($result->file_path ?? '');
+        } elseif (is_array($result)) {
+            $filePath = (string)($result['file_path'] ?? '');
+        }
+        if (!$ok || $filePath === '') {
+            return null;
+        }
+        $token = $_ENV['BOT_TOKEN'] ?? '';
+        $url = 'https://api.telegram.org/file/bot' . $token . '/' . $filePath;
+        $cache[$fileId] = $url;
+        return $url;
     }
 }

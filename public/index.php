@@ -73,22 +73,17 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/tokens', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->index($req, $res));
         $auth->post('/tokens/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->data($req, $res));
         $auth->post('/tokens/{id}/revoke', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TokensController($db))->revoke($req, $res, $args));
-        $auth->get('/tg-users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->index($req, $res));
-        $auth->post('/tg-users/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->data($req, $res));
-        $auth->post('/tg-users/search', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->search($req, $res));
-        $auth->get('/tg-users/{id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TgUsersController($db))->view($req, $res, $args));
-        $auth->get('/tg-groups', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgGroupsController($db))->index($req, $res));
-        $auth->post('/tg-groups', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgGroupsController($db))->store($req, $res));
-        $auth->map(['GET','POST'], '/tg-groups/{id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TgGroupsController($db))->view($req, $res, $args));
-        $auth->post('/tg-groups/{id}/add-user', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TgGroupsController($db))->addUser($req, $res, $args));
-        $auth->post('/tg-groups/{id}/remove-user', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TgGroupsController($db))->removeUser($req, $res, $args));
-        $auth->get('/join-requests', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->index($req, $res));
-        $auth->post('/join-requests/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->data($req, $res));
-        $auth->get('/join-requests/{chat_id}/{user_id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->view($req, $res, $args));
-        $auth->post('/join-requests/{chat_id}/{user_id}/approve', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->approve($req, $res, $args));
-        $auth->post('/join-requests/{chat_id}/{user_id}/decline', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->decline($req, $res, $args));
-        $auth->get('/chat-members', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatMembersController($db))->index($req, $res));
-        $auth->post('/chat-members/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatMembersController($db))->data($req, $res));
+        $auth->get('/tg-users', fn(Req $req, Res $res) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->index($req, $res));
+        $auth->post('/tg-users/data', fn(Req $req, Res $res) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->data($req, $res));
+        $auth->post('/tg-users/search', fn(Req $req, Res $res) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->search($req, $res));
+        $auth->get('/tg-users/{id}', fn(Req $req, Res $res, array $args) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->view($req, $res, $args));
+        $auth->get('/tg-users/{id}/chat', fn(Req $req, Res $res, array $args) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->chat($req, $res, $args));
+        ->get('/tg-groups', fn(Req , Res ) => (new \App\Controllers\Dashboard\TgGroupsController())->index(, ));
+        ->get('/tg-groups', fn(Req , Res ) => (new \App\Controllers\Dashboard\TgGroupsController())->index(, ));
+        ->post('/tg-groups', fn(Req , Res ) => (new \App\Controllers\Dashboard\TgGroupsController())->store(, ));
+        ->map(['GET','POST'], '/tg-groups/{id}', fn(Req , Res , array ) => (new \App\Controllers\Dashboard\TgGroupsController())->view(, , ));
+        ->post('/tg-groups/{id}/add-user', fn(Req , Res , array ) => (new \App\Controllers\Dashboard\TgGroupsController())->addUser(, , ));
+        ->post('/tg-groups/{id}/remove-user', fn(Req , Res , array ) => (new \App\Controllers\Dashboard\TgGroupsController())->removeUser(, , ));
         $auth->get('/users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->index($req, $res));
         $auth->post('/users/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->data($req, $res));
         $auth->get('/users/create', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PanelUsersController($db))->create($req, $res));
@@ -164,3 +159,4 @@ $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db, $c
 
 // === Запуск ===
 $app->run();
+
