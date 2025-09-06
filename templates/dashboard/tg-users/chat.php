@@ -36,61 +36,67 @@
 
 <h1>История чата: <?= htmlspecialchars($user['username'] ?: $user['user_id']) ?></h1>
 
-<div class="card">
-    <div class="card-body">
-        <div class="chat-wrapper">
-            <?php foreach ($items as $it): ?>
-                <?php $dir = ($it['direction'] ?? 'in') === 'out' ? 'out' : 'in'; ?>
-                <div class="chat-item <?= $dir ?>">
-                    <div class="bubble">
-                        <?php $type = (string)($it['type'] ?? 'text'); ?>
+<div class="row">
+    <div class="col-lg-6 col-md-12">
 
-                        <?php if ($type === 'text'): ?>
-                            <div class="text-msg"><?= nl2br(htmlspecialchars((string)($it['text'] ?? ''))) ?></div>
+        <div class="card">
+            <div class="card-body">
+                <div class="chat-wrapper">
+                    <?php foreach ($items as $it): ?>
+                        <?php $dir = ($it['direction'] ?? 'in') === 'out' ? 'out' : 'in'; ?>
+                        <div class="chat-item <?= $dir ?>">
+                            <div class="bubble">
+                                <?php $type = (string)($it['type'] ?? 'text'); ?>
 
-                        <?php elseif ($type === 'photo' && !empty($it['file_url'])): ?>
-                            <img src="<?= htmlspecialchars((string)$it['file_url']) ?>" alt="photo">
-                            <?php if (!empty($it['caption'])): ?>
-                                <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
-                            <?php endif; ?>
+                                <?php if ($type === 'text'): ?>
+                                    <div class="text-msg"><?= nl2br(htmlspecialchars((string)($it['text'] ?? ''))) ?></div>
 
-                        <?php elseif (in_array($type, ['video','animation','video_note'], true) && !empty($it['file_url'])): ?>
-                            <video controls src="<?= htmlspecialchars((string)$it['file_url']) ?>"></video>
-                            <?php if (!empty($it['caption'])): ?>
-                                <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
-                            <?php endif; ?>
+                                <?php elseif ($type === 'photo' && !empty($it['file_url'])): ?>
+                                    <img src="<?= htmlspecialchars((string)$it['file_url']) ?>" alt="photo">
+                                    <?php if (!empty($it['caption'])): ?>
+                                        <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
+                                    <?php endif; ?>
 
-                        <?php elseif (in_array($type, ['audio','voice'], true) && !empty($it['file_url'])): ?>
-                            <audio controls src="<?= htmlspecialchars((string)$it['file_url']) ?>"></audio>
-                            <?php if (!empty($it['caption'])): ?>
-                                <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
-                            <?php endif; ?>
+                                <?php elseif (in_array($type, ['video','animation','video_note'], true) && !empty($it['file_url'])): ?>
+                                    <video controls src="<?= htmlspecialchars((string)$it['file_url']) ?>"></video>
+                                    <?php if (!empty($it['caption'])): ?>
+                                        <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
+                                    <?php endif; ?>
 
-                        <?php elseif ($type === 'document' && !empty($it['file_url'])): ?>
-                            <a href="<?= htmlspecialchars((string)$it['file_url']) ?>" target="_blank">
-                                <?= htmlspecialchars((string)($it['file_name'] ?? 'Документ')) ?>
-                            </a>
-                            <?php if (!empty($it['caption'])): ?>
-                                <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
-                            <?php endif; ?>
+                                <?php elseif (in_array($type, ['audio','voice'], true) && !empty($it['file_url'])): ?>
+                                    <audio controls src="<?= htmlspecialchars((string)$it['file_url']) ?>"></audio>
+                                    <?php if (!empty($it['caption'])): ?>
+                                        <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
+                                    <?php endif; ?>
 
-                        <?php elseif ($type === 'sticker' && !empty($it['file_url'])): ?>
-                            <img src="<?= htmlspecialchars((string)$it['file_url']) ?>" alt="sticker">
+                                <?php elseif ($type === 'document' && !empty($it['file_url'])): ?>
+                                    <a href="<?= htmlspecialchars((string)$it['file_url']) ?>" target="_blank">
+                                        <?= htmlspecialchars((string)($it['file_name'] ?? 'Документ')) ?>
+                                    </a>
+                                    <?php if (!empty($it['caption'])): ?>
+                                        <div class="caption"><?= nl2br(htmlspecialchars((string)$it['caption'])) ?></div>
+                                    <?php endif; ?>
 
-                        <?php else: ?>
-                            <div class="text-msg">[<?= htmlspecialchars($type) ?>]</div>
-                        <?php endif; ?>
+                                <?php elseif ($type === 'sticker' && !empty($it['file_url'])): ?>
+                                    <img src="<?= htmlspecialchars((string)$it['file_url']) ?>" alt="sticker">
 
-                        <?php if (!empty($it['ts'])): ?>
-                            <div class="meta">
-                                <?= htmlspecialchars(date('Y-m-d H:i:s', (int)$it['ts'])) ?>
-                                · <?= $dir === 'out' ? 'вы' : 'пользователь' ?>
+                                <?php else: ?>
+                                    <div class="text-msg">[<?= htmlspecialchars($type) ?>]</div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($it['ts'])): ?>
+                                    <div class="meta">
+                                        <?= htmlspecialchars(date('Y-m-d H:i:s', (int)$it['ts'])) ?>
+                                        · <?= $dir === 'out' ? 'вы' : 'пользователь' ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                        <?php endif; ?>
-                    </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            </div>
         </div>
+
     </div>
 </div>
 

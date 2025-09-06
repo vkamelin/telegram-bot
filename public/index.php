@@ -22,7 +22,7 @@ $db = Database::getInstance();
 // === Slim App ===
 $app = AppFactory::create();
 $app->add(new RequestIdMiddleware());
-$app->add(new RequestSizeLimitMiddleware($config['request_size_limit']));
+$app->add(new RequestSizeLimitMiddleware($config['request_size_limit'], $config['request_size_overrides'] ?? []));
 $app->addBodyParsingMiddleware();
 $app->add(new SecurityHeadersMiddleware([
     'cors' => $config['cors'],

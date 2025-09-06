@@ -56,7 +56,14 @@ return [
         'redis_prefix' => $_ENV['RATE_LIMIT_REDIS_PREFIX'] ?? 'rl:',
     ],
 
+    // Global request size limit (bytes). Defaults to 1 MiB
     'request_size_limit' => (int)($_ENV['REQUEST_SIZE_LIMIT'] ?? 1048576),
+    // Optional per-path overrides for larger uploads (bytes)
+    'request_size_overrides' => [
+        // Allow larger uploads on dashboard message sending and files upload endpoints
+        '/dashboard/messages/send' => (int)($_ENV['REQUEST_SIZE_LIMIT_UPLOAD'] ?? 50 * 1024 * 1024),
+        '/dashboard/files' => (int)($_ENV['REQUEST_SIZE_LIMIT_UPLOAD'] ?? 50 * 1024 * 1024),
+    ],
 
     // Время жизни ключа идемпотентности по умолчанию
     'IDEMPOTENCY_KEY_TTL' => (int)($_ENV['IDEMPOTENCY_KEY_TTL'] ?? 60),

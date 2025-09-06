@@ -249,3 +249,26 @@ tg-spoiler.revealed {
 .submenu .nav-link.active {
     font-weight: 400 !important; /* Normalize weight for active item */
 }
+
+/* Dashboard polish */
+.kpi-card {
+    background: linear-gradient(
+        180deg,
+        rgba(var(--bs-primary-rgb, 13,110,253), .035) 0%,
+        rgba(var(--bs-primary-rgb, 13,110,253), .06) 100%
+    );
+}
+
+.kpi-icon {
+    font-size: 2rem;
+    opacity: .85;
+}
+
+.card-header.bg-transparent {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+/* Chart canvas should stretch nicely */
+#statusChart {
+    width: 100% !important;
+}

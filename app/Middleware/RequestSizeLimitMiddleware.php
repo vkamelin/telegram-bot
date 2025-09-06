@@ -16,13 +16,16 @@ use Slim\Psr7\Response;
 class RequestSizeLimitMiddleware implements MiddlewareInterface
 {
     private int $maxBytes;
+    /** @var array<string,int> */
+    private array $overrides;
 
     /**
      * @param int $maxBytes Максимальный размер тела запроса в байтах
      */
-    public function __construct(int $maxBytes)
+    public function __construct(int $maxBytes, array $overrides = [])
     {
         $this->maxBytes = $maxBytes;
+        $this->overrides = $overrides;
     }
 
     /**
@@ -34,8 +37,10 @@ class RequestSizeLimitMiddleware implements MiddlewareInterface
      */
     public function process(Request $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $limit = $this->resolveLimit($request);
+
         $length = $request->getServerParams()['CONTENT_LENGTH'] ?? $request->getHeaderLine('Content-Length');
-        if ($length !== null && $length !== '' && (int)$length > $this->maxBytes) {
+        if ($length !== null && $length !== '' && (int)$length > $limit) {
             $response = new Response(413);
             $payload = json_encode(['error' => 'Payload Too Large'], JSON_UNESCAPED_UNICODE);
             if (!is_string($payload)) {
@@ -46,7 +51,7 @@ class RequestSizeLimitMiddleware implements MiddlewareInterface
         }
 
         $bodySize = $request->getBody()->getSize();
-        if ($bodySize !== null && $bodySize > $this->maxBytes) {
+        if ($bodySize !== null && $bodySize > $limit) {
             $response = new Response(413);
             $payload = json_encode(['error' => 'Payload Too Large'], JSON_UNESCAPED_UNICODE);
             if (!is_string($payload)) {
@@ -57,5 +62,17 @@ class RequestSizeLimitMiddleware implements MiddlewareInterface
         }
 
         return $handler->handle($request);
+    }
+
+    private function resolveLimit(Request $request): int
+    {
+        $path = $request->getUri()->getPath();
+        // Exact match or prefix-based overrides
+        foreach ($this->overrides as $prefix => $bytes) {
+            if ($prefix === $path || str_starts_with($path, $prefix)) {
+                return (int)$bytes;
+            }
+        }
+        return $this->maxBytes;
     }
 }

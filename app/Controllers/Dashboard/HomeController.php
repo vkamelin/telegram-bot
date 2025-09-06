@@ -51,14 +51,14 @@ final class HomeController
 
         // 2. COUNT telegram_scheduled_messages с send_after <= NOW()
         $stmt = $this->db->query(
-            "SELECT COUNT(*) FROM telegram_scheduled_messages WHERE send_after <= NOW() AND status = 'pending'"
+            "SELECT COUNT(*) FROM telegram_scheduled_messages WHERE send_after <= UTC_TIMESTAMP() AND status = 'pending'"
         );
         $scheduled = (int)$stmt->fetchColumn();
 
         // 3. SUM/доля success/failed за последний час
         $stmt = $this->db->query(
             'SELECT status, COUNT(*) AS cnt FROM telegram_messages ' .
-            "WHERE status IN ('success','failed') AND processed_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR) GROUP BY status"
+            "WHERE status IN ('success','failed') AND processed_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 HOUR) GROUP BY status"
         );
         $success = 0;
         $failed = 0;
@@ -76,13 +76,13 @@ final class HomeController
 
         // 4. COUNT DISTINCT telegram_updates.user_id за 24ч
         $stmt = $this->db->query(
-            'SELECT COUNT(DISTINCT user_id) FROM telegram_updates WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)'
+            'SELECT COUNT(DISTINCT user_id) FROM telegram_updates WHERE created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 24 HOUR)'
         );
         $distinctUsers = (int)$stmt->fetchColumn();
 
         // 5. COUNT активных telegram_sessions.updated_at за 24ч
         $stmt = $this->db->query(
-            'SELECT COUNT(*) FROM telegram_sessions WHERE updated_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)'
+            'SELECT COUNT(*) FROM telegram_sessions WHERE updated_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 24 HOUR)'
         );
         $activeSessions = (int)$stmt->fetchColumn();
 
@@ -99,7 +99,7 @@ final class HomeController
             "SUM(CASE WHEN status='success' THEN 1 ELSE 0 END) AS success_cnt, " .
             "SUM(CASE WHEN status='failed' THEN 1 ELSE 0 END) AS failed_cnt " .
             'FROM telegram_messages ' .
-            'WHERE processed_at >= DATE_SUB(NOW(), INTERVAL 60 MINUTE) ' .
+            'WHERE processed_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 60 MINUTE) ' .
             'GROUP BY minute ORDER BY minute'
         );
         $rows = $stmt->fetchAll();
@@ -113,9 +113,12 @@ final class HomeController
         $labels = [];
         $successData = [];
         $failedData = [];
+        // Build minute buckets based on UTC to align with DB time window
+        $nowTs = time();
         for ($i = 59; $i >= 0; $i--) {
-            $minute = date('Y-m-d H:i', strtotime("-{$i} minutes"));
-            $labels[] = date('H:i', strtotime($minute));
+            $ts = $nowTs - ($i * 60);
+            $minute = gmdate('Y-m-d H:i', $ts);
+            $labels[] = gmdate('H:i', $ts);
             $successData[] = $indexed[$minute]['success'] ?? 0;
             $failedData[] = $indexed[$minute]['failed'] ?? 0;
         }
@@ -140,7 +143,7 @@ final class HomeController
 
             $stmt = $this->db->query(
                 "SELECT COUNT(*) FROM telegram_messages WHERE status='success' " .
-                'AND processed_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)'
+                'AND processed_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 MINUTE)'
             );
             $sendSpeed = (int)$stmt->fetchColumn();
         }
