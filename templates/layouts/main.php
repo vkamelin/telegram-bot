@@ -90,7 +90,7 @@ $messages = Flash::get();
 
 <main class="container-fluid">
     <div class="row">
-        <div class="col-lg-2">
+        <div class="col-lg-4 col-xl-3 col-xxl-2">
             <nav class="sidebar d-none d-lg-block">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <?php foreach ($menu as $menuItem):?>
@@ -110,7 +110,7 @@ $messages = Flash::get();
                 </ul>
             </nav>
         </div>
-        <div class="col-lg-10 main-content">
+        <div class="col-lg-8 col-xl-9 col-xxl-10 main-content">
             <?php if (!empty($messages)): ?>
                 <?php foreach ($messages as $message): ?>
                     <div class="alert alert-<?= $message['type'] ?> alert-dismissible fade show" role="alert">
