@@ -73,7 +73,24 @@ final class HealthService
         try {
             $output = [];
             $returnVar = 0;
-            @exec('supervisorctl status', $output, $returnVar);
+            // Allow querying Supervisor in another container via env-configured server URL
+            $serverUrl = trim((string)($_ENV['SUPERVISOR_SERVER_URL'] ?? ''));
+            $user = trim((string)($_ENV['SUPERVISOR_USER'] ?? ''));
+            $pass = trim((string)($_ENV['SUPERVISOR_PASS'] ?? ''));
+
+            $cmd = 'supervisorctl';
+            if ($serverUrl !== '') {
+                $cmd .= ' -s ' . escapeshellarg($serverUrl);
+            }
+            if ($user !== '') {
+                $cmd .= ' -u ' . escapeshellarg($user);
+            }
+            if ($pass !== '') {
+                $cmd .= ' -p ' . escapeshellarg($pass);
+            }
+            $cmd .= ' status';
+
+            @exec($cmd, $output, $returnVar);
             if ($returnVar !== 0) {
                 return false;
             }

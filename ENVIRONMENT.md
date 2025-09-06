@@ -72,6 +72,11 @@
 - `WORKERS_SCHEDULED_PROCS`: число процессов планировщика.
 - `SCHEDULED_DISPATCH_LIMIT`: лимит батча для отправки отложенных сообщений.
 
+Дополнительно для проверки статуса воркеров через Supervisor из другого контейнера/хоста:
+- `SUPERVISOR_SERVER_URL`: URL RPC Supervisor для `supervisorctl` (например, `http://supervisor:9001` при включённом `[inet_http_server]`, либо `unix:///var/run/supervisor.sock`).
+- `SUPERVISOR_USER`: имя пользователя для доступа к Supervisor (опционально, если настроена базовая аутентификация).
+- `SUPERVISOR_PASS`: пароль для доступа к Supervisor (опционально).
+
 ## Интеграции
 - `AITUNNEL_API_KEY`: ключ для AITunnel (если используется).
 
