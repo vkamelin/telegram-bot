@@ -73,9 +73,9 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/tokens', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->index($req, $res));
         $auth->post('/tokens/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TokensController($db))->data($req, $res));
         $auth->post('/tokens/{id}/revoke', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\TokensController($db))->revoke($req, $res, $args));
-        $auth->get('/tg-users', fn(Req $req, Res $res) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->index($req, $res));
-        $auth->post('/tg-users/data', fn(Req $req, Res $res) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->data($req, $res));
-        $auth->post('/tg-users/search', fn(Req $req, Res $res) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->search($req, $res));
+        $auth->get('/tg-users', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->index($req, $res));
+        $auth->post('/tg-users/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->data($req, $res));
+        $auth->post('/tg-users/search', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\TgUsersController($db))->search($req, $res));
         $auth->get('/tg-users/{id}', fn(Req $req, Res $res, array $args) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->view($req, $res, $args));
         $auth->get('/tg-users/{id}/chat', fn(Req $req, Res $res, array $args) => (new \\App\\Controllers\\Dashboard\\TgUsersController($db))->chat($req, $res, $args));
         ->get('/tg-groups', fn(Req , Res ) => (new \App\Controllers\Dashboard\TgGroupsController())->index(, ));
