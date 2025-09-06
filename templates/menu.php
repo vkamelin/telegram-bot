@@ -7,10 +7,35 @@ $menu = [
         'icon'  => 'bi bi-speedometer2',
     ],
     [
-        'url'      => '/dashboard/messages',
-        'title'    => 'Сообщения',
+        'url'      => '/dashboard/tg-users',
+        'title'    => 'Telegram',
         'icon'     => 'bi bi-telegram',
         'children' => [
+            [
+                'url'   => '/dashboard/tg-users',
+                'title' => 'Пользователи',
+                'icon'  => 'bi bi-people-fill',
+            ],
+            [
+                'url'   => '/dashboard/tg-groups',
+                'title' => 'Группы',
+                'icon'  => 'bi bi-people',
+            ],
+            [
+                'url'   => '/dashboard/join-requests',
+                'title' => 'Запросы на вступление',
+                'icon'  => 'bi bi-person-plus',
+            ],
+            [
+                'url'   => '/dashboard/chat-members',
+                'title' => 'Подписчики',
+                'icon'  => 'bi bi-people',
+            ],
+            [
+                'url'   => '/dashboard/updates',
+                'title' => 'Входящие',
+                'icon'  => 'bi bi-telegram',
+            ],
             [
                 'url'   => '/dashboard/messages',
                 'title' => 'Исходящие',
@@ -47,38 +72,6 @@ $menu = [
                 'url'   => '/dashboard/invoices/create',
                 'title' => 'Счета',
                 'icon'  => 'bi bi-file-earmark-text',
-            ],
-        ],
-    ],
-    [
-        'url'      => '/dashboard/updates',
-        'title'    => 'Telegram',
-        'icon'     => 'bi bi-telegram',
-        'children' => [
-            [
-                'url'   => '/dashboard/tg-users',
-                'title' => 'Пользователи',
-                'icon'  => 'bi bi-people-fill',
-            ],
-            [
-                'url'   => '/dashboard/tg-groups',
-                'title' => 'Группы',
-                'icon'  => 'bi bi-people',
-            ],
-            [
-                'url'   => '/dashboard/join-requests',
-                'title' => 'Запросы на вступление',
-                'icon'  => 'bi bi-person-plus',
-            ],
-            [
-                'url'   => '/dashboard/chat-members',
-                'title' => 'Подписчики',
-                'icon'  => 'bi bi-people',
-            ],
-            [
-                'url'   => '/dashboard/updates',
-                'title' => 'Входящие',
-                'icon'  => 'bi bi-telegram',
             ],
         ],
     ],

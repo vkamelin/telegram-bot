@@ -214,3 +214,17 @@ tg-spoiler.revealed {
 #selectedUsersSection {
     display: block;
 }
+
+/* Submenu hover style: keep light theme clean (no gray fill) */
+[data-bs-theme="light"] .submenu .btn.btn-outline-secondary:hover,
+[data-bs-theme="light"] .submenu .btn.btn-outline-secondary:focus,
+[data-bs-theme="light"] .submenu .btn.btn-outline-secondary:active {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: var(--bs-body-color) !important;
+    border-color: var(--bs-border-color) !important;
+}
+
+/* Submenu active link should not be bold */
+.submenu .nav-link.active {
+    font-weight: 400 !important; /* Normalize weight for active item */
+}
