@@ -150,8 +150,48 @@ final class MessagesController
     public function resend(Req $req, Res $res, array $args): Res
     {
         $id = (int)($args['id'] ?? 0);
-        $stmt = $this->db->prepare('INSERT INTO telegram_messages (user_id, method, `type`, data, priority) SELECT user_id, method, `type`, data, priority FROM telegram_messages WHERE id = :id');
+
+        // Получаем исходные данные сообщения
+        $stmt = $this->db->prepare('SELECT user_id, method, `type`, data, priority FROM telegram_messages WHERE id = :id');
         $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            Flash::add('error', 'Сообщение не найдено');
+            return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
+        }
+
+        // Декодируем payload
+        $payload = [];
+        try {
+            $decoded = json_decode((string)$row['data'], true, 512, JSON_THROW_ON_ERROR);
+            if (is_array($decoded)) {
+                $payload = $decoded;
+            }
+        } catch (\Throwable) {
+            // если не удалось декодировать, оставим пустой payload — Push сам поставит chat_id
+            $payload = [];
+        }
+
+        $chatId = (int)$row['user_id'];
+        $method = (string)$row['method'];
+        $type = (string)$row['type'];
+        $priority = (int)$row['priority'];
+
+        // Гарантируем наличие chat_id в полезной нагрузке
+        if (!isset($payload['chat_id']) || empty($payload['chat_id'])) {
+            $payload['chat_id'] = $chatId;
+        }
+
+        // Переотправляем через унифицированный помощник Push
+        $ok = Push::custom($method, $payload, $chatId, $type, $priority);
+
+        if ($ok) {
+            Flash::add('success', 'Сообщение повторно поставлено в очередь');
+        } else {
+            Flash::add('error', 'Не удалось повторно поставить сообщение в очередь');
+        }
+
         return $res->withHeader('Location', '/dashboard/messages')->withStatus(302);
     }
 
