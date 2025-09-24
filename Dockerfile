@@ -4,11 +4,12 @@ FROM php:8.3-fpm
 # system deps, extensions, composer, supervisor, tools
 RUN apt-get update \
  && apt-get install -y \
-      libzip-dev libonig-dev libpng-dev libjpeg-dev libfreetype6-dev libicu-dev \
+      libzip-dev libonig-dev libpng-dev libjpeg-dev libfreetype6-dev libicu-dev ca-certificates \
       zip unzip git curl supervisor mc htop \
  && docker-php-ext-configure zip \
  && docker-php-ext-install \
       pdo_mysql mysqli zip exif pcntl bcmath gd intl \
+ && pecl channel-update pecl.php.net \
  && pecl install redis \
  && docker-php-ext-enable redis \
  && curl -sS https://getcomposer.org/installer \
@@ -45,3 +46,4 @@ RUN composer install --no-dev --optimize-autoloader
 
 # entrypoint starts services
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
