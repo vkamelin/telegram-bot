@@ -63,6 +63,11 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->post('/pre-checkout/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\PreCheckoutController($db))->data($req, $res));
         $auth->get('/shipping', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ShippingQueriesController($db))->index($req, $res));
         $auth->post('/shipping/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ShippingQueriesController($db))->data($req, $res));
+        $auth->get('/join-requests', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->index($req, $res));
+        $auth->post('/join-requests/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->data($req, $res));
+        $auth->get('/join-requests/{chat_id}/{user_id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->view($req, $res, $args));
+        $auth->post('/join-requests/{chat_id}/{user_id}/approve', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->approve($req, $res, $args));
+        $auth->post('/join-requests/{chat_id}/{user_id}/decline', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->decline($req, $res, $args));
         $auth->get('/invoices/create', [\App\Controllers\Dashboard\InvoicesController::class, 'create']);
         $auth->post('/invoices', [\App\Controllers\Dashboard\InvoicesController::class, 'store']);
         $auth->get('/updates', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\UpdatesController($db))->index($req, $res));
