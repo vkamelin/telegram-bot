@@ -76,7 +76,7 @@ class GPTService
      * @return array{status:int, body:mixed, error_code:string|null, error_message:string|null}
      * @throws JsonException|GuzzleException При ошибке декодирования JSON ответа
      */
-    private function request(string $method, string $endpoint, $body = null): array
+    private function request(string $method, string $endpoint, array $body = null): array
     {
         if ($this->isOpen) {
             if ((microtime(true) - $this->openedAt) >= $this->openTimeout) {
@@ -229,7 +229,7 @@ class GPTService
      * @param array<string, mixed>|string $jsonSchema JSON Schema для валидации ответа.
      *                                                                   Может быть передан массивом или JSON-строкой;
      *                                                                   внутри метода преобразуется в массив.
-     * @param string $model Название модели (по умолчанию gpt-4o-mini)
+     * @param string $model Название модели (по умолчанию gemini-flash-1.5-8b)
      * @param float $temperature Температура для детерминированности (0.0 по умолчанию)
      * @param int|null $maxTokens Максимальное число токенов в ответе
      * @param string $schemaName Имя схемы для идентификации
@@ -240,7 +240,7 @@ class GPTService
     public function chatStructured(
         array        $messages,
         array|string $jsonSchema,
-        string       $model = 'gpt-4o-mini',
+        string       $model = 'gemini-flash-1.5-8b',
         float        $temperature = 0.0,
         ?int         $maxTokens = null,
         string       $schemaName = ''
