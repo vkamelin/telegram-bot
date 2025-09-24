@@ -68,6 +68,8 @@ $app->group('/dashboard', function (\Slim\Routing\RouteCollectorProxy $g) use ($
         $auth->get('/join-requests/{chat_id}/{user_id}', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->view($req, $res, $args));
         $auth->post('/join-requests/{chat_id}/{user_id}/approve', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->approve($req, $res, $args));
         $auth->post('/join-requests/{chat_id}/{user_id}/decline', fn(Req $req, Res $res, array $args) => (new \App\Controllers\Dashboard\ChatJoinRequestsController($db))->decline($req, $res, $args));
+        $auth->get('/chat-members', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatMembersController($db))->index($req, $res));
+        $auth->post('/chat-members/data', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\ChatMembersController($db))->data($req, $res));
         $auth->get('/invoices/create', [\App\Controllers\Dashboard\InvoicesController::class, 'create']);
         $auth->post('/invoices', [\App\Controllers\Dashboard\InvoicesController::class, 'store']);
         $auth->get('/updates', fn(Req $req, Res $res) => (new \App\Controllers\Dashboard\UpdatesController($db))->index($req, $res));
@@ -159,4 +161,5 @@ $app->group('/api', function (\Slim\Routing\RouteCollectorProxy $g) use ($db, $c
 
 // === Запуск ===
 $app->run();
+
 
