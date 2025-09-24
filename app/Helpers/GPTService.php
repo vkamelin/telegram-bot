@@ -6,6 +6,7 @@ namespace App\Helpers;
 
 use App\Telemetry;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use JsonException;
 
@@ -41,7 +42,7 @@ class GPTService
     /**
      * GPTService constructor.
      *
-     * @param string $apiKey       API-ключ для авторизации (Bearer)
+     * @param string $apiKey API-ключ для авторизации (Bearer)
      * @param array<string, mixed> $guzzleConfig Дополнительная конфигурация клиента Guzzle (базовый URI, timeout, verify и т.д.)
      */
     public function __construct(string $apiKey, array $guzzleConfig = [], int $failureThreshold = 5, int $openTimeout = 30)
@@ -68,12 +69,12 @@ class GPTService
     /**
      * Выполняет HTTP-запрос к GPT API с ретраями и обработкой ошибок.
      *
-     * @param string                    $method   HTTP метод (GET, POST и т.п.)
-     * @param string                    $endpoint Относительный путь к ресурсу API
-     * @param array<string, mixed>|null $body     Тело запроса, будет автоматически закодировано в JSON
+     * @param string $method HTTP метод (GET, POST и т.п.)
+     * @param string $endpoint Относительный путь к ресурсу API
+     * @param array<string, mixed>|null $body Тело запроса, будет автоматически закодировано в JSON
      *
      * @return array{status:int, body:mixed, error_code:string|null, error_message:string|null}
-     * @throws JsonException При ошибке декодирования JSON ответа
+     * @throws JsonException|GuzzleException При ошибке декодирования JSON ответа
      */
     private function request(string $method, string $endpoint, $body = null): array
     {
@@ -223,26 +224,28 @@ class GPTService
     /**
      * Отправляет структурированный запрос к GPT API с использованием JSON Schema.
      *
-     * @param array<int, array{role:string, content:string}> $messages    Список сообщений в формате
+     * @param array<int, array{role:string, content:string}> $messages Список сообщений в формате
      *                                                                   [ ['role'=>..., 'content'=>...], ... ]
-     * @param array<string, mixed>|string                    $jsonSchema  JSON Schema для валидации ответа.
+     * @param array<string, mixed>|string $jsonSchema JSON Schema для валидации ответа.
      *                                                                   Может быть передан массивом или JSON-строкой;
      *                                                                   внутри метода преобразуется в массив.
-     * @param string                                         $model       Название модели (по умолчанию gpt-4o-mini)
-     * @param float                                          $temperature Температура для детерминированности (0.0 по умолчанию)
-     * @param int|null                                       $maxTokens   Максимальное число токенов в ответе
-     * @param string                                         $schemaName  Имя схемы для идентификации
+     * @param string $model Название модели (по умолчанию gpt-4o-mini)
+     * @param float $temperature Температура для детерминированности (0.0 по умолчанию)
+     * @param int|null $maxTokens Максимальное число токенов в ответе
+     * @param string $schemaName Имя схемы для идентификации
      *
      * @return array{status:int, body:mixed, error_code:string|null, error_message:string|null}
+     * @throws JsonException|GuzzleException
      */
     public function chatStructured(
-        array $messages,
+        array        $messages,
         array|string $jsonSchema,
-        string $model = 'gpt-4o-mini',
-        float $temperature = 0.0,
-        ?int $maxTokens = null,
-        string $schemaName = ''
-    ): array {
+        string       $model = 'gpt-4o-mini',
+        float        $temperature = 0.0,
+        ?int         $maxTokens = null,
+        string       $schemaName = ''
+    ): array
+    {
         if (is_string($jsonSchema)) {
             try {
                 $jsonSchema = json_decode($jsonSchema, true, 512, JSON_THROW_ON_ERROR);
@@ -292,20 +295,21 @@ class GPTService
     /**
      * Отправляет обычный запрос к GPT API без валидации по схеме.
      *
-     * @param array<int, array{role:string, content:string}> $messages  Список сообщений (role/content)
-     * @param string                                         $model     Название модели
-     * @param array<string, mixed>                           $reasoning При необходимости причинный анализ
-     * @param int|null                                       $maxTokens Максимальное число токенов в ответе
+     * @param array<int, array{role:string, content:string}> $messages Список сообщений (role/content)
+     * @param string $model Название модели
+     * @param array<string, mixed> $reasoning При необходимости причинный анализ
+     * @param int|null $maxTokens Максимальное число токенов в ответе
      *
      * @return array{status:int, body:mixed, error_code:string|null, error_message:string|null}
-     * @throws JsonException
+     * @throws JsonException|GuzzleException
      */
     public function chat(
-        array $messages,
+        array  $messages,
         string $model,
-        array $reasoning = [],
-        ?int $maxTokens = null
-    ): array {
+        array  $reasoning = [],
+        ?int   $maxTokens = null
+    ): array
+    {
         // Подготовка тела запроса
         $payload = [
             'model' => $model,
@@ -327,6 +331,7 @@ class GPTService
      * Получение текущего баланса по API-ключу.
      *
      * @return array{status:int, body:mixed, error_code:string|null, error_message:string|null}
+     * @throws JsonException|GuzzleException
      */
     public function getBalance(): array
     {
@@ -337,6 +342,7 @@ class GPTService
      * Получение статистики использования API (промпты, токены и т.д.).
      *
      * @return array{status:int, body:mixed, error_code:string|null, error_message:string|null}
+     * @throws JsonException|GuzzleException
      */
     public function getStats(): array
     {
@@ -346,12 +352,13 @@ class GPTService
     /**
      * Строит текст структуры воронки продаж на основе шаблона classic.tpl.
      *
-     * @param string $product  Название продукта
+     * @param string $product Название продукта
      * @param string $audience Целевая аудитория
-     * @param string $goal     Цель воронки
-     * @param string $pains    Основные боли аудитории
+     * @param string $goal Цель воронки
+     * @param string $pains Основные боли аудитории
      *
      * @return array{text:string}|array{error:string}
+     * @throws JsonException
      */
     public function buildStructure(string $product, string $audience, string $goal, string $pains): array
     {
