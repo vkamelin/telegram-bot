@@ -12,14 +12,30 @@ use Throwable;
 final class Scheduled
 {
     /**
+     * Validates that the given identifier contains only safe characters.
+     */
+    private static function isSafeIdentifier(string $value): bool
+    {
+        return $value !== '' && preg_match('/^[A-Za-z0-9_]+$/', $value) === 1;
+    }
+
+    /**
      * Checks if a column exists in the given table.
      */
     private static function columnExists(\PDO $db, string $table, string $column): bool
     {
+        if (!self::isSafeIdentifier($table) || !self::isSafeIdentifier($column)) {
+            return false;
+        }
+
         try {
-            $stmt = $db->prepare("SHOW COLUMNS FROM `{$table}` LIKE :col");
-            $stmt->execute(['col' => $column]);
-            return (bool)$stmt->fetchColumn();
+            $sql = sprintf(
+                'SHOW COLUMNS FROM `%s` LIKE %s',
+                $table,
+                $db->quote($column)
+            );
+            $stmt = $db->query($sql);
+            return $stmt !== false && (bool)$stmt->fetchColumn();
         } catch (Throwable) {
             return false;
         }
@@ -30,10 +46,14 @@ final class Scheduled
      */
     private static function tableExists(\PDO $db, string $table): bool
     {
+        if (!self::isSafeIdentifier($table)) {
+            return false;
+        }
+
         try {
-            $stmt = $db->prepare('SHOW TABLES LIKE :tbl');
-            $stmt->execute(['tbl' => $table]);
-            return (bool)$stmt->fetchColumn();
+            $sql = sprintf('SHOW TABLES LIKE %s', $db->quote($table));
+            $stmt = $db->query($sql);
+            return $stmt !== false && (bool)$stmt->fetchColumn();
         } catch (Throwable) {
             return false;
         }
