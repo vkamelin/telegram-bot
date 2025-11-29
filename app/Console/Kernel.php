@@ -19,6 +19,7 @@ class Kernel
         Commands\MigrateRunCommand::class,
         Commands\MigrateCreateCommand::class,
         Commands\MigrateRollbackCommand::class,
+        Commands\SeedCreateCommand::class,
         Commands\RefreshTokenPurgeCommand::class,
         Commands\CreateAdminCommand::class,
         Commands\UpdateFilterCommand::class,
