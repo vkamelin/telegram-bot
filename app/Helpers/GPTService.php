@@ -211,7 +211,15 @@ class GPTService
         }
 
         $this->failureCount++;
-        if ($this->failureCount >= $this->failureThreshold || $this->isHalfOpen) {
+        if ($this->failureCount >= $this->failureThreshold) {
+            $this->isOpen = true;
+            $this->isHalfOpen = false;
+            $this->openedAt = microtime(true);
+            if (Telemetry::enabled()) {
+                Telemetry::setGptBreakerState('open');
+            }
+        } elseif ($this->isHalfOpen) {
+            // При нахождении в полуоткрытом состоянии любая ошибка снова открывает breaker
             $this->isOpen = true;
             $this->isHalfOpen = false;
             $this->openedAt = microtime(true);
