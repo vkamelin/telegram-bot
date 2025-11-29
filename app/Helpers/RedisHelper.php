@@ -40,29 +40,41 @@ class RedisHelper
         $redis = new Redis();
 
         // Connect via socket or TCP
-        $redis->pconnect($_ENV['REDIS_HOST'], (int)$_ENV['REDIS_PORT'], 1.0);
+        try {
+            $redis->pconnect($_ENV['REDIS_HOST'], (int)$_ENV['REDIS_PORT'], 1.0);
+        } catch (RedisException $e) {
+            throw new RedisException('Failed to connect to Redis: ' . $e->getMessage(), $e->getCode(), $e);
+        }
 
         // Apply key prefix before selecting the DB
         $prefix = (string)$_ENV['REDIS_PREFIX'];
         if ($prefix !== '') {
-            $redis->setOption(Redis::OPT_PREFIX, $prefix);
+            try {
+                $redis->setOption(Redis::OPT_PREFIX, $prefix);
+            } catch (RedisException $e) {
+                throw new RedisException('Failed to set Redis prefix: ' . $e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         // General options
-        $redis->setOption(Redis::OPT_MAX_RETRIES, 3);
-        $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_JSON);
-        $redis->setOption(Redis::OPT_READ_TIMEOUT, 1.0);
-        $redis->setOption(Redis::OPT_TCP_KEEPALIVE, true);
-        $redis->setOption(Redis::OPT_COMPRESSION, Redis::COMPRESSION_NONE);
-        $redis->setOption(Redis::OPT_REPLY_LITERAL, false);
-        $redis->setOption(Redis::OPT_COMPRESSION_LEVEL, 0);
-        $redis->setOption(Redis::OPT_BACKOFF_ALGORITHM, Redis::BACKOFF_ALGORITHM_EXPONENTIAL);
-        $redis->setOption(Redis::OPT_BACKOFF_BASE, 100);
-        $redis->setOption(Redis::OPT_BACKOFF_CAP, 1000);
+        try {
+            $redis->setOption(Redis::OPT_MAX_RETRIES, 3);
+            $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_JSON);
+            $redis->setOption(Redis::OPT_READ_TIMEOUT, 1.0);
+            $redis->setOption(Redis::OPT_TCP_KEEPALIVE, true);
+            $redis->setOption(Redis::OPT_COMPRESSION, Redis::COMPRESSION_NONE);
+            $redis->setOption(Redis::OPT_REPLY_LITERAL, false);
+            $redis->setOption(Redis::OPT_COMPRESSION_LEVEL, 0);
+            $redis->setOption(Redis::OPT_BACKOFF_ALGORITHM, Redis::BACKOFF_ALGORITHM_EXPONENTIAL);
+            $redis->setOption(Redis::OPT_BACKOFF_BASE, 100);
+            $redis->setOption(Redis::OPT_BACKOFF_CAP, 1000);
 
-        // Select the configured database
-        $dbIndex = (int)$_ENV['REDIS_DB'];
-        $redis->select($dbIndex);
+            // Select the configured database
+            $dbIndex = (int)$_ENV['REDIS_DB'];
+            $redis->select($dbIndex);
+        } catch (RedisException $e) {
+            throw new RedisException('Failed to configure Redis: ' . $e->getMessage(), $e->getCode(), $e);
+        }
 
         return self::$instance = $redis;
     }
@@ -80,6 +92,11 @@ class RedisHelper
     {
         $redis = self::getInstance();
         $key = self::REDIS_USER_KEY . ":{$userId}";
+
+        // Validate input data
+        if (empty($data)) {
+            return;
+        }
 
         // Use HMSET to write all fields in one command
         $redis->hMSet($key, $data);
