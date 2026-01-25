@@ -174,10 +174,10 @@ Push::mediaGroup(123456789, $media);
 ## Р›РёС†РµРЅР·РёСЏ
 РЎРј. `LICENSE.txt`.
 
-## UTM отчёт (Dashboard)
+## UTM оІ·Вёт Ё„ashboard)
 
-- Путь: `GET/POST /dashboard/utm`.
-- Фильтры по дате: поля `from` и `to` (HTML `datetime-local`), фильтруют по `tg_pre_checkout.received_at`.
-- Группировка: по полному значению `telegram_users.utm` (пустые — как `(no utm)`).
-- Метрики: сумма `SUM(tg_pre_checkout.total_amount)` для каждой UTM и общая сумма по выборке.
-- Единицы: суммы отображаются в минимальных единицах валюты (центы/копейки) так, как приходят от Telegram Payments.
+- Пітјє `GET/POST /dashboard/utm`.
+- ФЁлјІр» Їо ¤аІҐ: п®«Гї `from` и  to` (HTML `datetime-local`), рЁ«јт°іѕт Ї® `tg_pre_checkout.received_at`.
+- Г°уЇЇЁр®ўЄає п® п®«у»Ќ‚т‹—Ґтџ  `telegram_users.utm` (пі±т»Ґ В— к Є `(no utm)`).
+- МҐт°ЁЄиє сі¬¬а  SUM(tg_pre_checkout.total_amount)` д«ї к ¦д®© UTM и ®б№ Гї сі¬¬а Їо ўГ»б®°кҐ®
+- Е¤и­ЁГ¶Г»: сі¬¬Г» оІ®б° ж ѕт±ї в ¬и­Ём «ГјуЌђ е¤ЁтќҐ в «Гѕт» ЁГ¶е­ІГ»/к®Їе©Єи© т Є¬ к Є п°ЁГµо¤їт ®І Telegram Payments.
