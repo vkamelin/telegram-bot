@@ -170,14 +170,3 @@ Push::mediaGroup(123456789, $media);
 ## Развёртывание
 - Docker: `docker compose up -d --build`, миграции: `docker compose exec app php run migrate:run`
 - VPS (без Docker): настройте Nginx + PHP‑FPM, скопируйте конфиги Supervisor, выполните миграции и включите сервисы. Подробности — в `DEPLOYMENT.md`.
-
-## Лицензия
-См. `LICENSE.txt`.
-
-## UTM ¸򠨄ashboard)
-
-- ϳ򼺠`GET/POST /dashboard/utm`.
-- Ԩ뼲𻠯ಥ: ﮫÿ `from` 蠠to` (HTML `datetime-local`), 𨫼򰳾򠯮 `tg_pre_checkout.received_at`.
-- ð󯯨𮢪ຠﮠﮫ󻍂򋗥򟠠`telegram_users.utm` (ﳱ򻥠 ꠪ `(no utm)`).
-- ̥򰨪躠񳬬ࠠSUM(tg_pre_checkout.total_amount)` 䫿 ꠦ䮩 UTM 蠮Ṡÿ 񳬬࠯û᮰ꥮ
-- Ť譨öû: 񳬬û ᰠ栾򱿠⠬譨젫ü󍐠夨򝥠⠫þ򻠨ö孲û/ꮯ婪詠򠪬 ꠪ ﰨõ򠮲 Telegram Payments.
