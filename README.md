@@ -12,6 +12,8 @@
 - Workers + Supervisor для фоновых задач (long polling, планировщик, GPT)
 - Redis (опционально) для фильтра обновлений и оффсета long polling
 - Docker‑окружение (app + nginx + redis + supervisor)
+- **Webhook поддержка** (`public/webhook.php`) для получения обновлений от Telegram
+- **Воркер отправки сообщений** (`workers/telegram-db.php`) с очередью задач в БД
 
 Проект минималистичный, но расширяемый. Цель — понятная структура, безопасные дефолты, чёткая документация.
 
@@ -28,7 +30,9 @@ app/
   Console/           # мини‑консоль и команды
 public/
   index.php          # bootstrap Slim + маршруты
+  webhook.php        # точка входа для Telegram webhooks
 workers/             # фоновые воркеры (longpolling, handler, scheduler и др.)
+  telegram-db.php    # воркер отправки сообщений через БД очередь
 docker/              # конфиги nginx и supervisor для Docker/VPS
 ```
 
@@ -128,6 +132,35 @@ Push::mediaGroup(123456789, $media);
 
 Ограничения Telegram: общий запрос с медиа должен укладываться в лимиты API; контролируйте размер через `REQUEST_SIZE_LIMIT` и учитывайте лимиты Telegram Bot API.
 
+## Webhook поддержка
+Проект поддерживает получение обновлений от Telegram через webhook в дополнение к long polling:
+
+### Настройка webhook
+```bash
+# Установить webhook на URL
+curl -X POST "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://your-domain.com/webhook.php"}'
+
+# Проверить статус webhook
+curl "https://api.telegram.org/bot<BOT_TOKEN>/getWebhookInfo"
+```
+
+### Обработка webhook
+- **Точка входа:** `public/webhook.php`
+- **Функции:** 
+  - Валидация входящих данных от Telegram
+  - Проверка токена бота (опционально через URL параметр)
+  - Фильтрация обновлений через `UpdateFilter`
+  - Передача обработки в `workers/handler.php`
+- **Логирование:** Все входящие обновления логируются с информацией о фильтрации
+- **Безопасность:** Проверка JSON, токена бота и валидности данных
+
+### Переключение между webhook и long polling
+- **Webhook:** Установите переменную `USE_WEBHOOK=true` в `.env`
+- **Long polling:** Используйте стандартный воркер `workers/longpolling.php`
+- При использовании локального Telegram Bot API настройте `BOT_API_SERVER=local`
+
 ## Dashboard: промокоды
 - Маршруты:
   - `GET /dashboard/promo-codes` — список с фильтрами и выдачей.
@@ -146,10 +179,64 @@ Push::mediaGroup(123456789, $media);
 
 ## Воркеры и Supervisor
 - `workers/longpolling.php` — читает обновления через getUpdates (при желании можно перейти на webhooks)
-- `workers/handler.php` — обрабатывает конкретные апдейты (запускается форком из longpolling)
+- `workers/handler.php` — обрабатывает конкретные апдейты (запускается форком из longpolling или webhook)
 - `workers/scheduled_dispatcher.php` — планировщик рассылок
 - `workers/purge_refresh_tokens.php` — чистит протухшие refresh‑токены
 - `workers/gpt.php` — пример интеграции с GPT
+- **`workers/telegram-db.php`** — **воркер отправки сообщений через очередь в БД**
+
+### Воркер отправки сообщений (telegram-db.php)
+Специализированный воркер для отправки сообщений через очередь задач в базе данных:
+
+**Основные возможности:**
+- Извлекает задачи из таблицы `telegram_messages` по приоритетам (2, 1, 0)
+- Соблюдает лимиты RPS (максимум 25 сообщений в секунду)
+- Поддерживает все типы сообщений: text, photo, video, document, audio, animation, voice, video_note, sticker, media_group
+- Автоматически кодирует медиа-файлы для отправки
+- Экспоненциальная задержка при ошибках (до 5 попыток)
+- Обновляет счетчики для запланированных рассылок
+- Логирование статуса отправки и ошибок
+
+**Конфигурация:**
+```bash
+# Переменные окружения
+BOT_MAX_RPS=25                    # Максимум запросов в секунду
+BOT_API_SERVER=local|remote       # Локальный или удаленный API
+BOT_LOCAL_API_HOST=localhost      # Хост локального API
+BOT_LOCAL_API_PORT=8080           # Порт локального API
+```
+
+**Запуск воркера:**
+```bash
+# Напрямую
+php workers/telegram-db.php
+
+# Через Supervisor (рекомендуется)
+supervisorctl start telegram-db-worker
+
+# В Docker
+docker compose exec supervisor supervisorctl start telegram-db-worker
+```
+
+**Структура очереди сообщений:**
+```sql
+CREATE TABLE `telegram_messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `chat_id` bigint(20) NOT NULL,
+  `method` varchar(50) NOT NULL,
+  `data` json NOT NULL,
+  `priority` tinyint(1) DEFAULT 0,
+  `status` enum('pending','processing','success','failed') DEFAULT 'pending',
+  `message_id` int(11) DEFAULT NULL,
+  `error` text DEFAULT NULL,
+  `code` int(11) DEFAULT NULL,
+  `sent_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `processed_at` timestamp NULL DEFAULT NULL,
+  `scheduled_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_status_priority` (`status`,`priority`,`sent_at`)
+);
+```
 
 Примеры конфигов для Supervisor — в `docker/supervisor`. На VPS скопируйте их в `/etc/supervisor/`, выполните `supervisorctl reread && supervisorctl update`.
 
@@ -165,7 +252,7 @@ Push::mediaGroup(123456789, $media);
 - `filter:update` — управление списками фильтров обновлений (Redis/.env)
 
 ## Переменные окружения
-См. подробный список и примеры в `ENVIRONMENT.md`. Кратко: `APP_*`, `DB_*`, `REDIS_*`, `JWT_*`, `CORS_ORIGINS`, `CSP_*`, `RATE_LIMIT_*`, `REQUEST_SIZE_LIMIT`, `BOT_*`, `TG_*` (фильтры), `TELEMETRY_ENABLED`, `WORKERS_*`, `AITUNNEL_API_KEY`.
+См. подробный список и примеры в `ENVIRONMENT.md`. Кратко: `APP_*`, `DB_*`, `REDIS_*`, `JWT_*`, `CORS_ORIGINS`, `CSP_*`, `RATE_LIMIT_*`, `REQUEST_SIZE_LIMIT`, `BOT_*`, `TG_*` (фильтры), `TELEMETRY_ENABLED`, `WORKERS_*`, `AITUNNEL_API_KEY`, `USE_WEBHOOK`.
 
 ## Развёртывание
 - Docker: `docker compose up -d --build`, миграции: `docker compose exec app php run migrate:run`
